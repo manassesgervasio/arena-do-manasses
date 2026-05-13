@@ -130,7 +130,7 @@ async function salvarReservaBanco(reserva) {
 
   salvarReservaBanco(reservaAtual);
 }
-  }
+
 
   function mudarSemana(qtd) {
     const nova = new Date(dataBase);
