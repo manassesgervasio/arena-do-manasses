@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
+import { supabase } from "./supabase";  
 const horarios = [
   "08:00 - 09:00",
   "09:00 - 10:00",
@@ -97,17 +97,39 @@ export default function App() {
       }
     );
   }
+async function salvarReservaBanco(reserva) {
+  const { error } = await supabase
+    .from("reservas")
+    .insert([reserva]);
 
+  if (error) {
+    console.log(error);
+  }
+}
   function atualizarReserva(dataTexto, horario, campo, valor) {
-    const chave = chaveReserva(dataTexto, horario);
+  const chave = chaveReserva(dataTexto, horario);
 
-    setReservas((anterior) => ({
-      ...anterior,
-      [chave]: {
-        ...pegarReserva(dataTexto, horario),
-        [campo]: valor,
-      },
-    }));
+  setReservas((anterior) => ({
+    ...anterior,
+    [chave]: {
+      ...pegarReserva(dataTexto, horario),
+      [campo]: valor,
+    },
+  }));
+
+  const reservaAtual = {
+    cliente: pegarReserva(dataTexto, horario).cliente || "",
+    telefone: pegarReserva(dataTexto, horario).telefone || "",
+    data: dataTexto,
+    horario,
+    valor: Number(pegarReserva(dataTexto, horario).valor || 0),
+    status: pegarReserva(dataTexto, horario).status || "Livre",
+  };
+
+  reservaAtual[campo] = valor;
+
+  salvarReservaBanco(reservaAtual);
+}
   }
 
   function mudarSemana(qtd) {
