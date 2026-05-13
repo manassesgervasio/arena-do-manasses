@@ -181,6 +181,7 @@ export default function App() {
         style={{
           textAlign: "center",
           fontSize: "38px",
+          color: "white",     
         }}
       >
         Arena do Manassés ⚽
