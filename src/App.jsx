@@ -295,10 +295,10 @@ return "#14532d";
                   <div
                     key={`${dataTexto}-${hora}`}
                     style={{
-                      background: corStatus(item.status),
-                      border: "1px solid #cbd5e1",
-                      borderRadius: "12px",
-                      padding: "10px",
+                      border: "1px solid rgba(255,255,255,0.25)",
+  borderRadius: "16px",
+  padding: "12px",
+  boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
                     }}
                   >
                     <input
