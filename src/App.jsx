@@ -236,7 +236,7 @@ return "#14532d";
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(5, 1fr)",
+         gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
           gap: "15px",
           marginTop: "30px",
         }}
