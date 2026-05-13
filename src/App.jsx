@@ -377,17 +377,19 @@ function Card({ titulo, valor }) {
   return (
     <div
       style={{
-        background: "#1e293b",
-        padding: "20px",
-        borderRadius: "18px",
+        background: "linear-gradient(135deg, #1e293b, #0f172a)",
+        padding: "22px",
+        borderRadius: "22px",
         textAlign: "center",
+        border: "1px solid rgba(255,255,255,0.12)",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
       }}
     >
-      <p style={{ color: "#cbd5e1" }}>
+      <p style={{ color: "#cbd5e1", fontSize: "18px", margin: 0 }}>
         {titulo}
       </p>
 
-      <h2 style={{ fontSize: "28px" }}>
+      <h2 style={{ fontSize: "34px", color: "white", margin: "10px 0 0" }}>
         {valor}
       </h2>
     </div>
