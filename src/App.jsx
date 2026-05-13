@@ -76,8 +76,34 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reservas));
-  }, [reservas]);
+  async function carregarReservas() {
+    const { data, error } = await supabase
+      .from("reservas")
+      .select("*");
+
+    if (error) {
+      console.log("Erro ao carregar reservas:", error);
+      return;
+    }
+
+    const reservasFormatadas = {};
+
+    data.forEach((reserva) => {
+      const chave = `${reserva.data}_${reserva.horario}`;
+
+      reservasFormatadas[chave] = {
+        dono: reserva.cliente || "",
+        telefone: reserva.telefone || "",
+        valor: reserva.valor || "",
+        status: reserva.status || "Livre",
+      };
+    });
+
+    setReservas(reservasFormatadas);
+  }
+
+  carregarReservas();
+}, []);
 
   const dias = useMemo(() => gerarDiasDaSemana(dataBase), [dataBase]);
 
