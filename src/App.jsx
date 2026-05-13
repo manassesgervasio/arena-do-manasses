@@ -285,7 +285,7 @@ return "#14532d";
             display: "grid",
             gridTemplateColumns: "120px repeat(7, minmax(210px, 1fr))"
             gap: "10px",
-            minWidth: "1650px"
+            minWidth: "1650px",
           }}
         >
           <div style={cabecalho}>Horário</div>
