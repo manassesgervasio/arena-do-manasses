@@ -261,9 +261,9 @@ return "#14532d";
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "130px repeat(7, 240px)",
+            gridTemplateColumns: "120px repeat(7, minmax(210px, 1fr))"
             gap: "10px",
-            minWidth: "1850px",
+            minWidth: "1650px"
           }}
         >
           <div style={cabecalho}>Horário</div>
