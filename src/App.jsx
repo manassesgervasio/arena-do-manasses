@@ -118,7 +118,7 @@ async function salvarReservaBanco(reserva) {
   }));
 
   const reservaAtual = {
-    cliente: pegarReserva(dataTexto, horario).cliente || "",
+    cliente: pegarReserva(dataTexto, horario).dono || "",
     telefone: pegarReserva(dataTexto, horario).telefone || "",
     data: dataTexto,
     horario,
