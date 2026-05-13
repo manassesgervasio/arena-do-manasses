@@ -100,7 +100,9 @@ export default function App() {
 async function salvarReservaBanco(reserva) {
   const { error } = await supabase
     .from("reservas")
-    .insert([reserva]);
+    .upsert([reserva], {
+  onConflict: "data,horario",
+});
 
   if (error) {
     console.log(error);
