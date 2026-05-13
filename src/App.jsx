@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-
 const horarios = [
   "08:00 - 09:00",
   "09:00 - 10:00",
@@ -19,87 +17,153 @@ const horarios = [
   "23:00 - 00:00",
 ];
 
-function criarAgenda() {
-  const agenda = {};
+const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado"];
 
-  dias.forEach((dia) => {
-    agenda[dia] = {};
+const STORAGE_KEY = "arena-manasses-reservas-v2";
 
-    horarios.forEach((hora) => {
-      agenda[dia][hora] = {
-        dono: "",
-        valor: "",
-        status: "Livre",
-      };
-    });
+function formatarData(data) {
+  return data.toISOString().split("T")[0];
+}
+
+function formatarDataBR(dataTexto) {
+  const [ano, mes, dia] = dataTexto.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
+function inicioDaSemana(data) {
+  const nova = new Date(data);
+
+  const dia = nova.getDay();
+  const diff = dia === 0 ? -6 : 1 - dia;
+
+  nova.setDate(nova.getDate() + diff);
+  nova.setHours(0, 0, 0, 0);
+
+  return nova;
+}
+
+function gerarDiasDaSemana(dataBase) {
+  const inicio = inicioDaSemana(dataBase);
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const data = new Date(inicio);
+
+    data.setDate(inicio.getDate() + i);
+
+    return data;
   });
+}
 
-  return agenda;
+function moeda(valor) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(valor || 0);
+}
+
+function numero(valor) {
+  return Number(String(valor || "").replace(",", ".")) || 0;
 }
 
 export default function App() {
-const [agenda, setAgenda] = useState(() => {
-  const dadosSalvos = localStorage.getItem("agenda-arena-manasses");
+  const [dataBase, setDataBase] = useState(new Date());
 
-  if (dadosSalvos) {
-    return JSON.parse(dadosSalvos);
+  const [reservas, setReservas] = useState(() => {
+    const salvas = localStorage.getItem(STORAGE_KEY);
+
+    return salvas ? JSON.parse(salvas) : {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(reservas));
+  }, [reservas]);
+
+  const dias = useMemo(() => gerarDiasDaSemana(dataBase), [dataBase]);
+
+  function chaveReserva(dataTexto, horario) {
+    return `${dataTexto}_${horario}`;
   }
 
-  return criarAgenda();
-});
+  function pegarReserva(dataTexto, horario) {
+    const chave = chaveReserva(dataTexto, horario);
 
-useEffect(() => {
-  localStorage.setItem(
-    "agenda-arena-manasses",
-    JSON.stringify(agenda)
-  );
-}, [agenda]);  
+    return (
+      reservas[chave] || {
+        dono: "",
+        telefone: "",
+        valor: "",
+        status: "Livre",
+      }
+    );
+  }
 
-  function atualizar(dia, hora, campo, valor) {
-    setAgenda((anterior) => ({
+  function atualizarReserva(dataTexto, horario, campo, valor) {
+    const chave = chaveReserva(dataTexto, horario);
+
+    setReservas((anterior) => ({
       ...anterior,
-      [dia]: {
-        ...anterior[dia],
-        [hora]: {
-          ...anterior[dia][hora],
-          [campo]: valor,
-        },
+      [chave]: {
+        ...pegarReserva(dataTexto, horario),
+        [campo]: valor,
       },
     }));
   }
 
+  function mudarSemana(qtd) {
+    const nova = new Date(dataBase);
+
+    nova.setDate(nova.getDate() + qtd * 7);
+
+    setDataBase(nova);
+  }
+
   const resumo = useMemo(() => {
-    let faturamento = 0;
-    let pendente = 0;
-    let jogos = 0;
-    let pagos = 0;
+    const lista = Object.entries(reservas).map(([chave, reserva]) => {
+      const [data, horario] = chave.split("_");
 
-    dias.forEach((dia) => {
-      horarios.forEach((hora) => {
-        const item = agenda[dia][hora];
-        const valor = Number(item.valor) || 0;
-
-        if (item.dono.trim() !== "") jogos++;
-
-        if (item.status === "Pago") {
-          faturamento += valor;
-          pagos++;
-        }
-
-        if (item.status === "Pendente") {
-          pendente += valor;
-        }
-      });
+      return {
+        data,
+        horario,
+        ...reserva,
+        valorNumero: numero(reserva.valor),
+      };
     });
 
-    return { faturamento, pendente, jogos, pagos };
-  }, [agenda]);
+    const faturamento = lista
+      .filter((r) => r.status === "Pago")
+      .reduce((soma, r) => soma + r.valorNumero, 0);
+
+    const pendente = lista
+      .filter((r) => r.status === "Pendente")
+      .reduce((soma, r) => soma + r.valorNumero, 0);
+
+    const jogos = lista.filter(
+      (r) => r.dono && r.dono.trim() !== ""
+    ).length;
+
+    const pagos = lista.filter((r) => r.status === "Pago").length;
+
+    const reservados = lista.filter(
+      (r) => r.status === "Reservado"
+    ).length;
+
+    return {
+      faturamento,
+      pendente,
+      jogos,
+      pagos,
+      reservados,
+      lista,
+    };
+  }, [reservas]);
 
   function corStatus(status) {
     if (status === "Pago") return "#dbeafe";
     if (status === "Pendente") return "#fee2e2";
     if (status === "Reservado") return "#fef3c7";
     if (status === "Cancelado") return "#e5e7eb";
+
     return "#dcfce7";
   }
 
@@ -113,26 +177,70 @@ useEffect(() => {
         fontFamily: "Arial",
       }}
     >
-      <h1 style={{ textAlign: "center", fontSize: "38px" }}>
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: "38px",
+        }}
+      >
         Arena do Manassés ⚽
       </h1>
 
-      <p style={{ textAlign: "center", fontSize: "18px" }}>
-        Agenda semanal, horários e faturamento automático
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: "18px",
+        }}
+      >
+        Agenda por datas reais
       </p>
 
       <div
         style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginTop: "25px",
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          onClick={() => mudarSemana(-1)}
+          style={botao}
+        >
+          ← Semana anterior
+        </button>
+
+        <input
+          type="date"
+          value={formatarData(dataBase)}
+          onChange={(e) =>
+            setDataBase(new Date(e.target.value + "T00:00:00"))
+          }
+          style={inputData}
+        />
+
+        <button
+          onClick={() => mudarSemana(1)}
+          style={botao}
+        >
+          Próxima semana →
+        </button>
+      </div>
+
+      <div
+        style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(5, 1fr)",
           gap: "15px",
           marginTop: "30px",
         }}
       >
-        <Card titulo="Faturamento" valor={`R$ ${resumo.faturamento}`} />
-        <Card titulo="Pendente" valor={`R$ ${resumo.pendente}`} />
+        <Card titulo="Faturamento" valor={moeda(resumo.faturamento)} />
+        <Card titulo="Pendente" valor={moeda(resumo.pendente)} />
         <Card titulo="Jogos" valor={resumo.jogos} />
         <Card titulo="Pagos" valor={resumo.pagos} />
+        <Card titulo="Reservados" valor={resumo.reservados} />
       </div>
 
       <div
@@ -148,18 +256,24 @@ useEffect(() => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "130px repeat(7, 220px)",
+            gridTemplateColumns: "130px repeat(7, 240px)",
             gap: "10px",
-            minWidth: "1700px",
+            minWidth: "1850px",
           }}
         >
           <div style={cabecalho}>Horário</div>
 
-          {dias.map((dia) => (
-            <div key={dia} style={cabecalho}>
-              {dia}
-            </div>
-          ))}
+          {dias.map((data) => {
+            const textoData = formatarData(data);
+
+            return (
+              <div key={textoData} style={cabecalho}>
+                <div>{diasSemana[data.getDay()]}</div>
+
+                <small>{formatarDataBR(textoData)}</small>
+              </div>
+            );
+          })}
 
           {horarios.map((hora) => (
             <>
@@ -167,12 +281,14 @@ useEffect(() => {
                 {hora}
               </div>
 
-              {dias.map((dia) => {
-                const item = agenda[dia][hora];
+              {dias.map((data) => {
+                const dataTexto = formatarData(data);
+
+                const item = pegarReserva(dataTexto, hora);
 
                 return (
                   <div
-                    key={`${dia}-${hora}`}
+                    key={`${dataTexto}-${hora}`}
                     style={{
                       background: corStatus(item.status),
                       border: "1px solid #cbd5e1",
@@ -184,7 +300,26 @@ useEffect(() => {
                       placeholder="Dono/Time"
                       value={item.dono}
                       onChange={(e) =>
-                        atualizar(dia, hora, "dono", e.target.value)
+                        atualizarReserva(
+                          dataTexto,
+                          hora,
+                          "dono",
+                          e.target.value
+                        )
+                      }
+                      style={inputStyle}
+                    />
+
+                    <input
+                      placeholder="Telefone"
+                      value={item.telefone}
+                      onChange={(e) =>
+                        atualizarReserva(
+                          dataTexto,
+                          hora,
+                          "telefone",
+                          e.target.value
+                        )
                       }
                       style={inputStyle}
                     />
@@ -194,7 +329,12 @@ useEffect(() => {
                       type="number"
                       value={item.valor}
                       onChange={(e) =>
-                        atualizar(dia, hora, "valor", e.target.value)
+                        atualizarReserva(
+                          dataTexto,
+                          hora,
+                          "valor",
+                          e.target.value
+                        )
                       }
                       style={inputStyle}
                     />
@@ -202,15 +342,20 @@ useEffect(() => {
                     <select
                       value={item.status}
                       onChange={(e) =>
-                        atualizar(dia, hora, "status", e.target.value)
+                        atualizarReserva(
+                          dataTexto,
+                          hora,
+                          "status",
+                          e.target.value
+                        )
                       }
                       style={inputStyle}
                     >
-                      <option>Livre</option>
-                      <option>Reservado</option>
-                      <option>Pago</option>
-                      <option>Pendente</option>
-                      <option>Cancelado</option>
+                      {statusLista.map((status) => (
+                        <option key={status}>
+                          {status}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 );
@@ -233,8 +378,13 @@ function Card({ titulo, valor }) {
         textAlign: "center",
       }}
     >
-      <p style={{ color: "#cbd5e1" }}>{titulo}</p>
-      <h2 style={{ fontSize: "30px" }}>{valor}</h2>
+      <p style={{ color: "#cbd5e1" }}>
+        {titulo}
+      </p>
+
+      <h2 style={{ fontSize: "28px" }}>
+        {valor}
+      </h2>
     </div>
   );
 }
@@ -263,4 +413,21 @@ const inputStyle = {
   padding: "8px",
   borderRadius: "8px",
   border: "1px solid #94a3b8",
+};
+
+const botao = {
+  background: "#22c55e",
+  color: "white",
+  border: "none",
+  padding: "12px 18px",
+  borderRadius: "12px",
+  cursor: "pointer",
+  fontWeight: "bold",
+};
+
+const inputData = {
+  padding: "12px",
+  borderRadius: "12px",
+  border: "none",
+  fontWeight: "bold",
 };
