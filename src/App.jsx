@@ -159,12 +159,12 @@ export default function App() {
   }, [reservas]);
 
   function corStatus(status) {
-    if (status === "Pago") return "#dbeafe";
-    if (status === "Pendente") return "#fee2e2";
-    if (status === "Reservado") return "#fef3c7";
-    if (status === "Cancelado") return "#e5e7eb";
+    if (status === "Pago") return "#166534";
+if (status === "Pendente") return "#b45309";
+if (status === "Reservado") return "#1d4ed8";
+if (status === "Cancelado") return "#6b7280";
 
-    return "#dcfce7";
+return "#14532d"; 
   }
 
   return (
