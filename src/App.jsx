@@ -158,7 +158,30 @@ async function salvarReservaBanco(reserva) {
 
   salvarReservaBanco(reservaAtual);
 }
+function limparReserva(dataTexto, horario) {
+  const chave = chaveReserva(dataTexto, horario);
 
+  const reservaLimpa = {
+    dono: "",
+    telefone: "",
+    valor: "",
+    status: "Livre",
+  };
+
+  setReservas((anterior) => ({
+    ...anterior,
+    [chave]: reservaLimpa,
+  }));
+
+  salvarReservaBanco({
+    cliente: "",
+    telefone: "",
+    data: dataTexto,
+    horario,
+    valor: 0,
+    status: "Livre",
+  });
+}
 
   function mudarSemana(qtd) {
     const nova = new Date(dataBase);
@@ -412,6 +435,19 @@ return "#14532d";
                         </option>
                       ))}
                     </select>
+                    <button
+  onClick={() => limparReserva(textoData, hora)}
+  style={{
+    marginTop: "5px",
+    width: "100%",
+    padding: "8px",
+    borderRadius: "8px",
+    border: "none",
+    cursor: "pointer",
+  }}
+>
+  Limpar
+</button>
                   </div>
                 );
               })}
