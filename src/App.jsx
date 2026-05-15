@@ -430,6 +430,16 @@ transition: "0.2s",
   boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
                     }}
                   >
+                    <div
+  style={{
+    fontSize: "11px",
+    fontWeight: "bold",
+    color: "#475569",
+    marginBottom: "4px",
+  }}
+>
+  {hora.split(" - ")[0]}
+</div>
                     <input
                       placeholder="cliente/Time"
                       value={item.cliente}
