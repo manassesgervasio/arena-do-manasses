@@ -375,6 +375,7 @@ const jogosDia = horarios.filter((horaAtual) => {
     fontSize: "14px",
   }}
 >
+  {moeda(totalDia)}
   <div style={{ fontSize: "11px", marginTop: "2px" }}>
   {jogosDia} jogos
 </div>
