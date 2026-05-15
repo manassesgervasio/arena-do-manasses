@@ -461,15 +461,13 @@ transition: "0.2s",
                     </select>
                     <button
                     type="button"
-  onClick={() => limparReserva(dataTexto, hora)}
-  style={{
-    marginTop: "5px",
-    width: "100%",
-    padding: "8px",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-  }}
+ onClick={() => {
+  const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+
+  if (confirmar) {
+    limparReserva(dataTexto, hora);
+  }
+}}
 >
   Limpar
 </button>
