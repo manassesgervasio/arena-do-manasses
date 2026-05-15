@@ -509,10 +509,11 @@ const horarioStyle = {
 
 const inputStyle = {
   width: "100%",
-  marginBottom: "8px",
-  padding: "8px",
-  borderRadius: "8px",
+  marginBottom: "5px",
+  padding: "6px",
+  borderRadius: "7px",
   border: "1px solid #94a3b8",
+  fontSize: "13px",
 };
 
 const botao = {
