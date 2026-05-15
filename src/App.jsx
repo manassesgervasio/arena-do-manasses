@@ -92,7 +92,7 @@ export default function App() {
       const chave = `${reserva.data}_${reserva.horario}`;
 
       reservasFormatadas[chave] = {
-        dono: reserva.cliente || "",
+        cliente: reserva.cliente || "",
         telefone: reserva.telefone || "",
         valor: reserva.valor || "",
         status: reserva.status || "Livre",
@@ -116,7 +116,7 @@ export default function App() {
 
     return (
       reservas[chave] || {
-        dono: "",
+        cliente: "",
         telefone: "",
         valor: "",
         status: "Livre",
@@ -146,7 +146,7 @@ async function salvarReservaBanco(reserva) {
   }));
 
   const reservaAtual = {
-    cliente: pegarReserva(dataTexto, horario).dono || "",
+    cliente: pegarReserva(dataTexto, horario).cliente || "",
     telefone: pegarReserva(dataTexto, horario).telefone || "",
     data: dataTexto,
     horario,
@@ -162,7 +162,7 @@ function limparReserva(dataTexto, horario) {
   const chave = chaveReserva(dataTexto, horario);
 
   const reservaLimpa = {
-    dono: "",
+    cliente: "",
     telefone: "",
     valor: "",
     status: "Livre",
@@ -212,7 +212,7 @@ function limparReserva(dataTexto, horario) {
       .reduce((soma, r) => soma + r.valorNumero, 0);
 
     const jogos = lista.filter(
-      (r) => r.dono && r.dono.trim() !== ""
+      (r) => r.cliente && r.cliente.trim() !== ""
     ).length;
 
     const pagos = lista.filter((r) => r.status === "Pago").length;
@@ -375,13 +375,13 @@ return "#14532d";
                     }}
                   >
                     <input
-                      placeholder="Dono/Time"
-                      value={item.dono}
+                      placeholder="cliente/Time"
+                      value={item.cliente}
                       onChange={(e) =>
                         atualizarReserva(
                           dataTexto,
                           hora,
-                          "dono",
+                          "cliente",
                           e.target.value
                         )
                       }
