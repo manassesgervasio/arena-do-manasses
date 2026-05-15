@@ -358,9 +358,20 @@ const totalDia = horarios.reduce((total, horaAtual) => {
             return (
               <div key={textoData} style={cabecalho}>
                 <div>{diasSemana[data.getDay()]}</div>
-<small>{moeda(totalDia)}</small>
+<div style={{ marginTop: "4px", fontSize: "12px" }}>
+  {formatarDataBR(textoData)}
+</div>
 
-                <small>{formatarDataBR(textoData)}</small>
+<div
+  style={{
+    marginTop: "4px",
+    fontWeight: "bold",
+    color: "#86efac",
+    fontSize: "14px",
+  }}
+>
+  {moeda(totalDia)}
+</div>
               </div>  
             );
           })}
