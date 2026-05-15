@@ -394,6 +394,7 @@ maxHeight: "70vh",
                     <input
                       placeholder="Telefone"
                       value={item.telefone}
+                      maxLength={11}
                       onChange={(e) =>
                         atualizarReserva(
                           dataTexto,
@@ -402,7 +403,10 @@ maxHeight: "70vh",
                           e.target.value
                         )
                       }
-                      style={inputStyle}
+                      style={{
+  ...inputStyle,
+  fontSize: "12px",
+}}
                     />
 
                     <input
