@@ -351,7 +351,6 @@ maxHeight: "70vh",
               <div key={textoData} style={cabecalho}>
                 <div>{diasSemana[data.getDay()]}</div>
 
-<small>{moeda(totalDia)}</small>
 
                 <small>{formatarDataBR(textoData)}</small>
               </div>  
