@@ -337,9 +337,9 @@ maxHeight: "70vh",
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "90px repeat(7, minmax(140px, 1fr))",
+            gridTemplateColumns: "70px repeat(7, minmax(120px, 1fr))",
             gap: "10px",
-            minWidth: "1150px",
+            minWidth: "100%",
           }}
         >
           <div style={cabecalho}>Horário</div>
