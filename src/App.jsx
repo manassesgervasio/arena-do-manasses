@@ -330,8 +330,8 @@ return "#14532d";
 maxHeight: "70vh",
           background: "white",
           color: "#0f172a",
-          borderRadius: "20px",
-          padding: "20px",
+          borderRadius: "14px",
+          padding: "12px",
         }}
       >
         <div
@@ -371,6 +371,23 @@ maxHeight: "70vh",
                   <div
                     key={`${dataTexto}-${hora}`}
                     style={{
+                      background:
+  item.status === "Pago"
+    ? "#dcfce7"
+    : item.status === "Pendente"
+    ? "#fef9c3"
+    : item.status === "Cancelado"
+    ? "#fee2e2"
+    : "white",
+
+opacity: item.status === "Livre" ? 0.85 : 1,
+
+transform:
+  item.status === "Livre"
+    ? "scale(0.98)"
+    : "scale(1)",
+
+transition: "0.2s",
                       border: "1px solid rgba(255,255,255,0.25)",
   borderRadius: "16px",
   padding: "12px",
@@ -505,10 +522,11 @@ zIndex: 100,
 const horarioStyle = {
   background: "#e2e8f0",
   color: "#0f172a",
-  padding: "15px",
-  borderRadius: "12px",
+  padding: "10px",
+  borderRadius: "10px",
   textAlign: "center",
   fontWeight: "bold",
+  fontSize: "14px",
 };
 
 const inputStyle = {
