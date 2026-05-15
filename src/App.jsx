@@ -159,6 +159,7 @@ async function salvarReservaBanco(reserva) {
   salvarReservaBanco(reservaAtual);
 }
 function limparReserva(dataTexto, horario) {
+console.log("CLICOU NO LIMPAR", dataTexto, horario);
   const chave = chaveReserva(dataTexto, horario);
 
   const reservaLimpa = {
@@ -325,6 +326,8 @@ return "#14532d";
         style={{
           marginTop: "30px",
           overflowX: "auto",
+          overflowY: "auto",
+maxHeight: "70vh",
           background: "white",
           color: "#0f172a",
           borderRadius: "20px",
@@ -334,9 +337,9 @@ return "#14532d";
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "120px repeat(7, minmax(210px, 1fr))",
+            gridTemplateColumns: "100px repeat(7, minmax(160px, 1fr))",
             gap: "10px",
-            minWidth: "1650px",
+            minWidth: "1300px",
           }}
         >
           <div style={cabecalho}>Horário</div>
@@ -437,7 +440,7 @@ return "#14532d";
                     </select>
                     <button
                     type="button"
-  onClick={() => limparReserva(textoData, hora)}
+  onClick={() => limparReserva(dataTexto, hora)}
   style={{
     marginTop: "5px",
     width: "100%",
@@ -490,6 +493,9 @@ const cabecalho = {
   borderRadius: "12px",
   textAlign: "center",
   fontWeight: "bold",
+  position: "sticky",
+  top: "0",
+zIndex: 100,
 };
 
 const horarioStyle = {
