@@ -355,6 +355,11 @@ const totalDia = horarios.reduce((total, horaAtual) => {
 
   return total;
 }, 0);
+const jogosDia = horarios.filter((horaAtual) => {
+  const reserva = pegarReserva(textoData, horaAtual);
+
+  return reserva.status !== "Livre";
+}).length;
             return (
               <div key={textoData} style={cabecalho}>
                 <div>{diasSemana[data.getDay()]}</div>
@@ -370,7 +375,9 @@ const totalDia = horarios.reduce((total, horaAtual) => {
     fontSize: "14px",
   }}
 >
-  {moeda(totalDia)}
+  <div style={{ fontSize: "11px", marginTop: "2px" }}>
+  {jogosDia} jogos
+</div>
 </div>
               </div>  
             );
