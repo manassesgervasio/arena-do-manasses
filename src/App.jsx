@@ -436,6 +436,7 @@ return "#14532d";
                       ))}
                     </select>
                     <button
+                    type="button"
   onClick={() => limparReserva(textoData, hora)}
   style={{
     marginTop: "5px",
