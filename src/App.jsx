@@ -337,12 +337,12 @@ maxHeight: "70vh",
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "70px repeat(7, minmax(120px, 1fr))",
+            gridTemplateColumns: "repeat(7, minmax(130px, 1fr))",
             gap: "10px",
             minWidth: "100%",
           }}
         >
-          <div style={cabecalho}>Horário</div>
+          
 
           {dias.map((data) => {
             const textoData = formatarData(data);
@@ -386,9 +386,7 @@ const jogosDia = horarios.filter((horaAtual) => {
 
           {horarios.map((hora) => (
             <>
-              <div key={hora} style={horarioStyle}>
-                {hora}
-              </div>
+              
 
               {dias.map((data) => {
                 const dataTexto = formatarData(data);
