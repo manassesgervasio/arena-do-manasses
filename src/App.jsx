@@ -351,8 +351,10 @@ maxHeight: "70vh",
               <div key={textoData} style={cabecalho}>
                 <div>{diasSemana[data.getDay()]}</div>
 
+<small>{moeda(totalDia)}</small>
+
                 <small>{formatarDataBR(textoData)}</small>
-              </div>
+              </div>  
             );
           })}
 
@@ -366,7 +368,15 @@ maxHeight: "70vh",
                 const dataTexto = formatarData(data);
 
                 const item = pegarReserva(dataTexto, hora);
+const totalDia = horarios.reduce((total, horaAtual) => {
+  const reserva = pegarReserva(dataTexto, horaAtual);
 
+  if (reserva.status === "Pago") {
+    return total + Number(reserva.valor || 0);
+  }
+
+  return total;
+}, 0);
                 return (
                   <div
                     key={`${dataTexto}-${hora}`}
