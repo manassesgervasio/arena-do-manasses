@@ -94,11 +94,12 @@ export default function App() {
       const chave = `${reserva.data}_${reserva.horario}`;
 
       reservasFormatadas[chave] = {
-        cliente: reserva.cliente || "",
-        telefone: reserva.telefone || "",
-        valor: reserva.valor || "",
-        status: reserva.status || "Livre",
-      };
+  cliente: reserva.cliente || "",
+  telefone: reserva.telefone || "",
+  valor: reserva.valor || "",
+  status: reserva.status || "Livre",
+  tipo: reserva.tipo || "Avulso",
+};
     });
 
     setReservas(reservasFormatadas);
@@ -117,13 +118,14 @@ export default function App() {
     const chave = chaveReserva(dataTexto, horario);
 
     return (
-      reservas[chave] || {
-        cliente: "",
-        telefone: "",
-        valor: "",
-        status: "Livre",
-      }
-    );
+  reservas[chave] || {
+    cliente: "",
+    telefone: "",
+    valor: "",
+    status: "Livre",
+    tipo: "Avulso",
+  }
+);
   }
 async function salvarReservaBanco(reserva) {
   const { error } = await supabase
@@ -166,11 +168,12 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
   const chave = chaveReserva(dataTexto, horario);
 
   const reservaLimpa = {
-    cliente: "",
-    telefone: "",
-    valor: "",
-    status: "Livre",
-  };
+  cliente: "",
+  telefone: "",
+  valor: "",
+  status: "Livre",
+  tipo: "Avulso",
+};
 
   setReservas((anterior) => ({
     ...anterior,
@@ -178,13 +181,14 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
   }));
 
   salvarReservaBanco({
-    cliente: "",
-    telefone: "",
-    data: dataTexto,
-    horario,
-    valor: 0,
-    status: "Livre",
-  });
+  cliente: "",
+  telefone: "",
+  data: dataTexto,
+  horario,
+  valor: 0,
+  status: "Livre",
+  tipo: "Avulso",
+});
 }
 
   function mudarSemana(qtd) {
@@ -194,6 +198,48 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
 
     setDataBase(nova);
   }
+  async function copiarFixosProximaSemana() {
+  const confirmar = confirm("Copiar todos os horários FIXOS desta semana para a próxima?");
+
+  if (!confirmar) return;
+
+  const novasReservas = {};
+
+  Object.entries(reservas).forEach(([chave, reserva]) => {
+    if (reserva.tipo !== "Fixo") return;
+
+    const [dataTexto, horario] = chave.split("_");
+
+    const novaData = new Date(dataTexto + "T00:00:00");
+    novaData.setDate(novaData.getDate() + 7);
+
+    const novaDataTexto = formatarData(novaData);
+    const novaChave = `${novaDataTexto}_${horario}`;
+
+    novasReservas[novaChave] = {
+      ...reserva,
+      status: "Reservado",
+      tipo: "Fixo",
+    };
+
+    salvarReservaBanco({
+      cliente: reserva.cliente || "",
+      telefone: reserva.telefone || "",
+      data: novaDataTexto,
+      horario,
+      valor: Number(reserva.valor || 0),
+      status: "Reservado",
+      tipo: "Fixo",
+    });
+  });
+
+  setReservas((anterior) => ({
+    ...anterior,
+    ...novasReservas,
+  }));
+
+  alert("Horários fixos copiados para a próxima semana!");
+}
 
   const resumo = useMemo(() => {
     const lista = Object.entries(reservas).map(([chave, reserva]) => {
@@ -347,6 +393,15 @@ return "#14532d";
         >
           Próxima semana →
         </button>
+        <button
+          onClick={copiarFixosProximaSemana}
+          style={{
+           ...botao,
+           background: "#2563eb",
+        }}
+>
+  Copiar fixos →
+</button>
       </div>
 
       <div
@@ -402,7 +457,11 @@ const totalDia = horarios.reduce((total, horaAtual) => {
 const jogosDia = horarios.filter((horaAtual) => {
   const reserva = pegarReserva(textoData, horaAtual);
 
-  return reserva.status !== "Livre";
+  return (
+  reserva.cliente &&
+  reserva.cliente.trim() !== "" &&
+  ["Pago", "Pendente", "Reservado"].includes(reserva.status)
+);
 }).length;
             return (
               <div key={textoData} style={cabecalho}>
