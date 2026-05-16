@@ -18,7 +18,7 @@ const horarios = [
 ];
 
 const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado"];
+const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado", "Mensalista"];
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
 
