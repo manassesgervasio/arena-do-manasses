@@ -18,7 +18,9 @@ const horarios = [
 ];
 
 const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado", "Mensalista"];
+const tipoLista = ["Avulso", "Fixo", "Mensalista"];
+
+const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado", "Faltou"];
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
 
@@ -152,6 +154,7 @@ async function salvarReservaBanco(reserva) {
     horario,
     valor: Number(pegarReserva(dataTexto, horario).valor || 0),
     status: pegarReserva(dataTexto, horario).status || "Livre",
+    tipo: pegarReserva(dataTexto, horario).tipo || "Avulso",
   };
 
   reservaAtual[campo] = valor;
@@ -484,7 +487,7 @@ transition: "0.2s",
   }}
 >
   {hora.split(" - ")[0]}
-  {item.status === "Mensalista" && (
+  {item.tipo === "Mensalista" && (
   <div
     style={{
       fontSize: "10px",
@@ -494,6 +497,18 @@ transition: "0.2s",
     }}
   >
     ⭐ Mensalista
+  </div>
+)}
+{item.tipo === "Fixo" && (
+  <div
+    style={{
+      fontSize: "10px",
+      fontWeight: "bold",
+      color: "#2563eb",
+      marginBottom: "4px",
+    }}
+  >
+    🔒 Fixo
   </div>
 )}
 </div>
@@ -544,6 +559,22 @@ transition: "0.2s",
                       style={inputStyle}
                     />
 
+                    <select
+  value={item.tipo || "Avulso"}
+  onChange={(e) =>
+    atualizarReserva(
+      dataTexto,
+      hora,
+      "tipo",
+      e.target.value
+    )
+  }
+  style={inputStyle}
+>
+  {tipoLista.map((tipo) => (
+    <option key={tipo}>{tipo}</option>
+  ))}
+</select>
                     <select
                       value={item.status}
                       onChange={(e) =>
