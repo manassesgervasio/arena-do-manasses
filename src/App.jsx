@@ -328,6 +328,8 @@ return "#14532d";
           marginTop: "30px",
           overflowX: "auto",
           overflowY: "auto",
+          scrollBehavior: "smooth",
+          paddingBottom: "10px",
 maxHeight: "70vh",
           background: "white",
           color: "#0f172a",
@@ -418,7 +420,9 @@ const totalDia = horarios.reduce((total, horaAtual) => {
 opacity: item.status === "Livre" ? 0.72 : 1,
 
 transform:
-  item.status === "Livre"
+  item.status === "Pago"
+    ? "scale(1.02)"
+    : item.status === "Livre"
     ? "scale(0.98)"
     : "scale(1)",
 
