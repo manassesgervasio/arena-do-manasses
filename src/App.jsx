@@ -644,6 +644,26 @@ transition: "0.2s",
         <h3>{cliente.nome}</h3>
 
         <p>{cliente.telefone || "Sem telefone"}</p>
+        {cliente.telefone && (
+  <a
+    href={`https://wa.me/55${cliente.telefone.replace(/\D/g, "")}`}
+    target="_blank"
+    rel="noreferrer"
+    style={{
+      display: "inline-block",
+      marginTop: "8px",
+      padding: "8px 12px",
+      borderRadius: "10px",
+      background: "#22c55e",
+      color: "white",
+      textDecoration: "none",
+      fontWeight: "bold",
+      fontSize: "13px",
+    }}
+  >
+    WhatsApp
+  </a>
+)}
 
         <p>Jogos: {cliente.jogos}</p>
 
