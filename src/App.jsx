@@ -216,8 +216,11 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
       .reduce((soma, r) => soma + r.valorNumero, 0);
 
     const jogos = lista.filter(
-      (r) => r.cliente && r.cliente.trim() !== ""
-    ).length;
+  (r) =>
+    r.cliente &&
+    r.cliente.trim() !== "" &&
+    ["Pago", "Pendente", "Reservado"].includes(r.status)
+).length;
 
     const pagos = lista.filter((r) => r.status === "Pago").length;
 
