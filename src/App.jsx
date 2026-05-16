@@ -166,6 +166,7 @@ async function salvarReservaBanco(reserva) {
 function limparReserva(dataTexto, horario) {
 console.log("CLICOU NO LIMPAR", dataTexto, horario);
   const chave = chaveReserva(dataTexto, horario);
+  const reservaAtual = pegarReserva(dataTexto, horario);
 
   const reservaLimpa = {
   cliente: "",
@@ -175,10 +176,30 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
   tipo: "Avulso",
 };
 
-  setReservas((anterior) => ({
-    ...anterior,
-    [chave]: reservaLimpa,
-  }));
+  setReservas((anterior) => {
+  const copia = { ...anterior };
+
+  copia[chave] = reservaLimpa;
+
+  if (reservaAtual.grupoFixo) {
+    Object.keys(copia).forEach((itemChave) => {
+      const item = copia[itemChave];
+
+      if (item.grupoFixo === reservaAtual.grupoFixo) {
+        copia[itemChave] = {
+          cliente: "",
+          telefone: "",
+          valor: "",
+          status: "Livre",
+          tipo: "Avulso",
+          grupoFixo: "",
+        };
+      }
+    });
+  }
+
+  return copia;
+});
 
   salvarReservaBanco({
   cliente: "",
@@ -230,11 +251,25 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
       const novaDataTexto = formatarData(novaData);
       const novaChave = `${novaDataTexto}_${horario}`;
 
-      novasReservas[novaChave] = {
-        ...reserva,
-        status: "Reservado",
-        tipo: "Fixo",
-      };
+      const grupoFixo =
+  reserva.grupoFixo ||
+  `${reserva.cliente}-${horario}`;
+  reserva.grupoFixo = grupoFixo;
+
+      const chaveOriginal = `${dataTexto}_${horario}`;
+
+novasReservas[chaveOriginal] = {
+  ...reserva,
+  grupoFixo,
+};
+
+novasReservas[novaChave] = {
+  ...reserva,
+  status: "Reservado",
+  tipo: "Fixo",
+  grupoFixo,
+};
+      
 
       salvarReservaBanco({
         cliente: reserva.cliente || "",
@@ -244,6 +279,7 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
         valor: Number(reserva.valor || 0),
         status: "Reservado",
         tipo: "Fixo",
+        grupo_fixo: grupoFixo,
       });
     }
   });
@@ -256,45 +292,7 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
   alert(`Horários fixos copiados por ${semanas} semana(s)!`);
 }
 
-  if (!confirmar) return;
 
-  const novasReservas = {};
-
-  Object.entries(reservas).forEach(([chave, reserva]) => {
-    if (reserva.tipo !== "Fixo") return;
-
-    const [dataTexto, horario] = chave.split("_");
-
-    const novaData = new Date(dataTexto + "T00:00:00");
-    novaData.setDate(novaData.getDate() + 7);
-
-    const novaDataTexto = formatarData(novaData);
-    const novaChave = `${novaDataTexto}_${horario}`;
-
-    novasReservas[novaChave] = {
-      ...reserva,
-      status: "Reservado",
-      tipo: "Fixo",
-    };
-
-    salvarReservaBanco({
-      cliente: reserva.cliente || "",
-      telefone: reserva.telefone || "",
-      data: novaDataTexto,
-      horario,
-      valor: Number(reserva.valor || 0),
-      status: "Reservado",
-      tipo: "Fixo",
-    });
-  });
-
-  setReservas((anterior) => ({
-    ...anterior,
-    ...novasReservas,
-  }));
-
-  alert("Horários fixos copiados para a próxima semana!");
-}
 
   const resumo = useMemo(() => {
     const lista = Object.entries(reservas).map(([chave, reserva]) => {
