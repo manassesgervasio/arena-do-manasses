@@ -452,6 +452,8 @@ const totalDia = horarios.reduce((total, horaAtual) => {
     ? "#fef9c3"
     : item.status === "Cancelado"
     ? "#fee2e2"
+    : item.status === "Mensalista"
+? "#dbeafe"
     : "white",
 
 opacity: item.status === "Livre" ? 0.72 : 1,
@@ -482,6 +484,18 @@ transition: "0.2s",
   }}
 >
   {hora.split(" - ")[0]}
+  {item.status === "Mensalista" && (
+  <div
+    style={{
+      fontSize: "10px",
+      fontWeight: "bold",
+      color: "#2563eb",
+      marginBottom: "4px",
+    }}
+  >
+    ⭐ Mensalista
+  </div>
+)}
 </div>
                     <input
                       placeholder="cliente/Time"
