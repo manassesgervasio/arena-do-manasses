@@ -415,7 +415,7 @@ const totalDia = horarios.reduce((total, horaAtual) => {
     ? "#fee2e2"
     : "white",
 
-opacity: item.status === "Livre" ? 0.85 : 1,
+opacity: item.status === "Livre" ? 0.72 : 1,
 
 transform:
   item.status === "Livre"
@@ -426,7 +426,10 @@ transition: "0.2s",
                       border: "1px solid rgba(255,255,255,0.25)",
   borderRadius: "16px",
   padding: "12px",
-  boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
+  boxShadow:
+  item.status === "Livre"
+    ? "0 4px 12px rgba(15, 23, 42, 0.08)"
+    : "0 8px 20px rgba(15, 23, 42, 0.18)",
                     }}
                   >
                     <div
