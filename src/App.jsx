@@ -559,7 +559,8 @@ const cabecalho = {
   fontWeight: "bold",
   fontSize: "14px",
   position: "sticky",
-  top: "0",
+  top: "10px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
 zIndex: 100,
 };
 
