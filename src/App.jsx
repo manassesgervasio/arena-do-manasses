@@ -278,9 +278,10 @@ return "#14532d";
         style={{
           display: "flex",
           justifyContent: "center",
-          gap: "10px",
+          gap: "8px",
           marginTop: "25px",
           flexWrap: "wrap",
+          padding: "0 10px",
         }}
       >
         <button
