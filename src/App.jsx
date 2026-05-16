@@ -310,7 +310,7 @@ return "#14532d";
       <div
         style={{
           display: "grid",
-         gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+         gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
           gap: "15px",
           marginTop: "30px",
         }}
@@ -577,7 +577,8 @@ const inputStyle = {
   padding: "6px",
   borderRadius: "7px",
   border: "1px solid #94a3b8",
-  fontSize: "13px",
+  fontSize: "12px",
+  minHeight: "34px",
 };
 
 const botao = {
