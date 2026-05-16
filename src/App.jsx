@@ -231,6 +231,41 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
       lista,
     };
   }, [reservas]);
+  const clientes = useMemo(() => {
+  const mapa = {};
+
+  resumo.lista.forEach((reserva) => {
+    if (!reserva.cliente) return;
+
+    const nome = reserva.cliente.trim();
+    const telefone = reserva.telefone || "";
+
+    if (!mapa[nome]) {
+      mapa[nome] = {
+        nome,
+        telefone,
+        jogos: 0,
+        pago: 0,
+        pendente: 0,
+        ultimaReserva: reserva.data,
+      };
+    }
+
+    mapa[nome].jogos += 1;
+
+    if (reserva.status === "Pago") {
+      mapa[nome].pago += reserva.valorNumero;
+    }
+
+    if (reserva.status === "Pendente") {
+      mapa[nome].pendente += reserva.valorNumero;
+    }
+
+    mapa[nome].ultimaReserva = reserva.data;
+  });
+
+  return Object.values(mapa);
+}, [resumo.lista]);
 
   function corStatus(status) {
     if (status === "Pago") return "#166534";
@@ -532,6 +567,45 @@ transition: "0.2s",
           ))}
         </div>
       </div>
+      <div
+  style={{
+    marginTop: "40px",
+  }}
+>
+  <h2 style={{ marginBottom: "20px" }}>
+    Clientes
+  </h2>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+      gap: "15px",
+    }}
+  >
+    {clientes.map((cliente) => (
+      <div
+        key={cliente.nome}
+        style={{
+          background: "#1e293b",
+          borderRadius: "18px",
+          padding: "18px",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <h3>{cliente.nome}</h3>
+
+        <p>{cliente.telefone || "Sem telefone"}</p>
+
+        <p>Jogos: {cliente.jogos}</p>
+
+        <p>Pago: {moeda(cliente.pago)}</p>
+
+        <p>Pendente: {moeda(cliente.pendente)}</p>
+      </div>
+    ))}
+  </div>
+</div>  
     </div>
   );
 }
