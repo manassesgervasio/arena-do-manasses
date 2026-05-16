@@ -553,10 +553,11 @@ function Card({ titulo, valor }) {
 const cabecalho = {
   background: "#020617",
   color: "white",
-  padding: "15px",
+  padding: "10px 6px",
   borderRadius: "12px",
   textAlign: "center",
   fontWeight: "bold",
+  fontSize: "14px",
   position: "sticky",
   top: "0",
 zIndex: 100,
@@ -586,10 +587,11 @@ const botao = {
   background: "#22c55e",
   color: "white",
   border: "none",
-  padding: "12px 18px",
+  padding: "10px 14px",
   borderRadius: "12px",
   cursor: "pointer",
   fontWeight: "bold",
+  fontSize: "14px",
 };
 
 const inputData = {
