@@ -199,7 +199,62 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
     setDataBase(nova);
   }
   async function copiarFixosProximaSemana() {
-  const confirmar = confirm("Copiar todos os horários FIXOS desta semana para a próxima?");
+  const quantidade = prompt("Quantas semanas deseja repetir os horários fixos?", "4");
+
+  if (!quantidade) return;
+
+  const semanas = Number(quantidade);
+
+  if (!semanas || semanas < 1) {
+    alert("Informe uma quantidade válida de semanas.");
+    return;
+  }
+
+  const confirmar = confirm(
+    `Copiar todos os horários FIXOS por ${semanas} semana(s)?`
+  );
+
+  if (!confirmar) return;
+
+  const novasReservas = {};
+
+  Object.entries(reservas).forEach(([chave, reserva]) => {
+    if (reserva.tipo !== "Fixo") return;
+
+    const [dataTexto, horario] = chave.split("_");
+
+    for (let i = 1; i <= semanas; i++) {
+      const novaData = new Date(dataTexto + "T00:00:00");
+      novaData.setDate(novaData.getDate() + 7 * i);
+
+      const novaDataTexto = formatarData(novaData);
+      const novaChave = `${novaDataTexto}_${horario}`;
+
+      novasReservas[novaChave] = {
+        ...reserva,
+        status: "Reservado",
+        tipo: "Fixo",
+      };
+
+      salvarReservaBanco({
+        cliente: reserva.cliente || "",
+        telefone: reserva.telefone || "",
+        data: novaDataTexto,
+        horario,
+        valor: Number(reserva.valor || 0),
+        status: "Reservado",
+        tipo: "Fixo",
+      });
+    }
+  });
+
+  setReservas((anterior) => ({
+    ...anterior,
+    ...novasReservas,
+  }));
+
+  alert(`Horários fixos copiados por ${semanas} semana(s)!`);
+}
 
   if (!confirmar) return;
 
