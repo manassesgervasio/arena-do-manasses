@@ -458,8 +458,8 @@ const totalDia = horarios.reduce((total, horaAtual) => {
     ? "#fef9c3"
     : item.status === "Cancelado"
     ? "#fee2e2"
-    : item.status === "Mensalista"
-? "#dbeafe"
+    : item.status === "Faltou"
+? "#e5e7eb"
     : "white",
 
 opacity: item.status === "Livre" ? 0.72 : 1,
