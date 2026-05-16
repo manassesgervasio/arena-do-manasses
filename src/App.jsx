@@ -375,7 +375,9 @@ const jogosDia = horarios.filter((horaAtual) => {
     marginTop: "4px",
     fontWeight: "bold",
     color: "#86efac",
-    fontSize: "14px",
+    fontSize: "12px",
+lineHeight: "14px",
+wordBreak: "break-word",
   }}
 >
   {moeda(totalDia)}
@@ -550,9 +552,17 @@ function Card({ titulo, valor }) {
         {titulo}
       </p>
 
-      <h2 style={{ fontSize: "34px", color: "white", margin: "10px 0 0" }}>
-        {valor}
-      </h2>
+      <h2
+  style={{
+    fontSize: "32px",
+    color: "white",
+    margin: "10px 0 0",
+    wordBreak: "break-word",
+    lineHeight: "36px",
+  }}
+>
+  {valor}
+</h2>
     </div>
   );
 }
