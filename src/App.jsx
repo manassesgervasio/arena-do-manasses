@@ -307,6 +307,25 @@ novasReservas[novaChave] = {
       };
     });
 
+    const mesAtual = new Date().getMonth();
+const anoAtual = new Date().getFullYear();
+
+const listaMes = lista.filter((r) => {
+  const data = new Date(r.data + "T00:00:00");
+
+  return (
+    data.getMonth() === mesAtual &&
+    data.getFullYear() === anoAtual
+  );
+});
+
+const faturamentoMes = listaMes
+  .filter((r) => r.status === "Pago")
+  .reduce((soma, r) => soma + r.valorNumero, 0);
+
+const pendenteMes = listaMes
+  .filter((r) => r.status === "Pendente")
+  .reduce((soma, r) => soma + r.valorNumero, 0);
     const faturamento = lista
       .filter((r) => r.status === "Pago")
       .reduce((soma, r) => soma + r.valorNumero, 0);
@@ -565,6 +584,15 @@ return "#14532d";
         <Card titulo="Jogos" valor={resumo.jogos} />
         <Card titulo="Pagos" valor={resumo.pagos} />
         <Card titulo="Reservados" valor={resumo.reservados} />
+        <Card
+  titulo="Mês Pago"
+  valor={moeda(resumo.faturamentoMes)}
+/>
+
+<Card
+  titulo="Mês Pendente"
+  valor={moeda(resumo.pendenteMes)}
+/>
       </div>
 
       <div
