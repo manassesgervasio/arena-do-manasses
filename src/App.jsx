@@ -339,8 +339,8 @@ novasReservas[novaChave] = {
     const pagos = lista.filter((r) => r.status === "Pago").length;
 
     const reservados = lista.filter(
-      (r) => r.status === "Reservado"
-    ).length;
+  (r) => r.status === "Reservado" && r.tipo !== "Fixo"
+).length;
 
     return {
       faturamento,
