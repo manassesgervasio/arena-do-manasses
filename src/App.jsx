@@ -828,12 +828,17 @@ transition: "0.2s",
 <button
   type="button"
   onClick={() => {
-    const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+  if (item.status === "Pago") {
+    alert("Horário pago não pode ser limpo sem autorização.");
+    return;
+  }
 
-    if (confirmar) {
-      limparReserva(dataTexto, hora);
-    }
-  }}
+  const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+
+  if (confirmar) {
+    limparReserva(dataTexto, hora);
+  }
+}}
 >
   Limpar
 </button>
