@@ -318,7 +318,7 @@ novasReservas[novaChave] = {
   (r) =>
     r.cliente &&
     r.cliente.trim() !== "" &&
-    ["Pago", "Pendente", "Reservado"].includes(r.status)
+    ["Pago", "Pendente"].includes(r.status)
 ).length;
 
     const pagos = lista.filter((r) => r.status === "Pago").length;
@@ -513,7 +513,7 @@ const jogosDia = horarios.filter((horaAtual) => {
   return (
   reserva.cliente &&
   reserva.cliente.trim() !== "" &&
-  ["Pago", "Pendente", "Reservado"].includes(reserva.status)
+  ["Pago", "Pendente"].includes(reserva.status)
 );
 }).length;
             return (
