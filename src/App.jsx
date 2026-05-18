@@ -70,6 +70,10 @@ function numero(valor) {
 
 export default function App() {
   const [dataBase, setDataBase] = useState(new Date());
+  const [mesFiltro, setMesFiltro] = useState(() => {
+  const hoje = new Date();
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+});
 
   const [reservas, setReservas] = useState(() => {
     const salvas = localStorage.getItem(STORAGE_KEY);
@@ -307,14 +311,13 @@ novasReservas[novaChave] = {
       };
     });
 
-    const mesAtual = new Date().getMonth();
-const anoAtual = new Date().getFullYear();
+    const [anoAtual, mesAtual] = mesFiltro.split("-").map(Number);
 
 const listaMes = lista.filter((r) => {
   const data = new Date(r.data + "T00:00:00");
 
   return (
-    data.getMonth() === mesAtual &&
+    data.getMonth() + 1 === mesAtual &&
     data.getFullYear() === anoAtual
   );
 });
@@ -555,6 +558,18 @@ return "#14532d";
           }
           style={inputData}
         />
+        <input
+  type="month"
+  value={mesFiltro}
+  onChange={(e) => setMesFiltro(e.target.value)}
+  style={{
+    padding: "10px",
+    borderRadius: "10px",
+    border: "none",
+    fontWeight: "bold",
+    marginTop: "10px",
+  }}
+/>
 
         <button
           onClick={() => mudarSemana(1)}
