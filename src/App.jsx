@@ -140,21 +140,7 @@ async function salvarReservaBanco(reserva) {
 }
   function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
-  const reservaAntiga = pegarReserva(dataTexto, horario);
-
-if (
-  campo === "cliente" &&
-  reservaAntiga.cliente &&
-  reservaAntiga.cliente.trim() !== "" &&
-  valor.trim() !== "" &&
-  valor !== reservaAntiga.cliente
-) {
-  const confirmar = confirm(
-    `Esse horário já está reservado para ${reservaAntiga.cliente}. Deseja substituir?`
-  );
-
-  if (!confirmar) return;
-}
+  
 
   setReservas((anterior) => ({
     ...anterior,
