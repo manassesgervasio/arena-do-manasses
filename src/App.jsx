@@ -353,6 +353,8 @@ const pendenteMes = listaMes
       jogos,
       pagos,
       reservados,
+      faturamentoMes,
+      pendenteMes,
       lista,
     };
   }, [reservas]);
