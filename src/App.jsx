@@ -733,6 +733,7 @@ transition: "0.2s",
                           e.target.value
                         )
                       }
+                      disabled={item.status === "Pago"}
                       style={inputStyle}
                     />
 
@@ -748,6 +749,7 @@ transition: "0.2s",
                           e.target.value
                         )
                       }
+                      disabled={item.status === "Pago"}
                       style={{
   ...inputStyle,
   fontSize: "12px",
@@ -766,6 +768,7 @@ transition: "0.2s",
                           e.target.value
                         )
                       }
+                      disabled={item.status === "Pago"}
                       style={inputStyle}
                     />
 
@@ -779,6 +782,7 @@ transition: "0.2s",
       e.target.value
     )
   }
+  disabled={item.status === "Pago"}
   style={inputStyle}
 >
   {tipoLista.map((tipo) => (
@@ -795,6 +799,7 @@ transition: "0.2s",
                           e.target.value
                         )
                       }
+                      disabled={item.status === "Pago"}
                       style={inputStyle}
                     >
                       {statusLista.map((status) => (
