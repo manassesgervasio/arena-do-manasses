@@ -396,6 +396,100 @@ if (status === "Cancelado") return "#6b7280";
 return "#14532d"; 
   }
 
+  async function reservarHorario(dataTexto, horario) {
+  const reserva = pegarReserva(dataTexto, horario);
+
+  if (!reserva.cliente || reserva.cliente.trim() === "") {
+    alert("Informe o nome do cliente/time antes de reservar.");
+    return;
+  }
+
+  const tipo = reserva.tipo || "Avulso";
+  const status = reserva.status === "Livre" ? "Reservado" : reserva.status;
+
+  if (tipo !== "Fixo") {
+    const novaReserva = {
+      ...reserva,
+      status,
+      tipo,
+    };
+
+    setReservas((anterior) => ({
+      ...anterior,
+      [chaveReserva(dataTexto, horario)]: novaReserva,
+    }));
+
+    await salvarReservaBanco({
+      cliente: reserva.cliente || "",
+      telefone: reserva.telefone || "",
+      data: dataTexto,
+      horario,
+      valor: Number(reserva.valor || 0),
+      status,
+      tipo,
+      grupo_fixo: reserva.grupoFixo || "",
+    });
+
+    alert("Horário reservado!");
+    return;
+  }
+
+  const quantidade = prompt("Quantas semanas deseja repetir este horário fixo?", "24");
+
+  if (!quantidade) return;
+
+  const semanas = Number(quantidade);
+
+  if (!semanas || semanas < 1) {
+    alert("Informe uma quantidade válida de semanas.");
+    return;
+  }
+
+  const confirmar = confirm(
+    `Reservar este horário fixo por ${semanas} semana(s)?`
+  );
+
+  if (!confirmar) return;
+
+  const grupoFixo =
+    reserva.grupoFixo ||
+    `${reserva.cliente}-${horario}`;
+
+  const novasReservas = {};
+
+  for (let i = 0; i < semanas; i++) {
+    const novaData = new Date(dataTexto + "T00:00:00");
+    novaData.setDate(novaData.getDate() + 7 * i);
+
+    const novaDataTexto = formatarData(novaData);
+    const novaChave = chaveReserva(novaDataTexto, horario);
+
+    novasReservas[novaChave] = {
+      ...reserva,
+      status: "Reservado",
+      tipo: "Fixo",
+      grupoFixo,
+    };
+
+    await salvarReservaBanco({
+      cliente: reserva.cliente || "",
+      telefone: reserva.telefone || "",
+      data: novaDataTexto,
+      horario,
+      valor: Number(reserva.valor || 0),
+      status: "Reservado",
+      tipo: "Fixo",
+      grupo_fixo: grupoFixo,
+    });
+  }
+
+  setReservas((anterior) => ({
+    ...anterior,
+    ...novasReservas,
+  }));
+
+  alert(`Horário fixo reservado por ${semanas} semana(s)!`);
+}
   return (
     <div
       style={{
@@ -724,14 +818,31 @@ transition: "0.2s",
                       ))}
                     </select>
                     <button
-                    type="button"
- onClick={() => {
-  const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+  type="button"
+  onClick={() => reservarHorario(dataTexto, hora)}
+  style={{
+    marginRight: "6px",
+    background: "#22c55e",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    padding: "6px 8px",
+    fontWeight: "bold",
+    cursor: "pointer",
+  }}
+>
+  Reservar
+</button>
 
-  if (confirmar) {
-    limparReserva(dataTexto, hora);
-  }
-}}
+<button
+  type="button"
+  onClick={() => {
+    const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+
+    if (confirmar) {
+      limparReserva(dataTexto, hora);
+    }
+  }}
 >
   Limpar
 </button>
