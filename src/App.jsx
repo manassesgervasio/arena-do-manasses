@@ -1104,11 +1104,8 @@ transition: "0.2s",
   </a>
 )}
 
-        <p>
-  Posição no ranking: #{index + 1}
-</p>
+        
 
-<p>Jogos: {cliente.jogos}</p>
 
 
         {cliente.pendente > 0 && (
