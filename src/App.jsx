@@ -360,6 +360,7 @@ const pendenteMes = listaMes
       pendenteMes,
       lista,
     };
+    }, [reservas, mesFiltro]);
   
   const clientes = useMemo(() => {
   const mapa = {};
@@ -960,7 +961,7 @@ transition: "0.2s",
 </div>  
     </div>
   );
-}, [resumo]);
+}
 
 function Card({ titulo, valor }) {
   return (
@@ -1044,4 +1045,3 @@ const inputData = {
   border: "none",
   fontWeight: "bold",
 };
-}
