@@ -82,6 +82,8 @@ export default function App() {
   });
 
   const [buscaCliente, setBuscaCliente] = useState("");
+  const [filtroCliente, setFiltroCliente] = useState("Todos");
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
 
   useEffect(() => {
   async function carregarReservas() {
@@ -403,12 +405,26 @@ const pendenteMes = listaMes
 }, [resumo.lista]);
 
 const clientesFiltrados = clientes
-  .filter((cliente) =>
-    cliente.nome
+  .filter((cliente) => {
+    const buscaOk = cliente.nome
       .toLowerCase()
-      .includes(buscaCliente.toLowerCase())
-  )
+      .includes(buscaCliente.toLowerCase());
+
+    if (filtroCliente === "Ativos") {
+      return buscaOk && cliente.jogos > 0;
+    }
+
+    if (filtroCliente === "Inadimplentes") {
+      return buscaOk && cliente.pendente > 0;
+    }
+
+    return buscaOk;
+  })
   .sort((a, b) => {
+  if (b.pendente !== a.pendente) {
+    return b.pendente - a.pendente;
+  }
+
   if (b.jogos !== a.jogos) {
     return b.jogos - a.jogos;
   }
@@ -945,6 +961,16 @@ transition: "0.2s",
       clientes.filter((c) => c.pendente > 0).length
     }
   />
+  <Card
+  titulo="Total pendente"
+  valor={moeda(
+    clientes.reduce(
+      (total, cliente) =>
+        total + cliente.pendente,
+      0
+    )
+  )}
+/>
 
   <Card
     titulo="Clientes ativos"
@@ -979,6 +1005,25 @@ transition: "0.2s",
     fontWeight: "bold",
   }}
 />
+<select
+  value={filtroCliente}
+  onChange={(e) =>
+    setFiltroCliente(e.target.value)
+  }
+  style={{
+    width: "100%",
+    padding: "12px",
+    borderRadius: "12px",
+    border: "none",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: "bold",
+  }}
+>
+  <option>Todos</option>
+  <option>Ativos</option>
+  <option>Inadimplentes</option>
+</select>
 
   <div
     style={{
@@ -987,10 +1032,29 @@ transition: "0.2s",
       gap: "15px",
     }}
   >
+    {clientesFiltrados.length === 0 && (
+  <div
+    style={{
+      background: "#1e293b",
+      padding: "20px",
+      borderRadius: "16px",
+      textAlign: "center",
+      color: "#cbd5e1",
+      fontWeight: "bold",
+    }}
+  >
+    🔍 Nenhum cliente encontrado
+  </div>
+)}
     {clientesFiltrados.map((cliente, index) => (
       <div
-        key={cliente.nome}
+  key={cliente.nome}
+  onClick={() =>
+    setClienteSelecionado(cliente)
+  }
         style={{
+          cursor: "pointer",
+          transition: "0.2s",
   background:
     cliente.pendente > 0
       ? "#3f1d1d"
@@ -1046,9 +1110,7 @@ transition: "0.2s",
 
 <p>Jogos: {cliente.jogos}</p>
 
-        <p>Pago: {moeda(cliente.pago)}</p>
 
-        <p>Pendente: {moeda(cliente.pendente)}</p>
         {cliente.pendente > 0 && (
   <div
     style={{
@@ -1072,6 +1134,79 @@ transition: "0.2s",
     ))}
   </div>
 </div>  
+    {clienteSelecionado && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.7)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+    }}
+    onClick={() =>
+      setClienteSelecionado(null)
+    }
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        background: "#0f172a",
+        padding: "30px",
+        borderRadius: "20px",
+        width: "90%",
+        maxWidth: "600px",
+        maxHeight: "80vh",
+        overflowY: "auto",
+        color: "white",
+      }}
+    >
+      <h2>
+        {clienteSelecionado.nome}
+      </h2>
+
+      <p>
+        Telefone:{" "}
+        {clienteSelecionado.telefone ||
+          "Sem telefone"}
+      </p>
+
+      <p>
+        Jogos pagos:{" "}
+        {clienteSelecionado.jogos}
+      </p>
+
+      <p>
+        Total pago:{" "}
+        {moeda(clienteSelecionado.pago)}
+      </p>
+
+      <p>
+        Total pendente:{" "}
+        {moeda(clienteSelecionado.pendente)}
+      </p>
+
+      <button
+        onClick={() =>
+          setClienteSelecionado(null)
+        }
+        style={{
+          marginTop: "20px",
+          background: "#ef4444",
+          color: "white",
+          border: "none",
+          padding: "10px 14px",
+          borderRadius: "10px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Fechar
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }
