@@ -539,6 +539,7 @@ return "#14532d";
   alert(`Horário fixo reservado por ${semanas} semana(s)!`);
 }
   return (
+  <>
     <div
       style={{
         minHeight: "100vh",
@@ -721,10 +722,9 @@ wordBreak: "break-word",
           })}
 
           {horarios.map((hora) => (
-            <>
-              
-
-              {dias.map((data) => {
+  <div key={hora}>
+    
+    {dias.map((data) => {
                 const dataTexto = formatarData(data);
 
                 const item = pegarReserva(dataTexto, hora);
@@ -932,9 +932,9 @@ transition: "0.2s",
 </button>
                   </div>
                 );
-              })}
-            </>
-          ))}
+                            })}
+          </div>
+))}
         </div>
       </div>
       <div
@@ -1026,10 +1026,18 @@ transition: "0.2s",
 </select>
 
   <div
+  style={{
+    maxHeight: "55vh",
+    overflowY: "auto",
+    paddingRight: "8px",
+    paddingBottom: "10px",
+  }}
+>
+  <div
     style={{
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-      gap: "15px",
+      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+      gap: "10px",
     }}
   >
     {clientesFiltrados.length === 0 && (
@@ -1204,8 +1212,10 @@ transition: "0.2s",
     </div>
   </div>
 )}
-    </div>
-  );
+</div>
+</div>
+</>
+);
 }
 
 function Card({ titulo, valor }) {
