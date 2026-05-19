@@ -722,7 +722,7 @@ wordBreak: "break-word",
           })}
 
           {horarios.map((hora) => (
-  <div key={hora}>
+  <div key={hora} style={{ display: "contents" }}>
     
     {dias.map((data) => {
                 const dataTexto = formatarData(data);
