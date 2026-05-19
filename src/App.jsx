@@ -384,7 +384,9 @@ const pendenteMes = listaMes
       };
     }
 
-    mapa[nome].jogos += 1;
+    if (reserva.status === "Pago") {
+  mapa[nome].jogos += 1;
+}
 
     if (reserva.status === "Pago") {
       mapa[nome].pago += reserva.valorNumero;
@@ -400,11 +402,22 @@ const pendenteMes = listaMes
   return Object.values(mapa);
 }, [resumo.lista]);
 
-const clientesFiltrados = clientes.filter((cliente) =>
-  cliente.nome
-    .toLowerCase()
-    .includes(buscaCliente.toLowerCase())
-);
+const clientesFiltrados = clientes
+  .filter((cliente) =>
+    cliente.nome
+      .toLowerCase()
+      .includes(buscaCliente.toLowerCase())
+  )
+  .sort((a, b) => {
+  if (b.jogos !== a.jogos) {
+    return b.jogos - a.jogos;
+  }
+
+  return (
+    new Date(b.ultimaReserva) -
+    new Date(a.ultimaReserva)
+  );
+});
 
   function corStatus(status) {
     if (status === "Pago") return "#166534";
@@ -913,9 +926,43 @@ transition: "0.2s",
     marginTop: "40px",
   }}
 >
-  <h2 style={{ marginBottom: "20px" }}>
-    Clientes
-  </h2>
+  <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "12px",
+    marginBottom: "20px",
+  }}
+>
+  <Card
+    titulo="Clientes"
+    valor={clientes.length}
+  />
+
+  <Card
+    titulo="Inadimplentes"
+    valor={
+      clientes.filter((c) => c.pendente > 0).length
+    }
+  />
+
+  <Card
+    titulo="Clientes ativos"
+    valor={
+      clientes.filter((c) => c.jogos > 0).length
+    }
+  />
+</div>
+  <h2
+  style={{
+    marginBottom: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  }}
+>
+  🏆 Ranking de Clientes
+</h2>
 
   <input
   type="text"
@@ -940,17 +987,36 @@ transition: "0.2s",
       gap: "15px",
     }}
   >
-    {clientesFiltrados.map((cliente) => (
+    {clientesFiltrados.map((cliente, index) => (
       <div
         key={cliente.nome}
         style={{
-          background: "#1e293b",
+  background:
+    cliente.pendente > 0
+      ? "#3f1d1d"
+      : "#1e293b",
           borderRadius: "18px",
           padding: "18px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border:
+  cliente.pendente > 0
+    ? "1px solid #ef4444"
+    : "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <h3>{cliente.nome}</h3>
+        <h3
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    fontSize: "20px",
+  }}
+>
+  {index === 0 && "🥇"}
+  {index === 1 && "🥈"}
+  {index === 2 && "🥉"}
+
+  {cliente.nome}
+</h3>
 
         <p>{cliente.telefone || "Sem telefone"}</p>
         {cliente.telefone && (
@@ -974,11 +1040,34 @@ transition: "0.2s",
   </a>
 )}
 
-        <p>Jogos: {cliente.jogos}</p>
+        <p>
+  Posição no ranking: #{index + 1}
+</p>
+
+<p>Jogos: {cliente.jogos}</p>
 
         <p>Pago: {moeda(cliente.pago)}</p>
 
         <p>Pendente: {moeda(cliente.pendente)}</p>
+        {cliente.pendente > 0 && (
+  <div
+    style={{
+      marginTop: "8px",
+      background: "#ef4444",
+      color: "white",
+      padding: "6px 10px",
+      borderRadius: "999px",
+      fontSize: "12px",
+      fontWeight: "bold",
+      display: "inline-block",
+    }}
+  >
+    🔴 Inadimplente
+  </div>
+)}
+        <p>
+  Última reserva: {formatarDataBR(cliente.ultimaReserva)}
+</p>
       </div>
     ))}
   </div>
