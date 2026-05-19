@@ -360,7 +360,7 @@ const pendenteMes = listaMes
       pendenteMes,
       lista,
     };
-  }, [reservas]);
+  }, [reservas, mesFiltro]);
   const clientes = useMemo(() => {
   const mapa = {};
 
