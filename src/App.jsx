@@ -1059,8 +1059,8 @@ transition: "0.2s",
     cliente.pendente > 0
       ? "#3f1d1d"
       : "#1e293b",
-          borderRadius: "18px",
-          padding: "18px",
+          borderRadius: "14px",
+          padding: "12px",
           border:
   cliente.pendente > 0
     ? "1px solid #ef4444"
@@ -1072,7 +1072,7 @@ transition: "0.2s",
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    fontSize: "20px",
+    fontSize: "16px",
   }}
 >
   {index === 0 && "🥇"}
