@@ -874,9 +874,7 @@ transition: "0.2s",
   type="button"
   onClick={() => {
   if (item.status === "Pago") {
-    const senha = prompt(
-      "Digite a senha de administrador para limpar horário pago:"
-    );
+    const senha = prompt("Digite a senha de administrador para limpar horário pago:");
 
     if (senha !== "1234") {
       alert("Senha incorreta.");
@@ -885,8 +883,7 @@ transition: "0.2s",
   }
 
   const confirmar = confirm(
-    "Tem certeza que deseja limpar esta reserva?"
-  );
+    "Tem certeza que deseja limpar esta reserva?");
 
   if (confirmar) {
     limparReserva(dataTexto, hora);
