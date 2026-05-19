@@ -360,7 +360,7 @@ const pendenteMes = listaMes
       pendenteMes,
       lista,
     };
-  }, [reservas, mesFiltro]);
+  
   const clientes = useMemo(() => {
   const mapa = {};
 
@@ -874,11 +874,19 @@ transition: "0.2s",
   type="button"
   onClick={() => {
   if (item.status === "Pago") {
-    alert("Horário pago não pode ser limpo sem autorização.");
-    return;
+    const senha = prompt(
+      "Digite a senha de administrador para limpar horário pago:"
+    );
+
+    if (senha !== "1234") {
+      alert("Senha incorreta.");
+      return;
+    }
   }
 
-  const confirmar = confirm("Tem certeza que deseja limpar esta reserva?");
+  const confirmar = confirm(
+    "Tem certeza que deseja limpar esta reserva?"
+  );
 
   if (confirmar) {
     limparReserva(dataTexto, hora);
