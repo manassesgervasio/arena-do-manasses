@@ -81,6 +81,8 @@ export default function App() {
     return salvas ? JSON.parse(salvas) : {};
   });
 
+  const [buscaCliente, setBuscaCliente] = useState("");
+
   useEffect(() => {
   async function carregarReservas() {
     const { data, error } = await supabase
@@ -397,6 +399,12 @@ const pendenteMes = listaMes
 
   return Object.values(mapa);
 }, [resumo.lista]);
+
+const clientesFiltrados = clientes.filter((cliente) =>
+  cliente.nome
+    .toLowerCase()
+    .includes(buscaCliente.toLowerCase())
+);
 
   function corStatus(status) {
     if (status === "Pago") return "#166534";
@@ -909,6 +917,22 @@ transition: "0.2s",
     Clientes
   </h2>
 
+  <input
+  type="text"
+  placeholder="Buscar cliente..."
+  value={buscaCliente}
+  onChange={(e) => setBuscaCliente(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "12px",
+    borderRadius: "12px",
+    border: "none",
+    marginBottom: "20px",
+    fontSize: "14px",
+    fontWeight: "bold",
+  }}
+/>
+
   <div
     style={{
       display: "grid",
@@ -916,7 +940,7 @@ transition: "0.2s",
       gap: "15px",
     }}
   >
-    {clientes.map((cliente) => (
+    {clientesFiltrados.map((cliente) => (
       <div
         key={cliente.nome}
         style={{
