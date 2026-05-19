@@ -960,7 +960,7 @@ transition: "0.2s",
 </div>  
     </div>
   );
-}
+}, [resumo]);
 
 function Card({ titulo, valor }) {
   return (
@@ -1044,3 +1044,4 @@ const inputData = {
   border: "none",
   fontWeight: "bold",
 };
+}
