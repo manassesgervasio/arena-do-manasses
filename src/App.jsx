@@ -1,19 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import AgendaGrid from "./components/AgendaGrid";
 import AppHeader from "./components/AppHeader";
 import ClientesSection from "./components/ClientesSection";
 import ResumoCards from "./components/ResumoCards";
 import WeekControls from "./components/WeekControls";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
+import { useAgendaSemana } from "./hooks/useAgendaSemana";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import { supabase } from "./supabase";  
-import { formatarData, formatarDataBR, gerarDiasDaSemana, moeda } from "./utils";
+import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
 
 export default function App() {
-  const [dataBase, setDataBase] = useState(new Date());
+  const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
   return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
@@ -59,8 +60,6 @@ export default function App() {
 
   carregarReservas();
 }, []);
-
-  const dias = useMemo(() => gerarDiasDaSemana(dataBase), [dataBase]);
 
   function chaveReserva(dataTexto, horario) {
     return `${dataTexto}_${horario}`;
@@ -165,13 +164,6 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
 });
 }
 
-  function mudarSemana(qtd) {
-    const nova = new Date(dataBase);
-
-    nova.setDate(nova.getDate() + qtd * 7);
-
-    setDataBase(nova);
-  }
   async function copiarFixosProximaSemana() {
   const quantidade = prompt("Quantas semanas deseja repetir os horários fixos?", "4");
 
@@ -377,7 +369,7 @@ return "#14532d";
         formatarData={formatarData}
         onSemanaAnterior={() => mudarSemana(-1)}
         onDataChange={(e) =>
-          setDataBase(new Date(e.target.value + "T00:00:00"))
+          alterarData(e.target.value)
         }
         onMesFiltroChange={(e) => setMesFiltro(e.target.value)}
         onSemanaProxima={() => mudarSemana(1)}
