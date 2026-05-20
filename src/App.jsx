@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import AppHeader from "./AppHeader";
 import { supabase } from "./supabase";  
 const horarios = [
   "08:00 - 09:00",
@@ -549,28 +550,7 @@ return "#14532d";
         fontFamily: "Arial",
       }}
     >
-      <h1
-       style={{
-    textAlign: "center",
-    fontSize: "46px",
-    color: "#ffffff",
-    fontWeight: "900",
-    letterSpacing: "1px",
-    textShadow: "0 0 18px rgba(34, 197, 94, 0.75)",
-    marginBottom: "8px",
-        }}
-      >
-        Arena do Manassés ⚽
-      </h1>
-
-      <p
-        style={{
-          textAlign: "center",
-          fontSize: "18px",
-        }}
-      >
-        Agenda por datas reais
-      </p>
+      <AppHeader />
 
       <div
         style={{
