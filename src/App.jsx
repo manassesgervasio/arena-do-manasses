@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import AppHeader from "./AppHeader";
+import ResumoCards from "./ResumoCards";
 import { supabase } from "./supabase";  
 const horarios = [
   "08:00 - 09:00",
@@ -607,29 +608,7 @@ return "#14532d";
 </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-         gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-          gap: "15px",
-          marginTop: "30px",
-        }}
-      >
-        <Card titulo="Faturamento" valor={moeda(resumo.faturamento)} />
-        <Card titulo="Pendente" valor={moeda(resumo.pendente)} />
-        <Card titulo="Jogos" valor={resumo.jogos} />
-        <Card titulo="Pagos" valor={resumo.pagos} />
-        <Card titulo="Reservados" valor={resumo.reservados} />
-        <Card
-  titulo="Mês Pago"
-  valor={moeda(resumo.faturamentoMes)}
-/>
-
-<Card
-  titulo="Mês Pendente"
-  valor={moeda(resumo.pendenteMes)}
-/>
-      </div>
+      <ResumoCards resumo={resumo} moeda={moeda} />
 
       <div
         style={{
