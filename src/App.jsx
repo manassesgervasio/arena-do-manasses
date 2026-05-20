@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppHeader from "./AppHeader";
 import ClientesSection from "./ClientesSection";
+import DiaCabecalho from "./DiaCabecalho";
 import ResumoCards from "./ResumoCards";
 import WeekControls from "./WeekControls";
 import { supabase } from "./supabase";  
@@ -615,28 +616,14 @@ const jogosDia = horarios.filter((horaAtual) => {
 );
 }).length;
             return (
-              <div key={textoData} style={cabecalho}>
-                <div>{diasSemana[data.getDay()]}</div>
-<div style={{ marginTop: "4px", fontSize: "12px" }}>
-  {formatarDataBR(textoData)}
-</div>
-
-<div
-  style={{
-    marginTop: "4px",
-    fontWeight: "bold",
-    color: "#86efac",
-    fontSize: "12px",
-lineHeight: "14px",
-wordBreak: "break-word",
-  }}
->
-  {moeda(totalDia)}
-  <div style={{ fontSize: "11px", marginTop: "2px" }}>
-  {jogosDia} jogos
-</div>
-</div>
-              </div>  
+              <DiaCabecalho
+                key={textoData}
+                diaSemana={diasSemana[data.getDay()]}
+                dataFormatada={formatarDataBR(textoData)}
+                totalDia={totalDia}
+                jogosDia={jogosDia}
+                moeda={moeda}
+              />
             );
           })}
 
@@ -877,20 +864,6 @@ transition: "0.2s",
 </>
 );
 }
-
-const cabecalho = {
-  background: "#020617",
-  color: "white",
-  padding: "10px 6px",
-  borderRadius: "12px",
-  textAlign: "center",
-  fontWeight: "bold",
-  fontSize: "14px",
-  position: "sticky",
-  top: "10px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
-zIndex: 100,
-};
 
 const horarioStyle = {
   background: "#e2e8f0",
