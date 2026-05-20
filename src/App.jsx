@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppHeader from "./AppHeader";
 import ClientesSection from "./ClientesSection";
 import DiaCabecalho from "./DiaCabecalho";
-import ReservaBadges from "./ReservaBadges";
+import HorarioCard from "./HorarioCard";
 import ResumoCards from "./ResumoCards";
 import WeekControls from "./WeekControls";
 import { supabase } from "./supabase";  
@@ -645,156 +645,54 @@ const totalDia = horarios.reduce((total, horaAtual) => {
   return total;
 }, 0);
                 return (
-                  <div
+                  <HorarioCard
                     key={`${dataTexto}-${hora}`}
-                    style={{
-                      background:
-  item.status === "Pago"
-    ? "#dcfce7"
-    : item.status === "Pendente"
-    ? "#fef9c3"
-    : item.status === "Cancelado"
-    ? "#fee2e2"
-    : item.status === "Faltou"
-? "#e5e7eb"
-    : "white",
-
-opacity: item.status === "Livre" ? 0.72 : 1,
-
-transform:
-  item.status === "Pago"
-    ? "scale(1.02)"
-    : item.status === "Livre"
-    ? "scale(0.98)"
-    : "scale(1)",
-
-transition: "0.2s",
-                      border: "1px solid rgba(255,255,255,0.25)",
-  borderRadius: "16px",
-  padding: "12px",
-  boxShadow:
-  item.status === "Livre"
-    ? "0 4px 12px rgba(15, 23, 42, 0.08)"
-    : "0 8px 20px rgba(15, 23, 42, 0.18)",
-                    }}
-                  >
-                    <div
-  style={{
-    fontSize: "11px",
-    fontWeight: "bold",
-    color: "#475569",
-    marginBottom: "4px",
-  }}
->
-  {hora.split(" - ")[0]}
-  <ReservaBadges tipo={item.tipo} />
-</div>
-                    <input
-                      placeholder="cliente/Time"
-                      value={item.cliente}
-                      onChange={(e) =>
-                        atualizarReserva(
-                          dataTexto,
-                          hora,
-                          "cliente",
-                          e.target.value
-                        )
-                      }
-                      disabled={item.status === "Pago"}
-                      style={inputStyle}
-                    />
-
-                    <input
-                      placeholder="Telefone"
-                      value={item.telefone}
-                      maxLength={11}
-                      onChange={(e) =>
-                        atualizarReserva(
-                          dataTexto,
-                          hora,
-                          "telefone",
-                          e.target.value
-                        )
-                      }
-                      disabled={item.status === "Pago"}
-                      style={{
-  ...inputStyle,
-  fontSize: "12px",
-}}
-                    />
-
-                    <input
-                      placeholder="Valor"
-                      type="number"
-                      value={item.valor}
-                      onChange={(e) =>
-                        atualizarReserva(
-                          dataTexto,
-                          hora,
-                          "valor",
-                          e.target.value
-                        )
-                      }
-                      disabled={item.status === "Pago"}
-                      style={inputStyle}
-                    />
-
-                    <select
-  value={item.tipo || "Avulso"}
-  onChange={(e) =>
-    atualizarReserva(
-      dataTexto,
-      hora,
-      "tipo",
-      e.target.value
-    )
-  }
-  disabled={item.status === "Pago"}
-  style={inputStyle}
->
-  {tipoLista.map((tipo) => (
-    <option key={tipo}>{tipo}</option>
-  ))}
-</select>
-                    <select
-                      value={item.status}
-                      onChange={(e) =>
-                        atualizarReserva(
-                          dataTexto,
-                          hora,
-                          "status",
-                          e.target.value
-                        )
-                      }
-                      disabled={item.status === "Pago"}
-                      style={inputStyle}
-                    >
-                      {statusLista.map((status) => (
-                        <option key={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-  type="button"
-  onClick={() => reservarHorario(dataTexto, hora)}
-  style={{
-    marginRight: "6px",
-    background: "#22c55e",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    padding: "6px 8px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  }}
->
-  Reservar
-</button>
-
-<button
-  type="button"
-  onClick={() => {
+                    item={item}
+                    hora={hora}
+                    tipoLista={tipoLista}
+                    statusLista={statusLista}
+                    onClienteChange={(e) =>
+                      atualizarReserva(
+                        dataTexto,
+                        hora,
+                        "cliente",
+                        e.target.value
+                      )
+                    }
+                    onTelefoneChange={(e) =>
+                      atualizarReserva(
+                        dataTexto,
+                        hora,
+                        "telefone",
+                        e.target.value
+                      )
+                    }
+                    onValorChange={(e) =>
+                      atualizarReserva(
+                        dataTexto,
+                        hora,
+                        "valor",
+                        e.target.value
+                      )
+                    }
+                    onTipoChange={(e) =>
+                      atualizarReserva(
+                        dataTexto,
+                        hora,
+                        "tipo",
+                        e.target.value
+                      )
+                    }
+                    onStatusChange={(e) =>
+                      atualizarReserva(
+                        dataTexto,
+                        hora,
+                        "status",
+                        e.target.value
+                      )
+                    }
+                    onReservar={() => reservarHorario(dataTexto, hora)}
+                    onLimpar={() => {
   if (item.status === "Pago") {
     const senha = prompt("Digite a senha de administrador para limpar horário pago:");
 
@@ -811,10 +709,7 @@ transition: "0.2s",
     limparReserva(dataTexto, hora);
   }
 }}
->
-  Limpar
-</button>
-                  </div>
+                  />
                 );
                             })}
           </div>
@@ -851,15 +746,5 @@ const horarioStyle = {
   textAlign: "center",
   fontWeight: "bold",
   fontSize: "14px",
-};
-
-const inputStyle = {
-  width: "100%",
-  marginBottom: "5px",
-  padding: "6px",
-  borderRadius: "7px",
-  border: "1px solid #94a3b8",
-  fontSize: "12px",
-  minHeight: "34px",
 };
 
