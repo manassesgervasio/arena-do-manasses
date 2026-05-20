@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import AppHeader from "./AppHeader";
+import ClienteModal from "./ClienteModal";
 import ResumoCards from "./ResumoCards";
 import WeekControls from "./WeekControls";
 import { supabase } from "./supabase";  
@@ -1057,79 +1058,11 @@ transition: "0.2s",
     ))}
   </div>
 </div>  
-    {clienteSelecionado && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.7)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 9999,
-    }}
-    onClick={() =>
-      setClienteSelecionado(null)
-    }
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        background: "#0f172a",
-        padding: "30px",
-        borderRadius: "20px",
-        width: "90%",
-        maxWidth: "600px",
-        maxHeight: "80vh",
-        overflowY: "auto",
-        color: "white",
-      }}
-    >
-      <h2>
-        {clienteSelecionado.nome}
-      </h2>
-
-      <p>
-        Telefone:{" "}
-        {clienteSelecionado.telefone ||
-          "Sem telefone"}
-      </p>
-
-      <p>
-        Jogos pagos:{" "}
-        {clienteSelecionado.jogos}
-      </p>
-
-      <p>
-        Total pago:{" "}
-        {moeda(clienteSelecionado.pago)}
-      </p>
-
-      <p>
-        Total pendente:{" "}
-        {moeda(clienteSelecionado.pendente)}
-      </p>
-
-      <button
-        onClick={() =>
-          setClienteSelecionado(null)
-        }
-        style={{
-          marginTop: "20px",
-          background: "#ef4444",
-          color: "white",
-          border: "none",
-          padding: "10px 14px",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
-        Fechar
-      </button>
-    </div>
-  </div>
-)}
+    <ClienteModal
+      cliente={clienteSelecionado}
+      moeda={moeda}
+      onClose={() => setClienteSelecionado(null)}
+    />
 </div>
 </div>
 </>
