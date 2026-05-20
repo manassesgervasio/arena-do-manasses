@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import AgendaGrid from "./AgendaGrid";
-import AppHeader from "./AppHeader";
-import ClientesSection from "./ClientesSection";
-import ResumoCards from "./ResumoCards";
-import WeekControls from "./WeekControls";
+import AgendaGrid from "./components/AgendaGrid";
+import AppHeader from "./components/AppHeader";
+import ClientesSection from "./components/ClientesSection";
+import ResumoCards from "./components/ResumoCards";
+import WeekControls from "./components/WeekControls";
 import { supabase } from "./supabase";  
 const horarios = [
   "08:00 - 09:00",
