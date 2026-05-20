@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppHeader from "./AppHeader";
 import ClientesSection from "./ClientesSection";
 import DiaCabecalho from "./DiaCabecalho";
+import ReservaBadges from "./ReservaBadges";
 import ResumoCards from "./ResumoCards";
 import WeekControls from "./WeekControls";
 import { supabase } from "./supabase";  
@@ -686,30 +687,7 @@ transition: "0.2s",
   }}
 >
   {hora.split(" - ")[0]}
-  {item.tipo === "Mensalista" && (
-  <div
-    style={{
-      fontSize: "10px",
-      fontWeight: "bold",
-      color: "#2563eb",
-      marginBottom: "4px",
-    }}
-  >
-    ⭐ Mensalista
-  </div>
-)}
-{item.tipo === "Fixo" && (
-  <div
-    style={{
-      fontSize: "10px",
-      fontWeight: "bold",
-      color: "#2563eb",
-      marginBottom: "4px",
-    }}
-  >
-    🔒 Fixo
-  </div>
-)}
+  <ReservaBadges tipo={item.tipo} />
 </div>
                     <input
                       placeholder="cliente/Time"
