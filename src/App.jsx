@@ -4,28 +4,8 @@ import AppHeader from "./components/AppHeader";
 import ClientesSection from "./components/ClientesSection";
 import ResumoCards from "./components/ResumoCards";
 import WeekControls from "./components/WeekControls";
+import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { supabase } from "./supabase";  
-const horarios = [
-  "08:00 - 09:00",
-  "09:00 - 10:00",
-  "10:00 - 11:00",
-  "11:00 - 12:00",
-  "14:00 - 15:00",
-  "15:00 - 16:00",
-  "16:00 - 17:00",
-  "17:00 - 18:00",
-  "18:00 - 19:00",
-  "19:00 - 20:00",
-  "20:00 - 21:00",
-  "21:00 - 22:00",
-  "22:00 - 23:00",
-  "23:00 - 00:00",
-];
-
-const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-const tipoLista = ["Avulso", "Fixo", "Mensalista"];
-
-const statusLista = ["Livre", "Reservado", "Pago", "Pendente", "Cancelado", "Faltou"];
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
 
