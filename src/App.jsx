@@ -6,52 +6,9 @@ import ResumoCards from "./components/ResumoCards";
 import WeekControls from "./components/WeekControls";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { supabase } from "./supabase";  
+import { formatarData, formatarDataBR, gerarDiasDaSemana, moeda, numero } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
-
-function formatarData(data) {
-  return data.toISOString().split("T")[0];
-}
-
-function formatarDataBR(dataTexto) {
-  const [ano, mes, dia] = dataTexto.split("-");
-  return `${dia}/${mes}/${ano}`;
-}
-
-function inicioDaSemana(data) {
-  const nova = new Date(data);
-
-  const dia = nova.getDay();
-  const diff = dia === 0 ? -6 : 1 - dia;
-
-  nova.setDate(nova.getDate() + diff);
-  nova.setHours(0, 0, 0, 0);
-
-  return nova;
-}
-
-function gerarDiasDaSemana(dataBase) {
-  const inicio = inicioDaSemana(dataBase);
-
-  return Array.from({ length: 7 }, (_, i) => {
-    const data = new Date(inicio);
-
-    data.setDate(inicio.getDate() + i);
-
-    return data;
-  });
-}
-
-function moeda(valor) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(valor || 0);
-}
-
-function numero(valor) {
-  return Number(String(valor || "").replace(",", ".")) || 0;
-}
 
 export default function App() {
   const [dataBase, setDataBase] = useState(new Date());
