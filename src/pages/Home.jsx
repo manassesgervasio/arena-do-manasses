@@ -1,6 +1,7 @@
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
 import ClientesSection from "../components/ClientesSection";
+import MobileNavigation from "../components/MobileNavigation";
 import ResumoCards from "../components/ResumoCards";
 import WeekControls from "../components/WeekControls";
 
@@ -93,6 +94,7 @@ export default function Home({
         }
         onClienteModalClose={() => setClienteSelecionado(null)}
       />
+      <MobileNavigation />
 </div>
 </>
 );

@@ -163,12 +163,53 @@ code {
   display: none;
 }
 
+.mobile-navigation {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .home-page {
+    padding-bottom: 88px !important;
+  }
+
   .agenda-desktop {
     display: none !important;
   }
 
   .agenda-mobile {
     display: block;
+  }
+
+  .mobile-navigation {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 9000;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    box-sizing: border-box;
+  }
+
+  .mobile-navigation-item {
+    min-height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .mobile-navigation-item.is-active {
+    background: #22c55e;
+    color: #052e16;
   }
 }
