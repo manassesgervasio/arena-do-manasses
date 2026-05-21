@@ -2,6 +2,7 @@ export default function AppHeader() {
   return (
     <>
       <h1
+       className="app-title"
        style={{
     textAlign: "center",
     fontSize: "46px",
@@ -16,6 +17,7 @@ export default function AppHeader() {
       </h1>
 
       <p
+        className="app-subtitle"
         style={{
           textAlign: "center",
           fontSize: "18px",

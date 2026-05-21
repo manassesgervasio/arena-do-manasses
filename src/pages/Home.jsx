@@ -36,6 +36,7 @@ export default function Home({
   return (
   <>
     <div
+      className="home-page"
       style={{
         minHeight: "100vh",
         background: "#0f172a",

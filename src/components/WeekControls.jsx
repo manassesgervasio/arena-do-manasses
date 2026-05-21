@@ -10,6 +10,7 @@ export default function WeekControls({
 }) {
   return (
     <div
+      className="week-controls"
       style={{
         display: "flex",
         justifyContent: "center",
@@ -20,6 +21,7 @@ export default function WeekControls({
       }}
     >
       <button
+        className="week-control-button"
         onClick={onSemanaAnterior}
         style={botao}
       >
@@ -27,12 +29,14 @@ export default function WeekControls({
       </button>
 
       <input
+        className="week-control-input"
         type="date"
         value={formatarData(dataBase)}
         onChange={onDataChange}
         style={inputData}
       />
       <input
+        className="week-control-input"
         type="month"
         value={mesFiltro}
         onChange={onMesFiltroChange}
@@ -46,12 +50,14 @@ export default function WeekControls({
       />
 
       <button
+        className="week-control-button"
         onClick={onSemanaProxima}
         style={botao}
       >
         Próxima semana →
       </button>
       <button
+        className="week-control-button"
         onClick={onCopiarFixos}
         style={{
           ...botao,

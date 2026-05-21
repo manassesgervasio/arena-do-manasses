@@ -109,6 +109,7 @@ export default function HorarioCard({
         ))}
       </select>
       <button
+        className="horario-action-button"
         type="button"
         onClick={onReservar}
         style={{
@@ -117,17 +118,27 @@ export default function HorarioCard({
           color: "white",
           border: "none",
           borderRadius: "8px",
-          padding: "6px 8px",
+          padding: "8px 10px",
           fontWeight: "bold",
           cursor: "pointer",
+          minHeight: "40px",
         }}
       >
         Reservar
       </button>
 
       <button
+        className="horario-action-button"
         type="button"
         onClick={onLimpar}
+        style={{
+          border: "1px solid #cbd5e1",
+          borderRadius: "8px",
+          padding: "8px 10px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          minHeight: "40px",
+        }}
       >
         Limpar
       </button>
