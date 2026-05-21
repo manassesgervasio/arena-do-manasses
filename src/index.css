@@ -158,3 +158,17 @@ code {
     margin-bottom: 4px !important;
   }
 }
+
+.agenda-mobile {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .agenda-desktop {
+    display: none !important;
+  }
+
+  .agenda-mobile {
+    display: block;
+  }
+}
