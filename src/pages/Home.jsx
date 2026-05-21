@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
 import ClientesSection from "../components/ClientesSection";
@@ -34,20 +35,27 @@ export default function Home({
   setFiltroCliente,
   setClienteSelecionado,
 }) {
-  return (
-  <>
-    <div
-      className="home-page"
-      style={{
-        minHeight: "100vh",
-        background: "#0f172a",
-        color: "white",
-        padding: "25px",
-        fontFamily: "Arial",
-      }}
-    >
-      <AppHeader />
+  const [activeMobileTab, setActiveMobileTab] = useState("agenda");
+  const [isMobile, setIsMobile] = useState(() =>
+    window.matchMedia("(max-width: 640px)").matches
+  );
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+
+    function handleChange(event) {
+      setIsMobile(event.matches);
+    }
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  function renderWeekControls() {
+    return (
       <WeekControls
         dataBase={dataBase}
         mesFiltro={mesFiltro}
@@ -60,9 +68,11 @@ export default function Home({
         onSemanaProxima={() => mudarSemana(1)}
         onCopiarFixos={copiarFixosProximaSemana}
       />
+    );
+  }
 
-      <ResumoCards resumo={resumo} moeda={moeda} />
-
+  function renderAgenda() {
+    return (
       <AgendaGrid
         dias={dias}
         horarios={horarios}
@@ -77,6 +87,11 @@ export default function Home({
         reservarHorario={reservarHorario}
         limparReserva={limparReserva}
       />
+    );
+  }
+
+  function renderClientes() {
+    return (
       <ClientesSection
         clientes={clientes}
         clientesFiltrados={clientesFiltrados}
@@ -94,7 +109,58 @@ export default function Home({
         }
         onClienteModalClose={() => setClienteSelecionado(null)}
       />
-      <MobileNavigation />
+    );
+  }
+
+  function renderFinanceiro() {
+    return <ResumoCards resumo={resumo} moeda={moeda} />;
+  }
+
+  function renderMobileContent() {
+    if (activeMobileTab === "clientes") {
+      return renderClientes();
+    }
+
+    if (activeMobileTab === "financeiro") {
+      return renderFinanceiro();
+    }
+
+    return (
+      <>
+        {renderWeekControls()}
+        {renderAgenda()}
+      </>
+    );
+  }
+
+  return (
+  <>
+    <div
+      className="home-page"
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        color: "white",
+        padding: "25px",
+        fontFamily: "Arial",
+      }}
+    >
+      <AppHeader />
+
+      {isMobile ? (
+        renderMobileContent()
+      ) : (
+        <>
+          {renderWeekControls()}
+          {renderFinanceiro()}
+          {renderAgenda()}
+          {renderClientes()}
+        </>
+      )}
+      <MobileNavigation
+        activeTab={activeMobileTab}
+        onTabChange={setActiveMobileTab}
+      />
 </div>
 </>
 );

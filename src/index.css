@@ -180,6 +180,14 @@ code {
     display: block;
   }
 
+  .mobile-tab-panel {
+    display: none;
+  }
+
+  .mobile-tab-panel.is-active {
+    display: block;
+  }
+
   .mobile-navigation {
     position: fixed;
     left: 12px;
