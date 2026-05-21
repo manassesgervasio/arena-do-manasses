@@ -184,6 +184,40 @@ code {
     display: block;
   }
 
+  .agenda-mobile .dia-cabecalho {
+    display: grid;
+    gap: 2px;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    top: 6px !important;
+    font-size: 13px !important;
+    line-height: 16px !important;
+  }
+
+  .agenda-mobile .dia-cabecalho-semana {
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  .agenda-mobile .dia-cabecalho-data {
+    margin-top: 0 !important;
+    font-size: 11px !important;
+    line-height: 14px !important;
+    color: #cbd5e1;
+  }
+
+  .agenda-mobile .dia-cabecalho-resumo {
+    margin-top: 0 !important;
+    font-size: 12px !important;
+    line-height: 14px !important;
+  }
+
+  .agenda-mobile .dia-cabecalho-jogos {
+    margin-top: 0 !important;
+    font-size: 11px !important;
+    line-height: 13px !important;
+  }
+
   .mobile-tab-panel {
     display: none;
   }

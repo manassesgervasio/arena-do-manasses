@@ -6,13 +6,17 @@ export default function DiaCabecalho({
   moeda,
 }) {
   return (
-    <div style={cabecalho}>
-      <div>{diaSemana}</div>
-      <div style={{ marginTop: "4px", fontSize: "12px" }}>
+    <div className="dia-cabecalho" style={cabecalho}>
+      <div className="dia-cabecalho-semana">{diaSemana}</div>
+      <div
+        className="dia-cabecalho-data"
+        style={{ marginTop: "4px", fontSize: "12px" }}
+      >
         {dataFormatada}
       </div>
 
       <div
+        className="dia-cabecalho-resumo"
         style={{
           marginTop: "4px",
           fontWeight: "bold",
@@ -23,7 +27,10 @@ export default function DiaCabecalho({
         }}
       >
         {moeda(totalDia)}
-        <div style={{ fontSize: "11px", marginTop: "2px" }}>
+        <div
+          className="dia-cabecalho-jogos"
+          style={{ fontSize: "11px", marginTop: "2px" }}
+        >
           {jogosDia} jogos
         </div>
       </div>
