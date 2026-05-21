@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-import AgendaGrid from "./components/AgendaGrid";
-import AppHeader from "./components/AppHeader";
-import ClientesSection from "./components/ClientesSection";
-import ResumoCards from "./components/ResumoCards";
-import WeekControls from "./components/WeekControls";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
+import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
@@ -351,67 +347,36 @@ return "#14532d";
   alert(`Horário fixo reservado por ${semanas} semana(s)!`);
 }
   return (
-  <>
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0f172a",
-        color: "white",
-        padding: "25px",
-        fontFamily: "Arial",
-      }}
-    >
-      <AppHeader />
-
-      <WeekControls
-        dataBase={dataBase}
-        mesFiltro={mesFiltro}
-        formatarData={formatarData}
-        onSemanaAnterior={() => mudarSemana(-1)}
-        onDataChange={(e) =>
-          alterarData(e.target.value)
-        }
-        onMesFiltroChange={(e) => setMesFiltro(e.target.value)}
-        onSemanaProxima={() => mudarSemana(1)}
-        onCopiarFixos={copiarFixosProximaSemana}
-      />
-
-      <ResumoCards resumo={resumo} moeda={moeda} />
-
-      <AgendaGrid
-        dias={dias}
-        horarios={horarios}
-        diasSemana={diasSemana}
-        tipoLista={tipoLista}
-        statusLista={statusLista}
-        formatarData={formatarData}
-        formatarDataBR={formatarDataBR}
-        moeda={moeda}
-        pegarReserva={pegarReserva}
-        atualizarReserva={atualizarReserva}
-        reservarHorario={reservarHorario}
-        limparReserva={limparReserva}
-      />
-      <ClientesSection
-        clientes={clientes}
-        clientesFiltrados={clientesFiltrados}
-        buscaCliente={buscaCliente}
-        filtroCliente={filtroCliente}
-        moeda={moeda}
-        formatarDataBR={formatarDataBR}
-        clienteSelecionado={clienteSelecionado}
-        onBuscaClienteChange={(e) => setBuscaCliente(e.target.value)}
-        onFiltroClienteChange={(e) =>
-          setFiltroCliente(e.target.value)
-        }
-        onClienteSelect={(cliente) =>
-          setClienteSelecionado(cliente)
-        }
-        onClienteModalClose={() => setClienteSelecionado(null)}
-      />
-</div>
-</>
-);
+    <Home
+      dataBase={dataBase}
+      mesFiltro={mesFiltro}
+      dias={dias}
+      horarios={horarios}
+      diasSemana={diasSemana}
+      tipoLista={tipoLista}
+      statusLista={statusLista}
+      resumo={resumo}
+      clientes={clientes}
+      clientesFiltrados={clientesFiltrados}
+      buscaCliente={buscaCliente}
+      filtroCliente={filtroCliente}
+      clienteSelecionado={clienteSelecionado}
+      formatarData={formatarData}
+      formatarDataBR={formatarDataBR}
+      moeda={moeda}
+      pegarReserva={pegarReserva}
+      atualizarReserva={atualizarReserva}
+      reservarHorario={reservarHorario}
+      limparReserva={limparReserva}
+      mudarSemana={mudarSemana}
+      alterarData={alterarData}
+      copiarFixosProximaSemana={copiarFixosProximaSemana}
+      setMesFiltro={setMesFiltro}
+      setBuscaCliente={setBuscaCliente}
+      setFiltroCliente={setFiltroCliente}
+      setClienteSelecionado={setClienteSelecionado}
+    />
+  );
 }
 
 const horarioStyle = {
