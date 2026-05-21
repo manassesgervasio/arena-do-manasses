@@ -1,6 +1,7 @@
 export default function ClienteCard({ cliente, index, formatarDataBR, onClick }) {
   return (
     <div
+      className="cliente-card"
       onClick={onClick}
       style={{
         cursor: "pointer",
@@ -18,6 +19,7 @@ export default function ClienteCard({ cliente, index, formatarDataBR, onClick })
       }}
     >
       <h3
+        className="cliente-card-title"
         style={{
           display: "flex",
           alignItems: "center",
@@ -35,6 +37,7 @@ export default function ClienteCard({ cliente, index, formatarDataBR, onClick })
       <p>{cliente.telefone || "Sem telefone"}</p>
       {cliente.telefone && (
         <a
+          className="cliente-whatsapp-link"
           href={`https://wa.me/55${cliente.telefone.replace(/\D/g, "")}`}
           target="_blank"
           rel="noreferrer"
@@ -56,6 +59,7 @@ export default function ClienteCard({ cliente, index, formatarDataBR, onClick })
 
       {cliente.pendente > 0 && (
         <div
+          className="cliente-badge"
           style={{
             marginTop: "8px",
             background: "#ef4444",
@@ -70,7 +74,7 @@ export default function ClienteCard({ cliente, index, formatarDataBR, onClick })
           🔴 Inadimplente
         </div>
       )}
-      <p>
+      <p className="cliente-last-reserva">
         Última reserva: {formatarDataBR(cliente.ultimaReserva)}
       </p>
     </div>

@@ -16,11 +16,13 @@ export default function ClientesSection({
 }) {
   return (
     <div
+      className="clientes-section"
       style={{
         marginTop: "40px",
       }}
     >
       <div
+        className="clientes-stats-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -58,6 +60,7 @@ export default function ClientesSection({
         />
       </div>
       <h2
+        className="clientes-heading"
         style={{
           marginBottom: "20px",
           display: "flex",
@@ -69,6 +72,7 @@ export default function ClientesSection({
       </h2>
 
       <input
+        className="clientes-search"
         type="text"
         placeholder="Buscar cliente..."
         value={buscaCliente}
@@ -84,6 +88,7 @@ export default function ClientesSection({
         }}
       />
       <select
+        className="clientes-filter-select"
         value={filtroCliente}
         onChange={onFiltroClienteChange}
         style={{
@@ -102,6 +107,7 @@ export default function ClientesSection({
       </select>
 
       <div
+        className="clientes-list-scroll"
         style={{
           maxHeight: "55vh",
           overflowY: "auto",
@@ -110,6 +116,7 @@ export default function ClientesSection({
         }}
       >
         <div
+          className="clientes-list-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -155,6 +162,7 @@ export default function ClientesSection({
 function Card({ titulo, valor }) {
   return (
     <div
+      className="clientes-stat-card"
       style={{
         background: "linear-gradient(135deg, #1e293b, #0f172a)",
         padding: "22px",
@@ -169,6 +177,7 @@ function Card({ titulo, valor }) {
       </p>
 
       <h2
+        className="clientes-stat-value"
         style={{
           fontSize: "32px",
           color: "white",
