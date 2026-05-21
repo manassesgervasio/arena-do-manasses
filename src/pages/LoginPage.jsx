@@ -4,9 +4,10 @@ const permissoesIniciais = [
   "Financeiro",
 ];
 
-export default function LoginPage() {
+export default function LoginPage({ onEntrar }) {
   function handleSubmit(event) {
     event.preventDefault();
+    onEntrar();
   }
 
   return (

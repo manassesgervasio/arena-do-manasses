@@ -4,12 +4,14 @@ import { useAgendaSemana } from "./hooks/useAgendaSemana";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import Home from "./pages/Home";
+import LoginPage from "./pages/LoginPage";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
 
 export default function App() {
+  const [acessoLiberado, setAcessoLiberado] = useState(false);
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -346,6 +348,11 @@ return "#14532d";
 
   alert(`Horário fixo reservado por ${semanas} semana(s)!`);
 }
+
+  if (!acessoLiberado) {
+    return <LoginPage onEntrar={() => setAcessoLiberado(true)} />;
+  }
+
   return (
     <Home
       dataBase={dataBase}
