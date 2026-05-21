@@ -169,7 +169,7 @@ code {
 
 @media (max-width: 640px) {
   .home-page {
-    padding-bottom: 88px !important;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
   }
 
   .agenda-desktop {
@@ -186,13 +186,14 @@ code {
 
   .mobile-tab-panel.is-active {
     display: block;
+    padding-bottom: 18px;
   }
 
   .mobile-navigation {
     position: fixed;
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
     z-index: 9000;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
