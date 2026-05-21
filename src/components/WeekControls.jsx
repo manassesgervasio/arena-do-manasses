@@ -56,16 +56,6 @@ export default function WeekControls({
       >
         Próxima semana →
       </button>
-      <button
-        className="week-control-button"
-        onClick={onCopiarFixos}
-        style={{
-          ...botao,
-          background: "#2563eb",
-        }}
-      >
-        Copiar fixos →
-      </button>
     </div>
   );
 }

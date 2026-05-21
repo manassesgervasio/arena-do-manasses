@@ -148,7 +148,7 @@ code {
   }
 
   .week-control-button:last-child {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .horario-action-button {
@@ -173,7 +173,7 @@ code {
 
 @media (max-width: 640px) {
   .home-page {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
   }
 
   .agenda-desktop {
@@ -318,14 +318,13 @@ code {
   }
 
   .mobile-navigation {
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
+    position: static;
     z-index: 9000;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
+    width: 100%;
+    margin: 18px 0 4px;
     padding: 8px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 18px;

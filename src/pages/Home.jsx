@@ -155,6 +155,12 @@ export default function Home({
       }}
     >
       <AppHeader />
+      {isMobile && (
+        <MobileNavigation
+          activeTab={activeMobileTab}
+          onTabChange={setActiveMobileTab}
+        />
+      )}
 
       {isMobile ? (
         renderMobileContent()
@@ -166,10 +172,6 @@ export default function Home({
           {renderClientes()}
         </>
       )}
-      <MobileNavigation
-        activeTab={activeMobileTab}
-        onTabChange={setActiveMobileTab}
-      />
 </div>
 </>
 );
