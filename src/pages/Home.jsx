@@ -113,7 +113,16 @@ export default function Home({
   }
 
   function renderFinanceiro() {
-    return <ResumoCards resumo={resumo} moeda={moeda} />;
+    return (
+      <section className="financeiro-mobile-section">
+        <div className="financeiro-mobile-header">
+          <h2>Financeiro</h2>
+          <p>Resumo geral e mensal</p>
+        </div>
+
+        <ResumoCards resumo={resumo} moeda={moeda} />
+      </section>
+    );
   }
 
   function renderMobileContent() {
