@@ -9,9 +9,20 @@ import { supabase } from "./supabase";
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
+const PERFIS_PERMISSOES = {
+  Administrador: {
+    podeLimparPago: true,
+    podeEditarTudo: true,
+  },
+  Funcionário: {
+    podeLimparPago: false,
+    podeEditarTudo: false,
+  },
+};
 
 export default function App() {
   const [acessoLiberado, setAcessoLiberado] = useState(false);
+  const [perfilLogado, setPerfilLogado] = useState(null);
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -349,12 +360,28 @@ return "#14532d";
   alert(`Horário fixo reservado por ${semanas} semana(s)!`);
 }
 
+  const permissoesLogado = perfilLogado
+    ? PERFIS_PERMISSOES[perfilLogado]
+    : null;
+
+  function entrarComPerfil(perfil) {
+    setPerfilLogado(perfil);
+    setAcessoLiberado(true);
+  }
+
   if (!acessoLiberado) {
-    return <LoginPage onEntrar={() => setAcessoLiberado(true)} />;
+    return (
+      <LoginPage
+        onEntrar={entrarComPerfil}
+        perfisPermissoes={PERFIS_PERMISSOES}
+      />
+    );
   }
 
   return (
     <Home
+      perfilLogado={perfilLogado}
+      permissoesLogado={permissoesLogado}
       dataBase={dataBase}
       mesFiltro={mesFiltro}
       dias={dias}

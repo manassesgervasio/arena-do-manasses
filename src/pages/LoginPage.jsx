@@ -1,13 +1,18 @@
+import { useState } from "react";
+
 const permissoesIniciais = [
   "Agenda",
   "Clientes",
   "Financeiro",
 ];
 
-export default function LoginPage({ onEntrar }) {
+export default function LoginPage({ onEntrar, perfisPermissoes }) {
+  const [perfilSelecionado, setPerfilSelecionado] = useState("Administrador");
+  const permissoesPerfil = perfisPermissoes[perfilSelecionado];
+
   function handleSubmit(event) {
     event.preventDefault();
-    onEntrar();
+    onEntrar(perfilSelecionado);
   }
 
   return (
@@ -39,6 +44,21 @@ export default function LoginPage({ onEntrar }) {
             />
           </label>
 
+          <label className="login-field">
+            <span>Perfil</span>
+            <select
+              name="perfil"
+              value={perfilSelecionado}
+              onChange={(event) => setPerfilSelecionado(event.target.value)}
+            >
+              {Object.keys(perfisPermissoes).map((perfil) => (
+                <option key={perfil} value={perfil}>
+                  {perfil}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <button className="login-button" type="submit">
             Entrar
           </button>
@@ -48,6 +68,16 @@ export default function LoginPage({ onEntrar }) {
           {permissoesIniciais.map((permissao) => (
             <span key={permissao}>{permissao}</span>
           ))}
+          <span>
+            {permissoesPerfil.podeLimparPago
+              ? "Pode limpar pago"
+              : "Não pode limpar pago"}
+          </span>
+          <span>
+            {permissoesPerfil.podeEditarTudo
+              ? "Pode editar tudo"
+              : "Edição limitada"}
+          </span>
         </div>
       </section>
     </main>

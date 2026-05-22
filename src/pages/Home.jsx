@@ -7,6 +7,8 @@ import ResumoCards from "../components/ResumoCards";
 import WeekControls from "../components/WeekControls";
 
 export default function Home({
+  perfilLogado,
+  permissoesLogado,
   dataBase,
   mesFiltro,
   dias,
@@ -154,7 +156,10 @@ export default function Home({
         fontFamily: "Arial",
       }}
     >
-      <AppHeader />
+      <AppHeader
+        perfilLogado={perfilLogado}
+        permissoesLogado={permissoesLogado}
+      />
       {isMobile && (
         <MobileNavigation
           activeTab={activeMobileTab}

@@ -227,7 +227,8 @@ code {
   font-weight: 800;
 }
 
-.login-field input {
+.login-field input,
+.login-field select {
   min-height: 46px;
   width: 100%;
   padding: 12px;
@@ -237,6 +238,10 @@ code {
   color: #0f172a;
   font-size: 15px;
   box-sizing: border-box;
+}
+
+.login-field select {
+  cursor: pointer;
 }
 
 .login-button {
@@ -266,6 +271,21 @@ code {
   font-weight: 800;
 }
 
+.logged-profile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin: 12px auto 0;
+  padding: 7px 11px;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #bbf7d0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 @media (max-width: 640px) {
   .home-page {
     padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
@@ -289,7 +309,8 @@ code {
   }
 
   .login-button,
-  .login-field input {
+  .login-field input,
+  .login-field select {
     min-height: 48px;
   }
 

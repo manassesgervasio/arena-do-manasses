@@ -1,4 +1,4 @@
-export default function AppHeader() {
+export default function AppHeader({ perfilLogado, permissoesLogado }) {
   return (
     <>
       <h1
@@ -25,6 +25,12 @@ export default function AppHeader() {
       >
         Agenda por datas reais
       </p>
+
+      {perfilLogado && permissoesLogado && (
+        <div className="logged-profile" aria-label="Perfil logado">
+          Perfil logado: <strong>{perfilLogado}</strong>
+        </div>
+      )}
     </>
   );
 }
