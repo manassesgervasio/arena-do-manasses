@@ -15,6 +15,7 @@ export default function AgendaGrid({
   atualizarReserva,
   reservarHorario,
   limparReserva,
+  permissoesLogado,
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
   const diaMobile = dias[diaMobileIndex] || dias[0];
@@ -116,6 +117,11 @@ const jogosDia = horarios.filter((horaAtual) => {
         onReservar={() => reservarHorario(dataTexto, hora)}
         onLimpar={() => {
   if (item.status === "Pago") {
+    if (!permissoesLogado?.podeLimparPago) {
+      alert("Seu perfil não permite limpar horários pagos. Peça ajuda a um administrador.");
+      return;
+    }
+
     const senha = prompt("Digite a senha de administrador para limpar horário pago:");
 
     if (senha !== "1234") {

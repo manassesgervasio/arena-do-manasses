@@ -88,6 +88,7 @@ export default function Home({
         atualizarReserva={atualizarReserva}
         reservarHorario={reservarHorario}
         limparReserva={limparReserva}
+        permissoesLogado={permissoesLogado}
       />
     );
   }
