@@ -9,6 +9,7 @@ import WeekControls from "../components/WeekControls";
 export default function Home({
   perfilLogado,
   permissoesLogado,
+  onSair,
   dataBase,
   mesFiltro,
   dias,
@@ -160,6 +161,7 @@ export default function Home({
       <AppHeader
         perfilLogado={perfilLogado}
         permissoesLogado={permissoesLogado}
+        onSair={onSair}
       />
       {isMobile && (
         <MobileNavigation

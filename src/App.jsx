@@ -9,6 +9,8 @@ import { supabase } from "./supabase";
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
+const ACESSO_STORAGE_KEY = "arena-manasses-acessoLiberado";
+const PERFIL_STORAGE_KEY = "arena-manasses-perfilSelecionado";
 const PERFIS_PERMISSOES = {
   Administrador: {
     podeLimparPago: true,
@@ -20,9 +22,26 @@ const PERFIS_PERMISSOES = {
   },
 };
 
+function perfilValido(perfil) {
+  return Object.prototype.hasOwnProperty.call(PERFIS_PERMISSOES, perfil);
+}
+
+function restaurarAcessoLocal() {
+  const acessoSalvo = localStorage.getItem(ACESSO_STORAGE_KEY);
+  const perfilSalvo = localStorage.getItem(PERFIL_STORAGE_KEY);
+
+  return acessoSalvo === "true" && perfilValido(perfilSalvo);
+}
+
+function restaurarPerfilLocal() {
+  const perfilSalvo = localStorage.getItem(PERFIL_STORAGE_KEY);
+
+  return perfilValido(perfilSalvo) ? perfilSalvo : null;
+}
+
 export default function App() {
-  const [acessoLiberado, setAcessoLiberado] = useState(false);
-  const [perfilLogado, setPerfilLogado] = useState(null);
+  const [acessoLiberado, setAcessoLiberado] = useState(restaurarAcessoLocal);
+  const [perfilLogado, setPerfilLogado] = useState(restaurarPerfilLocal);
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -367,6 +386,15 @@ return "#14532d";
   function entrarComPerfil(perfil) {
     setPerfilLogado(perfil);
     setAcessoLiberado(true);
+    localStorage.setItem(ACESSO_STORAGE_KEY, "true");
+    localStorage.setItem(PERFIL_STORAGE_KEY, perfil);
+  }
+
+  function sair() {
+    setPerfilLogado(null);
+    setAcessoLiberado(false);
+    localStorage.removeItem(ACESSO_STORAGE_KEY);
+    localStorage.removeItem(PERFIL_STORAGE_KEY);
   }
 
   if (!acessoLiberado) {
@@ -382,6 +410,7 @@ return "#14532d";
     <Home
       perfilLogado={perfilLogado}
       permissoesLogado={permissoesLogado}
+      onSair={sair}
       dataBase={dataBase}
       mesFiltro={mesFiltro}
       dias={dias}

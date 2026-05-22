@@ -1,4 +1,4 @@
-export default function AppHeader({ perfilLogado, permissoesLogado }) {
+export default function AppHeader({ perfilLogado, permissoesLogado, onSair }) {
   return (
     <>
       <h1
@@ -28,7 +28,12 @@ export default function AppHeader({ perfilLogado, permissoesLogado }) {
 
       {perfilLogado && permissoesLogado && (
         <div className="logged-profile" aria-label="Perfil logado">
-          Perfil logado: <strong>{perfilLogado}</strong>
+          <span>
+            Perfil logado: <strong>{perfilLogado}</strong>
+          </span>
+          <button type="button" onClick={onSair}>
+            Sair
+          </button>
         </div>
       )}
     </>
