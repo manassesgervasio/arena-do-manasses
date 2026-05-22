@@ -6,13 +6,24 @@ const permissoesIniciais = [
   "Financeiro",
 ];
 
-export default function LoginPage({ onEntrar, perfisPermissoes }) {
-  const [perfilSelecionado, setPerfilSelecionado] = useState("Administrador");
-  const permissoesPerfil = perfisPermissoes[perfilSelecionado];
+export default function LoginPage({ onEntrar }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    onEntrar(perfilSelecionado);
+    setErro("");
+    setCarregando(true);
+
+    const mensagemErro = await onEntrar({ email, senha });
+
+    if (mensagemErro) {
+      setErro(mensagemErro);
+    }
+
+    setCarregando(false);
   }
 
   return (
@@ -31,6 +42,9 @@ export default function LoginPage({ onEntrar, perfisPermissoes }) {
               name="email"
               autoComplete="email"
               placeholder="seu@email.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
             />
           </label>
 
@@ -41,26 +55,16 @@ export default function LoginPage({ onEntrar, perfisPermissoes }) {
               name="password"
               autoComplete="current-password"
               placeholder="Digite sua senha"
+              value={senha}
+              onChange={(event) => setSenha(event.target.value)}
+              required
             />
           </label>
 
-          <label className="login-field">
-            <span>Perfil</span>
-            <select
-              name="perfil"
-              value={perfilSelecionado}
-              onChange={(event) => setPerfilSelecionado(event.target.value)}
-            >
-              {Object.keys(perfisPermissoes).map((perfil) => (
-                <option key={perfil} value={perfil}>
-                  {perfil}
-                </option>
-              ))}
-            </select>
-          </label>
+          {erro && <p className="login-error">{erro}</p>}
 
-          <button className="login-button" type="submit">
-            Entrar
+          <button className="login-button" type="submit" disabled={carregando}>
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
@@ -68,16 +72,6 @@ export default function LoginPage({ onEntrar, perfisPermissoes }) {
           {permissoesIniciais.map((permissao) => (
             <span key={permissao}>{permissao}</span>
           ))}
-          <span>
-            {permissoesPerfil.podeLimparPago
-              ? "Pode limpar pago"
-              : "Não pode limpar pago"}
-          </span>
-          <span>
-            {permissoesPerfil.podeEditarTudo
-              ? "Pode editar tudo"
-              : "Edição limitada"}
-          </span>
         </div>
       </section>
     </main>

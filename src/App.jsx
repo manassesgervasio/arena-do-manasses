@@ -9,8 +9,7 @@ import { supabase } from "./supabase";
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
-const ACESSO_STORAGE_KEY = "arena-manasses-acessoLiberado";
-const PERFIL_STORAGE_KEY = "arena-manasses-perfilSelecionado";
+const PERFIL_PADRAO = "Funcionário";
 const PERFIS_PERMISSOES = {
   Administrador: {
     podeLimparPago: true,
@@ -26,22 +25,18 @@ function perfilValido(perfil) {
   return Object.prototype.hasOwnProperty.call(PERFIS_PERMISSOES, perfil);
 }
 
-function restaurarAcessoLocal() {
-  const acessoSalvo = localStorage.getItem(ACESSO_STORAGE_KEY);
-  const perfilSalvo = localStorage.getItem(PERFIL_STORAGE_KEY);
+function obterPerfilDaSessao(session) {
+  if (!session) return null;
 
-  return acessoSalvo === "true" && perfilValido(perfilSalvo);
-}
+  const perfil = session.user?.user_metadata?.perfil;
 
-function restaurarPerfilLocal() {
-  const perfilSalvo = localStorage.getItem(PERFIL_STORAGE_KEY);
-
-  return perfilValido(perfilSalvo) ? perfilSalvo : null;
+  return perfilValido(perfil) ? perfil : PERFIL_PADRAO;
 }
 
 export default function App() {
-  const [acessoLiberado, setAcessoLiberado] = useState(restaurarAcessoLocal);
-  const [perfilLogado, setPerfilLogado] = useState(restaurarPerfilLocal);
+  const [sessaoAuth, setSessaoAuth] = useState(null);
+  const [authCarregando, setAuthCarregando] = useState(true);
+  const [perfilLogado, setPerfilLogado] = useState(null);
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -57,6 +52,35 @@ export default function App() {
   const [buscaCliente, setBuscaCliente] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("Todos");
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
+
+  useEffect(() => {
+  let ativo = true;
+
+  async function carregarSessao() {
+    const { data } = await supabase.auth.getSession();
+
+    if (!ativo) return;
+
+    setSessaoAuth(data.session);
+    setPerfilLogado(obterPerfilDaSessao(data.session));
+    setAuthCarregando(false);
+  }
+
+  carregarSessao();
+
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (!ativo) return;
+
+    setSessaoAuth(session);
+    setPerfilLogado(obterPerfilDaSessao(session));
+    setAuthCarregando(false);
+  });
+
+  return () => {
+    ativo = false;
+    data.subscription.unsubscribe();
+  };
+}, []);
 
   useEffect(() => {
   async function carregarReservas() {
@@ -383,25 +407,40 @@ return "#14532d";
     ? PERFIS_PERMISSOES[perfilLogado]
     : null;
 
-  function entrarComPerfil(perfil) {
-    setPerfilLogado(perfil);
-    setAcessoLiberado(true);
-    localStorage.setItem(ACESSO_STORAGE_KEY, "true");
-    localStorage.setItem(PERFIL_STORAGE_KEY, perfil);
+  async function entrarComEmailSenha({ email, senha }) {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: senha,
+    });
+
+    if (error) {
+      return "E-mail ou senha inválidos. Confira os dados e tente novamente.";
+    }
+
+    return "";
   }
 
-  function sair() {
-    setPerfilLogado(null);
-    setAcessoLiberado(false);
-    localStorage.removeItem(ACESSO_STORAGE_KEY);
-    localStorage.removeItem(PERFIL_STORAGE_KEY);
+  async function sair() {
+    await supabase.auth.signOut();
   }
 
-  if (!acessoLiberado) {
+  if (authCarregando) {
+    return (
+      <main className="login-page">
+        <section className="login-panel" aria-label="Carregando sessão">
+          <div className="login-brand">
+            <h1>Arena do Manassés</h1>
+            <p>Carregando sessão...</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!sessaoAuth) {
     return (
       <LoginPage
-        onEntrar={entrarComPerfil}
-        perfisPermissoes={PERFIS_PERMISSOES}
+        onEntrar={entrarComEmailSenha}
       />
     );
   }

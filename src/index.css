@@ -256,6 +256,22 @@ code {
   cursor: pointer;
 }
 
+.login-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.login-error {
+  padding: 10px 12px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 12px;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .login-permissions {
   display: flex;
   flex-wrap: wrap;
