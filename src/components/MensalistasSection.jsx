@@ -2,6 +2,26 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
+const pagamentoSelect =
+  "id,mensalista_id,competencia,valor,data_vencimento,situacao,data_pagamento";
+
+function obterCompetenciaAtual() {
+  const hoje = new Date();
+
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function obterDataHoje() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function obterDataVencimento(competencia, diaVencimento) {
+  const [ano, mes] = competencia.split("-").map(Number);
+  const ultimoDia = new Date(ano, mes, 0).getDate();
+  const dia = Math.min(Number(diaVencimento || 1), ultimoDia);
+
+  return `${competencia}-${String(dia).padStart(2, "0")}`;
+}
 
 function normalizarMensalista(mensalista) {
   return {
@@ -15,9 +35,12 @@ function normalizarMensalista(mensalista) {
 }
 
 export default function MensalistasSection({ moeda }) {
+  const competenciaAtual = obterCompetenciaAtual();
   const [mensalistas, setMensalistas] = useState([]);
+  const [pagamentos, setPagamentos] = useState({});
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [pagamentoSalvandoId, setPagamentoSalvandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [novoMensalista, setNovoMensalista] = useState({
@@ -48,7 +71,32 @@ export default function MensalistasSection({ moeda }) {
         return;
       }
 
-      setMensalistas((data || []).map(normalizarMensalista));
+      const mensalistasNormalizados = (data || []).map(normalizarMensalista);
+      const mensalistaIds = mensalistasNormalizados.map((mensalista) => mensalista.id);
+      const pagamentosPorMensalista = {};
+
+      if (mensalistaIds.length > 0) {
+        const { data: pagamentosData, error: pagamentosError } = await supabase
+          .from("mensalista_pagamentos")
+          .select(pagamentoSelect)
+          .eq("competencia", competenciaAtual)
+          .in("mensalista_id", mensalistaIds);
+
+        if (!ativo) return;
+
+        if (pagamentosError) {
+          setErro("Não foi possível carregar os pagamentos dos mensalistas. Tente novamente em instantes.");
+          setCarregando(false);
+          return;
+        }
+
+        (pagamentosData || []).forEach((pagamento) => {
+          pagamentosPorMensalista[pagamento.mensalista_id] = pagamento;
+        });
+      }
+
+      setMensalistas(mensalistasNormalizados);
+      setPagamentos(pagamentosPorMensalista);
       setCarregando(false);
     }
 
@@ -57,7 +105,7 @@ export default function MensalistasSection({ moeda }) {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [competenciaAtual]);
 
   function atualizarCampo(campo, valor) {
     setNovoMensalista((anterior) => ({
@@ -108,12 +156,67 @@ export default function MensalistasSection({ moeda }) {
     setMostrarFormulario(false);
   }
 
+  function obterSituacaoMensal(mensalista) {
+    const pagamento = pagamentos[mensalista.id];
+
+    if (pagamento?.situacao) {
+      return pagamento.situacao;
+    }
+
+    const dataVencimento = obterDataVencimento(
+      competenciaAtual,
+      mensalista.vencimento
+    );
+
+    return obterDataHoje() > dataVencimento ? "Vencido" : "Pendente";
+  }
+
+  async function marcarMensalidadeComoPaga(mensalista) {
+    setErro("");
+    setPagamentoSalvandoId(mensalista.id);
+
+    const pagamentoAtual = pagamentos[mensalista.id];
+    const pagamentoBanco = {
+      mensalista_id: mensalista.id,
+      competencia: competenciaAtual,
+      valor: mensalista.valorMensal,
+      data_vencimento: obterDataVencimento(competenciaAtual, mensalista.vencimento),
+      situacao: "Pago",
+      data_pagamento: obterDataHoje(),
+    };
+
+    const resultado = pagamentoAtual?.id
+      ? await supabase
+          .from("mensalista_pagamentos")
+          .update(pagamentoBanco)
+          .eq("id", pagamentoAtual.id)
+          .select(pagamentoSelect)
+          .single()
+      : await supabase
+          .from("mensalista_pagamentos")
+          .insert([pagamentoBanco])
+          .select(pagamentoSelect)
+          .single();
+
+    setPagamentoSalvandoId(null);
+
+    if (resultado.error) {
+      setErro("Não foi possível marcar a mensalidade como paga. Tente novamente.");
+      return;
+    }
+
+    setPagamentos((anteriores) => ({
+      ...anteriores,
+      [mensalista.id]: resultado.data,
+    }));
+  }
+
   return (
     <section className="mensalistas-section">
       <div className="mensalistas-header">
         <div>
           <h2>Mensalistas</h2>
-          <p>Cadastro conectado ao Supabase, sem agenda e sem pagamentos</p>
+          <p>Mensalidades de {competenciaAtual}, sem agenda e sem resumo financeiro</p>
         </div>
 
         <button
@@ -187,6 +290,12 @@ export default function MensalistasSection({ moeda }) {
 
           {mensalistas.map((mensalista) => (
             <article className="mensalista-card" key={mensalista.id}>
+              {(() => {
+                const situacao = obterSituacaoMensal(mensalista);
+                const estaPago = situacao === "Pago";
+
+                return (
+                  <>
               <div className="mensalista-card-header">
                 <div>
                   <h3>{mensalista.nome}</h3>
@@ -209,6 +318,30 @@ export default function MensalistasSection({ moeda }) {
                   value={`Dia ${mensalista.vencimento}`}
                 />
               </div>
+
+              <div className="mensalista-payment-row">
+                <span
+                  className={`mensalista-situacao mensalista-situacao-${situacao.toLowerCase()}`}
+                >
+                  {situacao}
+                </span>
+
+                <button
+                  type="button"
+                  className="mensalista-payment-button"
+                  disabled={estaPago || pagamentoSalvandoId === mensalista.id}
+                  onClick={() => marcarMensalidadeComoPaga(mensalista)}
+                >
+                  {pagamentoSalvandoId === mensalista.id
+                    ? "Salvando..."
+                    : estaPago
+                    ? "Mensalidade paga"
+                    : "Marcar como pago"}
+                </button>
+              </div>
+                  </>
+                );
+              })()}
             </article>
           ))}
         </div>

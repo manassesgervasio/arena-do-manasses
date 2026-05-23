@@ -364,6 +364,30 @@ code {
   line-height: 19px;
 }
 
+.mensalista-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mensalista-payment-button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 9px;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.mensalista-payment-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
 .login-page {
   min-height: 100svh;
   display: grid;
@@ -764,6 +788,15 @@ code {
 
   .mensalistas-grid {
     grid-template-columns: 1fr;
+  }
+
+  .mensalista-payment-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mensalista-payment-button {
+    width: 100%;
   }
 
   .mobile-navigation-item.is-active {
