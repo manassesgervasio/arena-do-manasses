@@ -25,6 +25,13 @@ function obterDataVencimento(competencia, diaVencimento) {
   return `${competencia}-${String(dia).padStart(2, "0")}`;
 }
 
+function formatarDataCurta(dataTexto) {
+  if (!dataTexto) return "-";
+
+  const [ano, mes, dia] = dataTexto.split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 function normalizarMensalista(mensalista) {
   return {
     id: mensalista.id,
@@ -46,15 +53,17 @@ function criarFormularioVazio() {
   };
 }
 
-export default function MensalistasSection({ moeda }) {
+export default function MensalistasSection({ moeda, perfilLogado }) {
   const competenciaAtual = obterCompetenciaAtual();
+  const podeExcluirMensalista = perfilLogado === "Administrador";
   const [mensalistas, setMensalistas] = useState([]);
   const [pagamentos, setPagamentos] = useState({});
+  const [historicoPagamentos, setHistoricoPagamentos] = useState({});
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [pagamentoSalvandoId, setPagamentoSalvandoId] = useState(null);
   const [pagamentoExcluindoId, setPagamentoExcluindoId] = useState(null);
-  const [cancelandoId, setCancelandoId] = useState(null);
+  const [mensalistaExcluindoId, setMensalistaExcluindoId] = useState(null);
   const [erro, setErro] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("Todos");
   const [filtroSituacao, setFiltroSituacao] = useState("Todos");
@@ -84,14 +93,15 @@ export default function MensalistasSection({ moeda }) {
 
       const mensalistasNormalizados = (data || []).map(normalizarMensalista);
       const mensalistaIds = mensalistasNormalizados.map((mensalista) => mensalista.id);
-      const pagamentosPorMensalista = {};
+      const pagamentosAtuais = {};
+      const historicoPorMensalista = {};
 
       if (mensalistaIds.length > 0) {
         const { data: pagamentosData, error: pagamentosError } = await supabase
           .from("mensalista_pagamentos")
           .select(pagamentoSelect)
-          .eq("competencia", competenciaAtual)
-          .in("mensalista_id", mensalistaIds);
+          .in("mensalista_id", mensalistaIds)
+          .order("competencia", { ascending: false });
 
         if (!ativo) return;
 
@@ -102,12 +112,21 @@ export default function MensalistasSection({ moeda }) {
         }
 
         (pagamentosData || []).forEach((pagamento) => {
-          pagamentosPorMensalista[pagamento.mensalista_id] = pagamento;
+          if (!historicoPorMensalista[pagamento.mensalista_id]) {
+            historicoPorMensalista[pagamento.mensalista_id] = [];
+          }
+
+          historicoPorMensalista[pagamento.mensalista_id].push(pagamento);
+
+          if (pagamento.competencia === competenciaAtual) {
+            pagamentosAtuais[pagamento.mensalista_id] = pagamento;
+          }
         });
       }
 
       setMensalistas(mensalistasNormalizados);
-      setPagamentos(pagamentosPorMensalista);
+      setPagamentos(pagamentosAtuais);
+      setHistoricoPagamentos(historicoPorMensalista);
       setCarregando(false);
     }
 
@@ -200,6 +219,21 @@ export default function MensalistasSection({ moeda }) {
     return obterDataHoje() > dataVencimento ? "Vencido" : "Pendente";
   }
 
+  function atualizarHistoricoPagamento(mensalistaId, pagamentoAtualizado) {
+    setHistoricoPagamentos((anteriores) => {
+      const historicoAtual = anteriores[mensalistaId] || [];
+      const proximosPagamentos = [
+        pagamentoAtualizado,
+        ...historicoAtual.filter((pagamento) => pagamento.id !== pagamentoAtualizado.id),
+      ].sort((a, b) => b.competencia.localeCompare(a.competencia));
+
+      return {
+        ...anteriores,
+        [mensalistaId]: proximosPagamentos,
+      };
+    });
+  }
+
   async function marcarMensalidadeComoPaga(mensalista) {
     setErro("");
     setPagamentoSalvandoId(mensalista.id);
@@ -238,40 +272,56 @@ export default function MensalistasSection({ moeda }) {
       ...anteriores,
       [mensalista.id]: resultado.data,
     }));
+    atualizarHistoricoPagamento(mensalista.id, resultado.data);
   }
 
-  async function cancelarMensalista(mensalista) {
+  async function excluirMensalista(mensalista) {
+    if (!podeExcluirMensalista) {
+      setErro("Apenas administradores podem excluir mensalistas.");
+      return;
+    }
+
     const confirmar = confirm(
-      `Cancelar o mensalista "${mensalista.nome}"? Ele continuará aparecendo na lista.`
+      `Excluir definitivamente "${mensalista.nome}" e todo o histórico de pagamentos?`
     );
 
     if (!confirmar) return;
 
-    setErro("");
-    setCancelandoId(mensalista.id);
+    const senha = prompt("Digite a senha de administrador para excluir o mensalista:");
 
-    const { data, error } = await supabase
-      .from("mensalistas")
-      .update({ status: "Cancelado" })
-      .eq("id", mensalista.id)
-      .select(mensalistaSelect)
-      .single();
-
-    setCancelandoId(null);
-
-    if (error) {
-      setErro("Não foi possível cancelar o mensalista. Tente novamente.");
+    if (senha !== "1234") {
+      alert("Senha incorreta.");
       return;
     }
 
-    const mensalistaCancelado = normalizarMensalista(data);
+    setErro("");
+    setMensalistaExcluindoId(mensalista.id);
+
+    const { error } = await supabase
+      .from("mensalistas")
+      .delete()
+      .eq("id", mensalista.id);
+
+    setMensalistaExcluindoId(null);
+
+    if (error) {
+      setErro("Não foi possível excluir o mensalista. Tente novamente.");
+      return;
+    }
 
     setMensalistas((anteriores) =>
-      [
-        mensalistaCancelado,
-        ...anteriores.filter((item) => item.id !== mensalistaCancelado.id),
-      ].sort((a, b) => a.nome.localeCompare(b.nome))
+      anteriores.filter((item) => item.id !== mensalista.id)
     );
+    setPagamentos((anteriores) => {
+      const proximos = { ...anteriores };
+      delete proximos[mensalista.id];
+      return proximos;
+    });
+    setHistoricoPagamentos((anteriores) => {
+      const proximos = { ...anteriores };
+      delete proximos[mensalista.id];
+      return proximos;
+    });
   }
 
   async function excluirPagamentoMensal(mensalista) {
@@ -305,6 +355,12 @@ export default function MensalistasSection({ moeda }) {
       delete proximos[mensalista.id];
       return proximos;
     });
+    setHistoricoPagamentos((anteriores) => ({
+      ...anteriores,
+      [mensalista.id]: (anteriores[mensalista.id] || []).filter(
+        (item) => item.id !== pagamento.id
+      ),
+    }));
   }
 
   const resumoMensalistas = mensalistas.reduce(
@@ -493,6 +549,9 @@ export default function MensalistasSection({ moeda }) {
                 const situacao = obterSituacaoMensal(mensalista);
                 const estaPago = situacao === "Pago";
                 const temPagamentoMensal = Boolean(pagamentos[mensalista.id]?.id);
+                const historico = (historicoPagamentos[mensalista.id] || []).filter(
+                  (pagamento) => pagamento.competencia !== competenciaAtual
+                );
 
                 return (
                   <>
@@ -540,6 +599,28 @@ export default function MensalistasSection({ moeda }) {
                       </button>
                     </div>
 
+                    <section className="mensalista-history">
+                      <h4>Histórico de pagamentos</h4>
+                      {historico.length === 0 ? (
+                        <p>Nenhum pagamento anterior.</p>
+                      ) : (
+                        <div className="mensalista-history-list">
+                          {historico.map((pagamento) => (
+                            <div
+                              className="mensalista-history-item"
+                              key={pagamento.id}
+                            >
+                              <span>{pagamento.competencia}</span>
+                              <strong>{moeda(pagamento.valor)}</strong>
+                              <span>{pagamento.situacao}</span>
+                              <span>{formatarDataCurta(pagamento.data_vencimento)}</span>
+                              <span>{formatarDataCurta(pagamento.data_pagamento)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </section>
+
                     <button
                       type="button"
                       className="mensalista-edit-button"
@@ -548,21 +629,18 @@ export default function MensalistasSection({ moeda }) {
                       Editar mensalista
                     </button>
 
-                    <button
-                      type="button"
-                      className="mensalista-cancel-button"
-                      disabled={
-                        mensalista.status === "Cancelado" ||
-                        cancelandoId === mensalista.id
-                      }
-                      onClick={() => cancelarMensalista(mensalista)}
-                    >
-                      {cancelandoId === mensalista.id
-                        ? "Cancelando..."
-                        : mensalista.status === "Cancelado"
-                        ? "Mensalista cancelado"
-                        : "Cancelar mensalista"}
-                    </button>
+                    {podeExcluirMensalista && (
+                      <button
+                        type="button"
+                        className="mensalista-delete-button"
+                        disabled={mensalistaExcluindoId === mensalista.id}
+                        onClick={() => excluirMensalista(mensalista)}
+                      >
+                        {mensalistaExcluindoId === mensalista.id
+                          ? "Excluindo..."
+                          : "Excluir mensalista"}
+                      </button>
+                    )}
 
                     <button
                       type="button"

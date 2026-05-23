@@ -477,6 +477,23 @@ code {
   opacity: 0.7;
 }
 
+.mensalista-delete-button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(248, 113, 113, 0.34);
+  border-radius: 9px;
+  background: rgba(248, 113, 113, 0.16);
+  color: #fecaca;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.mensalista-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .mensalista-delete-payment-button {
   min-height: 34px;
   padding: 7px 10px;
@@ -492,6 +509,54 @@ code {
 .mensalista-delete-payment-button:disabled {
   cursor: default;
   opacity: 0.7;
+}
+
+.mensalista-history {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.mensalista-history h4 {
+  margin: 0;
+  color: white;
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 900;
+}
+
+.mensalista-history p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 800;
+}
+
+.mensalista-history-list {
+  display: grid;
+  gap: 7px;
+}
+
+.mensalista-history-item {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 0.9fr 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.35);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mensalista-history-item strong {
+  color: white;
+  font-size: 12px;
 }
 
 .login-page {
@@ -936,8 +1001,17 @@ code {
     width: 100%;
   }
 
+  .mensalista-delete-button {
+    width: 100%;
+  }
+
   .mensalista-delete-payment-button {
     width: 100%;
+  }
+
+  .mensalista-history-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .mobile-navigation-item.is-active {

@@ -131,7 +131,7 @@ export default function Home({
   }
 
   function renderMensalistas() {
-    return <MensalistasSection moeda={moeda} />;
+    return <MensalistasSection moeda={moeda} perfilLogado={perfilLogado} />;
   }
 
   function renderMobileContent() {
