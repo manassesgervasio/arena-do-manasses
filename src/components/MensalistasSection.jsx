@@ -1,40 +1,24 @@
-import { useState } from "react";
-
-const mensalistasMock = [
-  {
-    id: 1,
-    nome: "Time Amigos da Arena",
-    telefone: "11987654321",
-    valorMensal: 480,
-    vencimento: 10,
-    status: "Ativo",
-    situacao: "Pago",
-  },
-  {
-    id: 2,
-    nome: "Escolinha Base Forte",
-    telefone: "11912345678",
-    valorMensal: 720,
-    vencimento: 5,
-    status: "Ativo",
-    situacao: "Pendente",
-  },
-  {
-    id: 3,
-    nome: "Grupo Quarta FC",
-    telefone: "11955554444",
-    valorMensal: 360,
-    vencimento: 20,
-    status: "Pausado",
-    situacao: "Vencido",
-  },
-];
+import { useEffect, useState } from "react";
+import { supabase } from "../supabase";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
-const situacaoLista = ["Pago", "Pendente", "Vencido"];
+
+function normalizarMensalista(mensalista) {
+  return {
+    id: mensalista.id,
+    nome: mensalista.nome || "",
+    telefone: mensalista.telefone || "",
+    valorMensal: Number(mensalista.valor_mensal || 0),
+    vencimento: Number(mensalista.dia_vencimento || 1),
+    status: mensalista.status || "Ativo",
+  };
+}
 
 export default function MensalistasSection({ moeda }) {
-  const [mensalistas, setMensalistas] = useState(mensalistasMock);
+  const [mensalistas, setMensalistas] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [novoMensalista, setNovoMensalista] = useState({
     nome: "",
@@ -42,8 +26,38 @@ export default function MensalistasSection({ moeda }) {
     valorMensal: "",
     vencimento: "",
     status: "Ativo",
-    situacao: "Pendente",
   });
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarMensalistas() {
+      setCarregando(true);
+      setErro("");
+
+      const { data, error } = await supabase
+        .from("mensalistas")
+        .select("id,nome,telefone,valor_mensal,dia_vencimento,status")
+        .order("nome", { ascending: true });
+
+      if (!ativo) return;
+
+      if (error) {
+        setErro("Não foi possível carregar os mensalistas. Tente novamente em instantes.");
+        setCarregando(false);
+        return;
+      }
+
+      setMensalistas((data || []).map(normalizarMensalista));
+      setCarregando(false);
+    }
+
+    carregarMensalistas();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   function atualizarCampo(campo, valor) {
     setNovoMensalista((anterior) => ({
@@ -52,18 +66,37 @@ export default function MensalistasSection({ moeda }) {
     }));
   }
 
-  function adicionarMensalista(event) {
+  async function adicionarMensalista(event) {
     event.preventDefault();
+    setErro("");
+    setSalvando(true);
 
-    setMensalistas((anteriores) => [
-      {
-        ...novoMensalista,
-        id: Date.now(),
-        valorMensal: Number(novoMensalista.valorMensal || 0),
-        vencimento: Number(novoMensalista.vencimento || 1),
-      },
-      ...anteriores,
-    ]);
+    const mensalistaBanco = {
+      nome: novoMensalista.nome.trim(),
+      telefone: novoMensalista.telefone.trim(),
+      valor_mensal: Number(novoMensalista.valorMensal || 0),
+      dia_vencimento: Number(novoMensalista.vencimento || 1),
+      status: novoMensalista.status,
+    };
+
+    const { data, error } = await supabase
+      .from("mensalistas")
+      .insert([mensalistaBanco])
+      .select("id,nome,telefone,valor_mensal,dia_vencimento,status")
+      .single();
+
+    setSalvando(false);
+
+    if (error) {
+      setErro("Não foi possível salvar o mensalista. Confira os dados e tente novamente.");
+      return;
+    }
+
+    setMensalistas((anteriores) =>
+      [normalizarMensalista(data), ...anteriores].sort((a, b) =>
+        a.nome.localeCompare(b.nome)
+      )
+    );
 
     setNovoMensalista({
       nome: "",
@@ -71,7 +104,6 @@ export default function MensalistasSection({ moeda }) {
       valorMensal: "",
       vencimento: "",
       status: "Ativo",
-      situacao: "Pendente",
     });
     setMostrarFormulario(false);
   }
@@ -81,7 +113,7 @@ export default function MensalistasSection({ moeda }) {
       <div className="mensalistas-header">
         <div>
           <h2>Mensalistas</h2>
-          <p>Cadastro visual temporario, sem banco e sem agenda</p>
+          <p>Cadastro conectado ao Supabase, sem agenda e sem pagamentos</p>
         </div>
 
         <button
@@ -92,6 +124,8 @@ export default function MensalistasSection({ moeda }) {
           {mostrarFormulario ? "Fechar" : "Novo mensalista"}
         </button>
       </div>
+
+      {erro && <p className="mensalistas-error">{erro}</p>}
 
       {mostrarFormulario && (
         <form className="mensalistas-form" onSubmit={adicionarMensalista}>
@@ -137,46 +171,48 @@ export default function MensalistasSection({ moeda }) {
               <option key={status}>{status}</option>
             ))}
           </select>
-          <select
-            value={novoMensalista.situacao}
-            onChange={(event) => atualizarCampo("situacao", event.target.value)}
-          >
-            {situacaoLista.map((situacao) => (
-              <option key={situacao}>{situacao}</option>
-            ))}
-          </select>
-          <button type="submit">Adicionar</button>
+          <button type="submit" disabled={salvando}>
+            {salvando ? "Salvando..." : "Adicionar"}
+          </button>
         </form>
       )}
 
-      <div className="mensalistas-grid">
-        {mensalistas.map((mensalista) => (
-          <article className="mensalista-card" key={mensalista.id}>
-            <div className="mensalista-card-header">
-              <div>
-                <h3>{mensalista.nome}</h3>
-                <p>{mensalista.telefone || "Sem telefone"}</p>
+      {carregando ? (
+        <div className="mensalistas-empty">Carregando mensalistas...</div>
+      ) : (
+        <div className="mensalistas-grid">
+          {mensalistas.length === 0 && (
+            <div className="mensalistas-empty">Nenhum mensalista cadastrado.</div>
+          )}
+
+          {mensalistas.map((mensalista) => (
+            <article className="mensalista-card" key={mensalista.id}>
+              <div className="mensalista-card-header">
+                <div>
+                  <h3>{mensalista.nome}</h3>
+                  <p>{mensalista.telefone || "Sem telefone"}</p>
+                </div>
+                <span
+                  className={`mensalista-badge mensalista-badge-${mensalista.status.toLowerCase()}`}
+                >
+                  {mensalista.status}
+                </span>
               </div>
-              <span
-                className={`mensalista-badge mensalista-badge-${mensalista.status.toLowerCase()}`}
-              >
-                {mensalista.status}
-              </span>
-            </div>
 
-            <div className="mensalista-info-grid">
-              <Info label="Valor mensal" value={moeda(mensalista.valorMensal)} />
-              <Info label="Vencimento" value={`Dia ${mensalista.vencimento}`} />
-            </div>
-
-            <span
-              className={`mensalista-situacao mensalista-situacao-${mensalista.situacao.toLowerCase()}`}
-            >
-              {mensalista.situacao}
-            </span>
-          </article>
-        ))}
-      </div>
+              <div className="mensalista-info-grid">
+                <Info
+                  label="Valor mensal"
+                  value={moeda(mensalista.valorMensal)}
+                />
+                <Info
+                  label="Vencimento"
+                  value={`Dia ${mensalista.vencimento}`}
+                />
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

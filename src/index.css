@@ -211,6 +211,12 @@ code {
   cursor: pointer;
 }
 
+.mensalistas-primary-button:disabled,
+.mensalistas-form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .mensalistas-primary-button {
   flex: 0 0 auto;
   padding: 10px 14px;
@@ -241,6 +247,27 @@ code {
 
 .mensalistas-form button {
   padding: 10px 14px;
+}
+
+.mensalistas-error,
+.mensalistas-empty {
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.mensalistas-error {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+}
+
+.mensalistas-empty {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #111827;
+  color: #cbd5e1;
+  text-align: center;
 }
 
 .mensalistas-grid {
