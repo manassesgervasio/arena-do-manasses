@@ -48,6 +48,7 @@ export default function App() {
 
     return salvas ? JSON.parse(salvas) : {};
   });
+  const [totalMensalistasPago, setTotalMensalistasPago] = useState(0);
   const [horariosMensalistas, setHorariosMensalistas] = useState({});
   const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
 
@@ -114,6 +115,63 @@ export default function App() {
 
   carregarReservas();
 }, []);
+
+  useEffect(() => {
+  if (!sessaoAuth) {
+    setTotalMensalistasPago(0);
+    return;
+  }
+
+  let ativo = true;
+
+  async function carregarTotalMensalistasPago() {
+    const [
+      { data: mensalistasData, error: mensalistasError },
+      { data, error },
+    ] = await Promise.all([
+      supabase.from("mensalistas").select("id"),
+      supabase
+        .from("mensalista_pagamentos")
+        .select("id,mensalista_id,competencia,valor,situacao")
+        .eq("competencia", mesFiltro)
+        .eq("situacao", "Pago"),
+    ]);
+
+    if (!ativo) return;
+
+    if (mensalistasError || error) {
+      console.log("Erro ao carregar total pago de mensalistas:", mensalistasError || error);
+      setTotalMensalistasPago(0);
+      return;
+    }
+
+    const mensalistasExistentes = new Set(
+      (mensalistasData || []).map((mensalista) => mensalista.id)
+    );
+    const pagamentosPorMensalista = {};
+
+    (data || []).forEach((pagamento) => {
+      if (!mensalistasExistentes.has(pagamento.mensalista_id)) return;
+
+      if (!pagamentosPorMensalista[pagamento.mensalista_id]) {
+        pagamentosPorMensalista[pagamento.mensalista_id] = pagamento;
+      }
+    });
+
+    const totalPago = Object.values(pagamentosPorMensalista).reduce(
+      (total, pagamento) => total + Number(pagamento.valor || 0),
+      0
+    );
+
+    setTotalMensalistasPago(totalPago);
+  }
+
+  carregarTotalMensalistasPago();
+
+  return () => {
+    ativo = false;
+  };
+}, [sessaoAuth, mesFiltro, versaoHorariosMensalistas]);
 
   useEffect(() => {
   if (!sessaoAuth) {
@@ -375,6 +433,11 @@ novasReservas[novaChave] = {
 
 
   const resumo = useResumoReservas(reservas, mesFiltro);
+  const resumoFinanceiro = {
+    ...resumo,
+    totalMensalistas: totalMensalistasPago,
+    totalGeral: Number(resumo.faturamentoMes || 0) + totalMensalistasPago,
+  };
   
   const { clientes, clientesFiltrados } = useClientes(
     resumo.lista,
@@ -585,7 +648,7 @@ return "#14532d";
       statusLista={statusLista}
       horariosMensalistas={horariosMensalistas}
       onMensalistasChange={recarregarHorariosMensalistas}
-      resumo={resumo}
+      resumo={resumoFinanceiro}
       clientes={clientes}
       clientesFiltrados={clientesFiltrados}
       buscaCliente={buscaCliente}

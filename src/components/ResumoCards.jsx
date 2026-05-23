@@ -14,6 +14,14 @@ export default function ResumoCards({ resumo, moeda }) {
       <ResumoCard titulo="Pagos" valor={resumo.pagos} />
       <ResumoCard titulo="Reservados" valor={resumo.reservados} />
       <ResumoCard
+        titulo="Total mensalistas"
+        valor={moeda(resumo.totalMensalistas || 0)}
+      />
+      <ResumoCard
+        titulo="Total geral"
+        valor={moeda(resumo.totalGeral || 0)}
+      />
+      <ResumoCard
         titulo="Mês Pago"
         valor={moeda(resumo.faturamentoMes)}
       />

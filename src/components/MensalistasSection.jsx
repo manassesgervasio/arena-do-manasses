@@ -338,6 +338,7 @@ export default function MensalistasSection({
       [mensalista.id]: resultado.data,
     }));
     atualizarHistoricoPagamento(mensalista.id, resultado.data);
+    onMensalistasChange?.();
   }
 
   async function excluirMensalista(mensalista) {
@@ -362,15 +363,71 @@ export default function MensalistasSection({
     setErro("");
     setMensalistaExcluindoId(mensalista.id);
 
+    const { error: pagamentosError } = await supabase
+      .from("mensalista_pagamentos")
+      .delete()
+      .eq("mensalista_id", mensalista.id);
+
+    if (pagamentosError) {
+      setMensalistaExcluindoId(null);
+      setErro("Nao foi possivel excluir os pagamentos do mensalista. Tente novamente.");
+      return;
+    }
+
+    const { error: horariosError } = await supabase
+      .from("mensalista_horarios")
+      .delete()
+      .eq("mensalista_id", mensalista.id);
+
+    if (horariosError) {
+      setMensalistaExcluindoId(null);
+      setErro("Nao foi possivel excluir os horarios contratados do mensalista. Tente novamente.");
+      return;
+    }
+
     const { error } = await supabase
       .from("mensalistas")
       .delete()
       .eq("id", mensalista.id);
 
+    if (error) {
+      setMensalistaExcluindoId(null);
+      setErro("Não foi possível excluir o mensalista. Tente novamente.");
+      return;
+    }
+
+    const [
+      { data: mensalistaRestante, error: mensalistaVerificacaoError },
+      { data: pagamentosRestantes, error: pagamentosVerificacaoError },
+      { data: horariosRestantes, error: horariosVerificacaoError },
+    ] = await Promise.all([
+      supabase.from("mensalistas").select("id").eq("id", mensalista.id),
+      supabase
+        .from("mensalista_pagamentos")
+        .select("id")
+        .eq("mensalista_id", mensalista.id),
+      supabase
+        .from("mensalista_horarios")
+        .select("id")
+        .eq("mensalista_id", mensalista.id),
+    ]);
+
     setMensalistaExcluindoId(null);
 
-    if (error) {
-      setErro("Não foi possível excluir o mensalista. Tente novamente.");
+    if (
+      mensalistaVerificacaoError ||
+      pagamentosVerificacaoError ||
+      horariosVerificacaoError
+    ) {
+      setErro("Mensalista excluido, mas nao foi possivel verificar todos os registros relacionados.");
+    }
+
+    if (
+      mensalistaRestante?.length ||
+      pagamentosRestantes?.length ||
+      horariosRestantes?.length
+    ) {
+      setErro("A exclusao nao removeu todos os dados relacionados. Atualize a pagina e tente novamente.");
       return;
     }
 
@@ -432,6 +489,7 @@ export default function MensalistasSection({
         (item) => item.id !== pagamento.id
       ),
     }));
+    onMensalistasChange?.();
   }
 
   const resumoMensalistas = mensalistas.reduce(
