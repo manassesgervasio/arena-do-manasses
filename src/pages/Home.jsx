@@ -32,6 +32,7 @@ export default function Home({
   pegarReserva,
   atualizarReserva,
   reservarHorario,
+  alugarMensalistaComoAvulso,
   limparReserva,
   mudarSemana,
   alterarData,
@@ -92,6 +93,7 @@ export default function Home({
         pegarReserva={pegarReserva}
         atualizarReserva={atualizarReserva}
         reservarHorario={reservarHorario}
+        alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
         limparReserva={limparReserva}
         permissoesLogado={permissoesLogado}
       />

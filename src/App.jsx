@@ -221,6 +221,8 @@ async function salvarReservaBanco(reserva) {
   if (error) {
     console.log(error);
   }
+
+  return error;
 }
   function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
@@ -484,6 +486,49 @@ return "#14532d";
   alert(`Horário fixo reservado por ${semanas} semana(s)!`);
 }
 
+  async function alugarMensalistaComoAvulso(dataTexto, horario, dadosReserva) {
+  const reservaAtual = pegarReserva(dataTexto, horario);
+  const temReservaReal =
+    reservaAtual.status !== "Livre" ||
+    (reservaAtual.tipo && reservaAtual.tipo !== "Avulso") ||
+    Boolean(reservaAtual.cliente?.trim()) ||
+    Boolean(reservaAtual.telefone?.trim()) ||
+    Number(reservaAtual.valor || 0) > 0;
+
+  if (temReservaReal) {
+    return "Este horÃ¡rio jÃ¡ possui uma reserva real.";
+  }
+
+  const novaReserva = {
+    cliente: dadosReserva.cliente.trim(),
+    telefone: dadosReserva.telefone.trim(),
+    data: dataTexto,
+    horario,
+    valor: Number(dadosReserva.valor || 0),
+    status: dadosReserva.status || "Reservado",
+    tipo: "Avulso",
+  };
+
+  const error = await salvarReservaBanco(novaReserva);
+
+  if (error) {
+    return "NÃ£o foi possÃ­vel alugar este horÃ¡rio como avulso. Tente novamente.";
+  }
+
+  setReservas((anterior) => ({
+    ...anterior,
+    [chaveReserva(dataTexto, horario)]: {
+      cliente: novaReserva.cliente,
+      telefone: novaReserva.telefone,
+      valor: novaReserva.valor,
+      status: novaReserva.status,
+      tipo: "Avulso",
+    },
+  }));
+
+  return "";
+}
+
   const permissoesLogado = perfilLogado
     ? PERFIS_PERMISSOES[perfilLogado]
     : null;
@@ -552,6 +597,7 @@ return "#14532d";
       pegarReserva={pegarReserva}
       atualizarReserva={atualizarReserva}
       reservarHorario={reservarHorario}
+      alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
       limparReserva={limparReserva}
       mudarSemana={mudarSemana}
       alterarData={alterarData}

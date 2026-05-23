@@ -15,6 +15,7 @@ export default function AgendaGrid({
   pegarReserva,
   atualizarReserva,
   reservarHorario,
+  alugarMensalistaComoAvulso,
   limparReserva,
   permissoesLogado,
 }) {
@@ -126,6 +127,9 @@ const jogosDia = horarios.filter((horaAtual) => {
           )
         }
         onReservar={() => reservarHorario(dataTexto, hora)}
+        onAlugarComoAvulso={(dadosReserva) =>
+          alugarMensalistaComoAvulso(dataTexto, hora, dadosReserva)
+        }
         onLimpar={() => {
   if (item.status === "Pago") {
     if (!permissoesLogado?.podeLimparPago) {
