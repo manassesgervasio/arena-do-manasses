@@ -52,6 +52,7 @@ export default function MensalistasSection({ moeda }) {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [pagamentoSalvandoId, setPagamentoSalvandoId] = useState(null);
+  const [cancelandoId, setCancelandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mensalistaEditandoId, setMensalistaEditandoId] = useState(null);
@@ -233,6 +234,40 @@ export default function MensalistasSection({ moeda }) {
       ...anteriores,
       [mensalista.id]: resultado.data,
     }));
+  }
+
+  async function cancelarMensalista(mensalista) {
+    const confirmar = confirm(
+      `Cancelar o mensalista "${mensalista.nome}"? Ele continuará aparecendo na lista.`
+    );
+
+    if (!confirmar) return;
+
+    setErro("");
+    setCancelandoId(mensalista.id);
+
+    const { data, error } = await supabase
+      .from("mensalistas")
+      .update({ status: "Cancelado" })
+      .eq("id", mensalista.id)
+      .select(mensalistaSelect)
+      .single();
+
+    setCancelandoId(null);
+
+    if (error) {
+      setErro("Não foi possível cancelar o mensalista. Tente novamente.");
+      return;
+    }
+
+    const mensalistaCancelado = normalizarMensalista(data);
+
+    setMensalistas((anteriores) =>
+      [
+        mensalistaCancelado,
+        ...anteriores.filter((item) => item.id !== mensalistaCancelado.id),
+      ].sort((a, b) => a.nome.localeCompare(b.nome))
+    );
   }
 
   const resumoMensalistas = mensalistas.reduce(
@@ -435,6 +470,22 @@ export default function MensalistasSection({ moeda }) {
                       onClick={() => iniciarEdicao(mensalista)}
                     >
                       Editar mensalista
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mensalista-cancel-button"
+                      disabled={
+                        mensalista.status === "Cancelado" ||
+                        cancelandoId === mensalista.id
+                      }
+                      onClick={() => cancelarMensalista(mensalista)}
+                    >
+                      {cancelandoId === mensalista.id
+                        ? "Cancelando..."
+                        : mensalista.status === "Cancelado"
+                        ? "Mensalista cancelado"
+                        : "Cancelar mensalista"}
                     </button>
                   </>
                 );
