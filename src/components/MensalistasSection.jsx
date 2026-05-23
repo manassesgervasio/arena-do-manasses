@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
+const situacaoLista = ["Pago", "Pendente", "Vencido"];
 const mensalistaSelect = "id,nome,telefone,valor_mensal,dia_vencimento,status";
 const pagamentoSelect =
   "id,mensalista_id,competencia,valor,data_vencimento,situacao,data_pagamento";
@@ -52,8 +53,11 @@ export default function MensalistasSection({ moeda }) {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [pagamentoSalvandoId, setPagamentoSalvandoId] = useState(null);
+  const [pagamentoExcluindoId, setPagamentoExcluindoId] = useState(null);
   const [cancelandoId, setCancelandoId] = useState(null);
   const [erro, setErro] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("Todos");
+  const [filtroSituacao, setFiltroSituacao] = useState("Todos");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mensalistaEditandoId, setMensalistaEditandoId] = useState(null);
   const [novoMensalista, setNovoMensalista] = useState(criarFormularioVazio);
@@ -270,6 +274,39 @@ export default function MensalistasSection({ moeda }) {
     );
   }
 
+  async function excluirPagamentoMensal(mensalista) {
+    const pagamento = pagamentos[mensalista.id];
+
+    if (!pagamento?.id) return;
+
+    const confirmar = confirm(
+      `Excluir o pagamento de ${competenciaAtual} de "${mensalista.nome}"?`
+    );
+
+    if (!confirmar) return;
+
+    setErro("");
+    setPagamentoExcluindoId(mensalista.id);
+
+    const { error } = await supabase
+      .from("mensalista_pagamentos")
+      .delete()
+      .eq("id", pagamento.id);
+
+    setPagamentoExcluindoId(null);
+
+    if (error) {
+      setErro("Não foi possível excluir o pagamento mensal. Tente novamente.");
+      return;
+    }
+
+    setPagamentos((anteriores) => {
+      const proximos = { ...anteriores };
+      delete proximos[mensalista.id];
+      return proximos;
+    });
+  }
+
   const resumoMensalistas = mensalistas.reduce(
     (resumo, mensalista) => {
       if (mensalista.status === "Ativo") {
@@ -301,6 +338,16 @@ export default function MensalistasSection({ moeda }) {
       ativos: 0,
     }
   );
+
+  const mensalistasFiltrados = mensalistas.filter((mensalista) => {
+    const statusOk =
+      filtroStatus === "Todos" || mensalista.status === filtroStatus;
+    const situacao = obterSituacaoMensal(mensalista);
+    const situacaoOk =
+      filtroSituacao === "Todos" || situacao === filtroSituacao;
+
+    return statusOk && situacaoOk;
+  });
 
   return (
     <section className="mensalistas-section">
@@ -404,19 +451,48 @@ export default function MensalistasSection({ moeda }) {
         </form>
       )}
 
+      <div className="mensalistas-filters" aria-label="Filtros de mensalistas">
+        <label>
+          <span>Status</span>
+          <select
+            value={filtroStatus}
+            onChange={(event) => setFiltroStatus(event.target.value)}
+          >
+            <option>Todos</option>
+            {statusLista.map((status) => (
+              <option key={status}>{status}</option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          <span>Situação financeira</span>
+          <select
+            value={filtroSituacao}
+            onChange={(event) => setFiltroSituacao(event.target.value)}
+          >
+            <option>Todos</option>
+            {situacaoLista.map((situacao) => (
+              <option key={situacao}>{situacao}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       {carregando ? (
         <div className="mensalistas-empty">Carregando mensalistas...</div>
       ) : (
         <div className="mensalistas-grid">
-          {mensalistas.length === 0 && (
-            <div className="mensalistas-empty">Nenhum mensalista cadastrado.</div>
+          {mensalistasFiltrados.length === 0 && (
+            <div className="mensalistas-empty">Nenhum mensalista encontrado.</div>
           )}
 
-          {mensalistas.map((mensalista) => (
+          {mensalistasFiltrados.map((mensalista) => (
             <article className="mensalista-card" key={mensalista.id}>
               {(() => {
                 const situacao = obterSituacaoMensal(mensalista);
                 const estaPago = situacao === "Pago";
+                const temPagamentoMensal = Boolean(pagamentos[mensalista.id]?.id);
 
                 return (
                   <>
@@ -486,6 +562,22 @@ export default function MensalistasSection({ moeda }) {
                         : mensalista.status === "Cancelado"
                         ? "Mensalista cancelado"
                         : "Cancelar mensalista"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="mensalista-delete-payment-button"
+                      disabled={
+                        !temPagamentoMensal ||
+                        pagamentoExcluindoId === mensalista.id
+                      }
+                      onClick={() => excluirPagamentoMensal(mensalista)}
+                    >
+                      {pagamentoExcluindoId === mensalista.id
+                        ? "Excluindo..."
+                        : temPagamentoMensal
+                        ? "Excluir pagamento mensal"
+                        : "Sem pagamento mensal"}
                     </button>
                   </>
                 );
