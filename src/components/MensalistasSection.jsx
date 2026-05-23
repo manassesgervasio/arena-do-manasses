@@ -211,6 +211,38 @@ export default function MensalistasSection({ moeda }) {
     }));
   }
 
+  const resumoMensalistas = mensalistas.reduce(
+    (resumo, mensalista) => {
+      if (mensalista.status === "Ativo") {
+        resumo.ativos += 1;
+        resumo.previsto += mensalista.valorMensal;
+      }
+
+      const situacao = obterSituacaoMensal(mensalista);
+
+      if (situacao === "Pago") {
+        resumo.pago += mensalista.valorMensal;
+      }
+
+      if (situacao === "Pendente") {
+        resumo.pendente += mensalista.valorMensal;
+      }
+
+      if (situacao === "Vencido") {
+        resumo.vencido += mensalista.valorMensal;
+      }
+
+      return resumo;
+    },
+    {
+      previsto: 0,
+      pago: 0,
+      pendente: 0,
+      vencido: 0,
+      ativos: 0,
+    }
+  );
+
   return (
     <section className="mensalistas-section">
       <div className="mensalistas-header">
@@ -229,6 +261,29 @@ export default function MensalistasSection({ moeda }) {
       </div>
 
       {erro && <p className="mensalistas-error">{erro}</p>}
+
+      <div className="mensalistas-summary-grid">
+        <ResumoMensalistaCard
+          titulo="Total mensal previsto"
+          valor={moeda(resumoMensalistas.previsto)}
+        />
+        <ResumoMensalistaCard
+          titulo="Total pago"
+          valor={moeda(resumoMensalistas.pago)}
+        />
+        <ResumoMensalistaCard
+          titulo="Total pendente"
+          valor={moeda(resumoMensalistas.pendente)}
+        />
+        <ResumoMensalistaCard
+          titulo="Total vencido"
+          valor={moeda(resumoMensalistas.vencido)}
+        />
+        <ResumoMensalistaCard
+          titulo="Mensalistas ativos"
+          valor={resumoMensalistas.ativos}
+        />
+      </div>
 
       {mostrarFormulario && (
         <form className="mensalistas-form" onSubmit={adicionarMensalista}>
@@ -355,6 +410,15 @@ function Info({ label, value }) {
     <div className="mensalista-info">
       <span>{label}</span>
       <strong>{value}</strong>
+    </div>
+  );
+}
+
+function ResumoMensalistaCard({ titulo, valor }) {
+  return (
+    <div className="mensalistas-summary-card">
+      <span>{titulo}</span>
+      <strong>{valor}</strong>
     </div>
   );
 }
