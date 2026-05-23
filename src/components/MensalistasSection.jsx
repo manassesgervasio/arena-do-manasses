@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
+const mensalistaSelect = "id,nome,telefone,valor_mensal,dia_vencimento,status";
 const pagamentoSelect =
   "id,mensalista_id,competencia,valor,data_vencimento,situacao,data_pagamento";
 
@@ -34,6 +35,16 @@ function normalizarMensalista(mensalista) {
   };
 }
 
+function criarFormularioVazio() {
+  return {
+    nome: "",
+    telefone: "",
+    valorMensal: "",
+    vencimento: "",
+    status: "Ativo",
+  };
+}
+
 export default function MensalistasSection({ moeda }) {
   const competenciaAtual = obterCompetenciaAtual();
   const [mensalistas, setMensalistas] = useState([]);
@@ -43,13 +54,8 @@ export default function MensalistasSection({ moeda }) {
   const [pagamentoSalvandoId, setPagamentoSalvandoId] = useState(null);
   const [erro, setErro] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [novoMensalista, setNovoMensalista] = useState({
-    nome: "",
-    telefone: "",
-    valorMensal: "",
-    vencimento: "",
-    status: "Ativo",
-  });
+  const [mensalistaEditandoId, setMensalistaEditandoId] = useState(null);
+  const [novoMensalista, setNovoMensalista] = useState(criarFormularioVazio);
 
   useEffect(() => {
     let ativo = true;
@@ -60,7 +66,7 @@ export default function MensalistasSection({ moeda }) {
 
       const { data, error } = await supabase
         .from("mensalistas")
-        .select("id,nome,telefone,valor_mensal,dia_vencimento,status")
+        .select(mensalistaSelect)
         .order("nome", { ascending: true });
 
       if (!ativo) return;
@@ -114,7 +120,25 @@ export default function MensalistasSection({ moeda }) {
     }));
   }
 
-  async function adicionarMensalista(event) {
+  function limparFormularioMensalista() {
+    setNovoMensalista(criarFormularioVazio());
+    setMensalistaEditandoId(null);
+  }
+
+  function iniciarEdicao(mensalista) {
+    setErro("");
+    setNovoMensalista({
+      nome: mensalista.nome,
+      telefone: mensalista.telefone,
+      valorMensal: String(mensalista.valorMensal),
+      vencimento: String(mensalista.vencimento),
+      status: mensalista.status,
+    });
+    setMensalistaEditandoId(mensalista.id);
+    setMostrarFormulario(true);
+  }
+
+  async function salvarMensalista(event) {
     event.preventDefault();
     setErro("");
     setSalvando(true);
@@ -127,11 +151,14 @@ export default function MensalistasSection({ moeda }) {
       status: novoMensalista.status,
     };
 
-    const { data, error } = await supabase
-      .from("mensalistas")
-      .insert([mensalistaBanco])
-      .select("id,nome,telefone,valor_mensal,dia_vencimento,status")
-      .single();
+    const operacao = mensalistaEditandoId
+      ? supabase
+          .from("mensalistas")
+          .update(mensalistaBanco)
+          .eq("id", mensalistaEditandoId)
+      : supabase.from("mensalistas").insert([mensalistaBanco]);
+
+    const { data, error } = await operacao.select(mensalistaSelect).single();
 
     setSalvando(false);
 
@@ -140,19 +167,16 @@ export default function MensalistasSection({ moeda }) {
       return;
     }
 
+    const mensalistaSalvo = normalizarMensalista(data);
+
     setMensalistas((anteriores) =>
-      [normalizarMensalista(data), ...anteriores].sort((a, b) =>
-        a.nome.localeCompare(b.nome)
-      )
+      [
+        mensalistaSalvo,
+        ...anteriores.filter((mensalista) => mensalista.id !== mensalistaSalvo.id),
+      ].sort((a, b) => a.nome.localeCompare(b.nome))
     );
 
-    setNovoMensalista({
-      nome: "",
-      telefone: "",
-      valorMensal: "",
-      vencimento: "",
-      status: "Ativo",
-    });
+    limparFormularioMensalista();
     setMostrarFormulario(false);
   }
 
@@ -254,7 +278,13 @@ export default function MensalistasSection({ moeda }) {
         <button
           type="button"
           className="mensalistas-primary-button"
-          onClick={() => setMostrarFormulario((valor) => !valor)}
+          onClick={() => {
+            if (mostrarFormulario) {
+              limparFormularioMensalista();
+            }
+
+            setMostrarFormulario((valor) => !valor);
+          }}
         >
           {mostrarFormulario ? "Fechar" : "Novo mensalista"}
         </button>
@@ -286,7 +316,7 @@ export default function MensalistasSection({ moeda }) {
       </div>
 
       {mostrarFormulario && (
-        <form className="mensalistas-form" onSubmit={adicionarMensalista}>
+        <form className="mensalistas-form" onSubmit={salvarMensalista}>
           <input
             type="text"
             placeholder="Nome"
@@ -330,7 +360,11 @@ export default function MensalistasSection({ moeda }) {
             ))}
           </select>
           <button type="submit" disabled={salvando}>
-            {salvando ? "Salvando..." : "Adicionar"}
+            {salvando
+              ? "Salvando..."
+              : mensalistaEditandoId
+              ? "Salvar alterações"
+              : "Adicionar"}
           </button>
         </form>
       )}
@@ -351,49 +385,57 @@ export default function MensalistasSection({ moeda }) {
 
                 return (
                   <>
-              <div className="mensalista-card-header">
-                <div>
-                  <h3>{mensalista.nome}</h3>
-                  <p>{mensalista.telefone || "Sem telefone"}</p>
-                </div>
-                <span
-                  className={`mensalista-badge mensalista-badge-${mensalista.status.toLowerCase()}`}
-                >
-                  {mensalista.status}
-                </span>
-              </div>
+                    <div className="mensalista-card-header">
+                      <div>
+                        <h3>{mensalista.nome}</h3>
+                        <p>{mensalista.telefone || "Sem telefone"}</p>
+                      </div>
+                      <span
+                        className={`mensalista-badge mensalista-badge-${mensalista.status.toLowerCase()}`}
+                      >
+                        {mensalista.status}
+                      </span>
+                    </div>
 
-              <div className="mensalista-info-grid">
-                <Info
-                  label="Valor mensal"
-                  value={moeda(mensalista.valorMensal)}
-                />
-                <Info
-                  label="Vencimento"
-                  value={`Dia ${mensalista.vencimento}`}
-                />
-              </div>
+                    <div className="mensalista-info-grid">
+                      <Info
+                        label="Valor mensal"
+                        value={moeda(mensalista.valorMensal)}
+                      />
+                      <Info
+                        label="Vencimento"
+                        value={`Dia ${mensalista.vencimento}`}
+                      />
+                    </div>
 
-              <div className="mensalista-payment-row">
-                <span
-                  className={`mensalista-situacao mensalista-situacao-${situacao.toLowerCase()}`}
-                >
-                  {situacao}
-                </span>
+                    <div className="mensalista-payment-row">
+                      <span
+                        className={`mensalista-situacao mensalista-situacao-${situacao.toLowerCase()}`}
+                      >
+                        {situacao}
+                      </span>
 
-                <button
-                  type="button"
-                  className="mensalista-payment-button"
-                  disabled={estaPago || pagamentoSalvandoId === mensalista.id}
-                  onClick={() => marcarMensalidadeComoPaga(mensalista)}
-                >
-                  {pagamentoSalvandoId === mensalista.id
-                    ? "Salvando..."
-                    : estaPago
-                    ? "Mensalidade paga"
-                    : "Marcar como pago"}
-                </button>
-              </div>
+                      <button
+                        type="button"
+                        className="mensalista-payment-button"
+                        disabled={estaPago || pagamentoSalvandoId === mensalista.id}
+                        onClick={() => marcarMensalidadeComoPaga(mensalista)}
+                      >
+                        {pagamentoSalvandoId === mensalista.id
+                          ? "Salvando..."
+                          : estaPago
+                          ? "Mensalidade paga"
+                          : "Marcar como pago"}
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="mensalista-edit-button"
+                      onClick={() => iniciarEdicao(mensalista)}
+                    >
+                      Editar mensalista
+                    </button>
                   </>
                 );
               })()}

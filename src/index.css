@@ -418,6 +418,18 @@ code {
   opacity: 0.72;
 }
 
+.mensalista-edit-button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .login-page {
   min-height: 100svh;
   display: grid;
@@ -839,6 +851,10 @@ code {
   }
 
   .mensalista-payment-button {
+    width: 100%;
+  }
+
+  .mensalista-edit-button {
     width: 100%;
   }
 
