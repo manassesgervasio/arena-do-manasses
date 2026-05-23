@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
+import { diasSemana, horarios } from "../constants";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
 const situacaoLista = ["Pago", "Pendente", "Vencido"];
 const mensalistaSelect = "id,nome,telefone,valor_mensal,dia_vencimento,status";
+const horarioContratadoSelect = "id,mensalista_id,dia_semana,horario,ativo";
 const pagamentoSelect =
   "id,mensalista_id,competencia,valor,data_vencimento,situacao,data_pagamento";
 
@@ -50,6 +52,8 @@ function criarFormularioVazio() {
     valorMensal: "",
     vencimento: "",
     status: "Ativo",
+    diaSemana: "1",
+    horario: horarios[0],
   };
 }
 
@@ -57,6 +61,7 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
   const competenciaAtual = obterCompetenciaAtual();
   const podeExcluirMensalista = perfilLogado === "Administrador";
   const [mensalistas, setMensalistas] = useState([]);
+  const [horariosContratados, setHorariosContratados] = useState({});
   const [pagamentos, setPagamentos] = useState({});
   const [historicoPagamentos, setHistoricoPagamentos] = useState({});
   const [carregando, setCarregando] = useState(true);
@@ -95,18 +100,35 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
       const mensalistaIds = mensalistasNormalizados.map((mensalista) => mensalista.id);
       const pagamentosAtuais = {};
       const historicoPorMensalista = {};
+      const horariosPorMensalista = {};
 
       if (mensalistaIds.length > 0) {
-        const { data: pagamentosData, error: pagamentosError } = await supabase
+        const [
+          { data: pagamentosData, error: pagamentosError },
+          { data: horariosData, error: horariosError },
+        ] = await Promise.all([
+          supabase
           .from("mensalista_pagamentos")
           .select(pagamentoSelect)
           .in("mensalista_id", mensalistaIds)
-          .order("competencia", { ascending: false });
+            .order("competencia", { ascending: false }),
+          supabase
+            .from("mensalista_horarios")
+            .select(horarioContratadoSelect)
+            .in("mensalista_id", mensalistaIds)
+            .eq("ativo", true),
+        ]);
 
         if (!ativo) return;
 
         if (pagamentosError) {
           setErro("Não foi possível carregar os pagamentos dos mensalistas. Tente novamente em instantes.");
+          setCarregando(false);
+          return;
+        }
+
+        if (horariosError) {
+          setErro("Não foi possível carregar os horários contratados. Tente novamente em instantes.");
           setCarregando(false);
           return;
         }
@@ -122,9 +144,17 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
             pagamentosAtuais[pagamento.mensalista_id] = pagamento;
           }
         });
+
+        (horariosData || []).forEach((horarioContratado) => {
+          if (!horariosPorMensalista[horarioContratado.mensalista_id]) {
+            horariosPorMensalista[horarioContratado.mensalista_id] =
+              horarioContratado;
+          }
+        });
       }
 
       setMensalistas(mensalistasNormalizados);
+      setHorariosContratados(horariosPorMensalista);
       setPagamentos(pagamentosAtuais);
       setHistoricoPagamentos(historicoPorMensalista);
       setCarregando(false);
@@ -157,6 +187,8 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
       valorMensal: String(mensalista.valorMensal),
       vencimento: String(mensalista.vencimento),
       status: mensalista.status,
+      diaSemana: String(horariosContratados[mensalista.id]?.dia_semana ?? 1),
+      horario: horariosContratados[mensalista.id]?.horario || horarios[0],
     });
     setMensalistaEditandoId(mensalista.id);
     setMostrarFormulario(true);
@@ -184,14 +216,37 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
 
     const { data, error } = await operacao.select(mensalistaSelect).single();
 
-    setSalvando(false);
-
     if (error) {
+      setSalvando(false);
       setErro("Não foi possível salvar o mensalista. Confira os dados e tente novamente.");
       return;
     }
 
     const mensalistaSalvo = normalizarMensalista(data);
+    const horarioAtual = horariosContratados[mensalistaSalvo.id];
+    const horarioBanco = {
+      mensalista_id: mensalistaSalvo.id,
+      dia_semana: Number(novoMensalista.diaSemana),
+      horario: novoMensalista.horario,
+      ativo: true,
+    };
+
+    const horarioOperacao = horarioAtual?.id
+      ? supabase
+          .from("mensalista_horarios")
+          .update(horarioBanco)
+          .eq("id", horarioAtual.id)
+      : supabase.from("mensalista_horarios").insert([horarioBanco]);
+
+    const { data: horarioData, error: horarioError } = await horarioOperacao
+      .select(horarioContratadoSelect)
+      .single();
+
+    if (horarioError) {
+      setSalvando(false);
+      setErro("Mensalista salvo, mas não foi possível salvar o horário contratado.");
+      return;
+    }
 
     setMensalistas((anteriores) =>
       [
@@ -199,9 +254,14 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
         ...anteriores.filter((mensalista) => mensalista.id !== mensalistaSalvo.id),
       ].sort((a, b) => a.nome.localeCompare(b.nome))
     );
+    setHorariosContratados((anteriores) => ({
+      ...anteriores,
+      [mensalistaSalvo.id]: horarioData,
+    }));
 
     limparFormularioMensalista();
     setMostrarFormulario(false);
+    setSalvando(false);
   }
 
   function obterSituacaoMensal(mensalista) {
@@ -313,6 +373,11 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
       anteriores.filter((item) => item.id !== mensalista.id)
     );
     setPagamentos((anteriores) => {
+      const proximos = { ...anteriores };
+      delete proximos[mensalista.id];
+      return proximos;
+    });
+    setHorariosContratados((anteriores) => {
       const proximos = { ...anteriores };
       delete proximos[mensalista.id];
       return proximos;
@@ -497,6 +562,26 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
               <option key={status}>{status}</option>
             ))}
           </select>
+          <select
+            value={novoMensalista.diaSemana}
+            onChange={(event) => atualizarCampo("diaSemana", event.target.value)}
+          >
+            {diasSemana.map((dia, index) => (
+              <option key={dia} value={index}>
+                {dia}
+              </option>
+            ))}
+          </select>
+          <select
+            value={novoMensalista.horario}
+            onChange={(event) => atualizarCampo("horario", event.target.value)}
+          >
+            {horarios.map((horario) => (
+              <option key={horario} value={horario}>
+                {horario}
+              </option>
+            ))}
+          </select>
           <button type="submit" disabled={salvando}>
             {salvando
               ? "Salvando..."
@@ -549,6 +634,7 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
                 const situacao = obterSituacaoMensal(mensalista);
                 const estaPago = situacao === "Pago";
                 const temPagamentoMensal = Boolean(pagamentos[mensalista.id]?.id);
+                const horarioContratado = horariosContratados[mensalista.id];
                 const historico = (historicoPagamentos[mensalista.id] || []).filter(
                   (pagamento) => pagamento.competencia !== competenciaAtual
                 );
@@ -575,6 +661,18 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
                       <Info
                         label="Vencimento"
                         value={`Dia ${mensalista.vencimento}`}
+                      />
+                      <Info
+                        label="Dia contratado"
+                        value={
+                          horarioContratado
+                            ? diasSemana[horarioContratado.dia_semana]
+                            : "Sem dia"
+                        }
+                      />
+                      <Info
+                        label="Horario contratado"
+                        value={horarioContratado?.horario || "Sem horario"}
                       />
                     </div>
 
