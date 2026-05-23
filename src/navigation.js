@@ -14,4 +14,9 @@ export const navigationItems = [
     label: "Financeiro",
     path: "/financeiro",
   },
+  {
+    id: "mensalistas",
+    label: "Mensalistas",
+    path: "/mensalistas",
+  },
 ];

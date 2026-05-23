@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
 import ClientesSection from "../components/ClientesSection";
+import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
 import ResumoCards from "../components/ResumoCards";
 import WeekControls from "../components/WeekControls";
@@ -129,6 +130,10 @@ export default function Home({
     );
   }
 
+  function renderMensalistas() {
+    return <MensalistasSection moeda={moeda} />;
+  }
+
   function renderMobileContent() {
     if (activeMobileTab === "clientes") {
       return renderClientes();
@@ -136,6 +141,10 @@ export default function Home({
 
     if (activeMobileTab === "financeiro") {
       return renderFinanceiro();
+    }
+
+    if (activeMobileTab === "mensalistas") {
+      return renderMensalistas();
     }
 
     return (
@@ -177,6 +186,7 @@ export default function Home({
           {renderWeekControls()}
           {renderFinanceiro()}
           {renderAgenda()}
+          {renderMensalistas()}
           {renderClientes()}
         </>
       )}
