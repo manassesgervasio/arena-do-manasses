@@ -57,7 +57,11 @@ function criarFormularioVazio() {
   };
 }
 
-export default function MensalistasSection({ moeda, perfilLogado }) {
+export default function MensalistasSection({
+  moeda,
+  perfilLogado,
+  onMensalistasChange,
+}) {
   const competenciaAtual = obterCompetenciaAtual();
   const podeExcluirMensalista = perfilLogado === "Administrador";
   const [mensalistas, setMensalistas] = useState([]);
@@ -262,6 +266,7 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
     limparFormularioMensalista();
     setMostrarFormulario(false);
     setSalvando(false);
+    onMensalistasChange?.();
   }
 
   function obterSituacaoMensal(mensalista) {
@@ -387,6 +392,7 @@ export default function MensalistasSection({ moeda, perfilLogado }) {
       delete proximos[mensalista.id];
       return proximos;
     });
+    onMensalistasChange?.();
   }
 
   async function excluirPagamentoMensal(mensalista) {

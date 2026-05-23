@@ -3,6 +3,7 @@ import ReservaBadges from "./ReservaBadges";
 export default function HorarioCard({
   item,
   hora,
+  mensalistaContratado,
   tipoLista,
   statusLista,
   onClienteChange,
@@ -17,7 +18,9 @@ export default function HorarioCard({
     <div
       style={{
         background:
-          item.status === "Pago"
+          mensalistaContratado
+            ? "#ecfeff"
+            : item.status === "Pago"
             ? "#dcfce7"
             : item.status === "Pendente"
             ? "#fef9c3"
@@ -27,21 +30,25 @@ export default function HorarioCard({
             ? "#e5e7eb"
             : "white",
 
-        opacity: item.status === "Livre" ? 0.72 : 1,
+        opacity: item.status === "Livre" && !mensalistaContratado ? 0.72 : 1,
 
         transform:
           item.status === "Pago"
             ? "scale(1.02)"
-            : item.status === "Livre"
+            : item.status === "Livre" && !mensalistaContratado
             ? "scale(0.98)"
             : "scale(1)",
 
         transition: "0.2s",
-        border: "1px solid rgba(255,255,255,0.25)",
+        border: mensalistaContratado
+          ? "1px solid #0891b2"
+          : "1px solid rgba(255,255,255,0.25)",
         borderRadius: "16px",
         padding: "12px",
         boxShadow:
-          item.status === "Livre"
+          mensalistaContratado
+            ? "0 8px 20px rgba(8, 145, 178, 0.18)"
+            : item.status === "Livre"
             ? "0 4px 12px rgba(15, 23, 42, 0.08)"
             : "0 8px 20px rgba(15, 23, 42, 0.18)",
       }}
@@ -57,6 +64,25 @@ export default function HorarioCard({
         {hora.split(" - ")[0]}
         <ReservaBadges tipo={item.tipo} />
       </div>
+      {mensalistaContratado && (
+        <div
+          style={{
+            background: "#cffafe",
+            border: "1px solid #67e8f9",
+            borderRadius: "10px",
+            color: "#155e75",
+            fontSize: "11px",
+            fontWeight: "bold",
+            marginBottom: "8px",
+            padding: "7px",
+          }}
+        >
+          <div>Mensalista contratado</div>
+          <div style={{ color: "#0f172a", fontSize: "13px", marginTop: "2px" }}>
+            {mensalistaContratado.nome}
+          </div>
+        </div>
+      )}
       <input
         placeholder="cliente/Time"
         value={item.cliente}

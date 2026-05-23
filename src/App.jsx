@@ -48,6 +48,8 @@ export default function App() {
 
     return salvas ? JSON.parse(salvas) : {};
   });
+  const [horariosMensalistas, setHorariosMensalistas] = useState({});
+  const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
 
   const [buscaCliente, setBuscaCliente] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("Todos");
@@ -112,6 +114,85 @@ export default function App() {
 
   carregarReservas();
 }, []);
+
+  useEffect(() => {
+  if (!sessaoAuth) {
+    setHorariosMensalistas({});
+    return;
+  }
+
+  let ativo = true;
+
+  async function carregarHorariosMensalistas() {
+    const { data: mensalistasData, error: mensalistasError } = await supabase
+      .from("mensalistas")
+      .select("id,nome,status")
+      .eq("status", "Ativo");
+
+    if (!ativo) return;
+
+    if (mensalistasError) {
+      console.log("Erro ao carregar mensalistas ativos:", mensalistasError);
+      setHorariosMensalistas({});
+      return;
+    }
+
+    const mensalistasAtivos = mensalistasData || [];
+    const mensalistasPorId = {};
+    const mensalistaIds = mensalistasAtivos.map((mensalista) => {
+      mensalistasPorId[mensalista.id] = mensalista;
+      return mensalista.id;
+    });
+
+    if (mensalistaIds.length === 0) {
+      setHorariosMensalistas({});
+      return;
+    }
+
+    const { data: horariosData, error: horariosError } = await supabase
+      .from("mensalista_horarios")
+      .select("id,mensalista_id,dia_semana,horario,ativo")
+      .in("mensalista_id", mensalistaIds)
+      .eq("ativo", true);
+
+    if (!ativo) return;
+
+    if (horariosError) {
+      console.log("Erro ao carregar horários de mensalistas:", horariosError);
+      setHorariosMensalistas({});
+      return;
+    }
+
+    const proximosHorarios = {};
+
+    (horariosData || []).forEach((horarioContratado) => {
+      const mensalista = mensalistasPorId[horarioContratado.mensalista_id];
+      const chave = `${horarioContratado.dia_semana}_${horarioContratado.horario}`;
+
+      if (!mensalista || proximosHorarios[chave]) return;
+
+      proximosHorarios[chave] = {
+        id: horarioContratado.id,
+        mensalistaId: mensalista.id,
+        nome: mensalista.nome,
+        diaSemana: horarioContratado.dia_semana,
+        horario: horarioContratado.horario,
+      };
+    });
+
+    setHorariosMensalistas(proximosHorarios);
+  }
+
+  carregarHorariosMensalistas();
+
+  return () => {
+    ativo = false;
+  };
+}, [sessaoAuth, versaoHorariosMensalistas]);
+
+  function recarregarHorariosMensalistas() {
+    setVersaoHorariosMensalistas((versao) => versao + 1);
+  }
 
   function chaveReserva(dataTexto, horario) {
     return `${dataTexto}_${horario}`;
@@ -457,6 +538,8 @@ return "#14532d";
       diasSemana={diasSemana}
       tipoLista={tipoLista}
       statusLista={statusLista}
+      horariosMensalistas={horariosMensalistas}
+      onMensalistasChange={recarregarHorariosMensalistas}
       resumo={resumo}
       clientes={clientes}
       clientesFiltrados={clientesFiltrados}

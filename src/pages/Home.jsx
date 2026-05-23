@@ -18,6 +18,8 @@ export default function Home({
   diasSemana,
   tipoLista,
   statusLista,
+  horariosMensalistas,
+  onMensalistasChange,
   resumo,
   clientes,
   clientesFiltrados,
@@ -83,6 +85,7 @@ export default function Home({
         diasSemana={diasSemana}
         tipoLista={tipoLista}
         statusLista={statusLista}
+        horariosMensalistas={horariosMensalistas}
         formatarData={formatarData}
         formatarDataBR={formatarDataBR}
         moeda={moeda}
@@ -131,7 +134,13 @@ export default function Home({
   }
 
   function renderMensalistas() {
-    return <MensalistasSection moeda={moeda} perfilLogado={perfilLogado} />;
+    return (
+      <MensalistasSection
+        moeda={moeda}
+        perfilLogado={perfilLogado}
+        onMensalistasChange={onMensalistasChange}
+      />
+    );
   }
 
   function renderMobileContent() {

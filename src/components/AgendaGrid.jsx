@@ -8,6 +8,7 @@ export default function AgendaGrid({
   diasSemana,
   tipoLista,
   statusLista,
+  horariosMensalistas = {},
   formatarData,
   formatarDataBR,
   moeda,
@@ -66,12 +67,22 @@ const jogosDia = horarios.filter((horaAtual) => {
   function renderHorarioCard(data, hora) {
     const dataTexto = formatarData(data);
     const item = pegarReserva(dataTexto, hora);
+    const temReservaReal =
+      item.status !== "Livre" ||
+      (item.tipo && item.tipo !== "Avulso") ||
+      Boolean(item.cliente?.trim()) ||
+      Boolean(item.telefone?.trim()) ||
+      Number(item.valor || 0) > 0;
+    const mensalistaContratado = temReservaReal
+      ? null
+      : horariosMensalistas[`${data.getDay()}_${hora}`] || null;
 
     return (
       <HorarioCard
         key={`${dataTexto}-${hora}`}
         item={item}
         hora={hora}
+        mensalistaContratado={mensalistaContratado}
         tipoLista={tipoLista}
         statusLista={statusLista}
         onClienteChange={(e) =>
