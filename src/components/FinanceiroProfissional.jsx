@@ -41,9 +41,17 @@ function separarMesAno(mesAno) {
   return { ano, mes };
 }
 
+function obterPeriodoMes(mesAno) {
+  const { ano, mes } = separarMesAno(mesAno);
+  const inicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
+  const proximoMes = mes === 12 ? 1 : mes + 1;
+  const proximoAno = mes === 12 ? ano + 1 : ano;
+  const fim = `${proximoAno}-${String(proximoMes).padStart(2, "0")}-01`;
+
+  return { ano, mes, inicio, fim };
+}
+
 export default function FinanceiroProfissional({
-  reservasPagas = 0,
-  mensalistasPagos = 0,
   mesInicial = obterMesAtual(),
 }) {
   const [mesAno, setMesAno] = useState(mesInicial);
@@ -57,13 +65,23 @@ export default function FinanceiroProfissional({
   const [lancamentosErro, setLancamentosErro] = useState("");
   const [salvandoLancamento, setSalvandoLancamento] = useState(false);
   const [lancamentoEditandoId, setLancamentoEditandoId] = useState(null);
+  const [reservasPagasPeriodo, setReservasPagasPeriodo] = useState(0);
+  const [mensalistasPagosPeriodo, setMensalistasPagosPeriodo] =
+    useState(0);
+  const [resumoPeriodoCarregando, setResumoPeriodoCarregando] = useState(true);
+  const [resumoPeriodoErro, setResumoPeriodoErro] = useState("");
   const [fechamentoMensal, setFechamentoMensal] = useState(null);
   const [fechamentoCarregando, setFechamentoCarregando] = useState(true);
   const [fechamentoSalvando, setFechamentoSalvando] = useState(false);
   const [fechamentoMensagem, setFechamentoMensagem] = useState("");
   const [fechamentoErro, setFechamentoErro] = useState("");
+  const mesEstaFechado = Boolean(fechamentoMensal);
+  const mensagemMesFechado =
+    "Este mês está fechado. Reabra o mês para alterar lançamentos.";
 
   async function carregarLancamentosManuais() {
+    const { inicio, fim } = obterPeriodoMes(mesAno);
+
     setLancamentosCarregando(true);
     setLancamentosErro("");
 
@@ -73,6 +91,8 @@ export default function FinanceiroProfissional({
         "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
       )
       .eq("origem", "manual")
+      .gte("data_lancamento", inicio)
+      .lt("data_lancamento", fim)
       .order("data_lancamento", { ascending: false });
 
     if (error) {
@@ -140,7 +160,9 @@ export default function FinanceiroProfissional({
   useEffect(() => {
     let ativo = true;
 
-    async function carregarComControle() {
+    async function carregarLancamentosDoPeriodo() {
+      const { inicio, fim } = obterPeriodoMes(mesAno);
+
       setLancamentosCarregando(true);
       setLancamentosErro("");
 
@@ -150,6 +172,8 @@ export default function FinanceiroProfissional({
           "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
         )
         .eq("origem", "manual")
+        .gte("data_lancamento", inicio)
+        .lt("data_lancamento", fim)
         .order("data_lancamento", { ascending: false });
 
       if (!ativo) return;
@@ -167,12 +191,75 @@ export default function FinanceiroProfissional({
       setLancamentosCarregando(false);
     }
 
-    carregarComControle();
+    carregarLancamentosDoPeriodo();
 
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [mesAno]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarResumoPeriodo() {
+      const { inicio, fim } = obterPeriodoMes(mesAno);
+
+      setResumoPeriodoCarregando(true);
+      setResumoPeriodoErro("");
+
+      const [
+        { data: reservasData, error: reservasError },
+        { data: mensalistasData, error: mensalistasError },
+      ] = await Promise.all([
+        supabase
+          .from("reservas")
+          .select("id,data,valor,status")
+          .eq("status", "Pago")
+          .gte("data", inicio)
+          .lt("data", fim),
+        supabase
+          .from("mensalista_pagamentos")
+          .select("id,valor,situacao,data_pagamento")
+          .eq("situacao", "Pago")
+          .gte("data_pagamento", inicio)
+          .lt("data_pagamento", fim),
+      ]);
+
+      if (!ativo) return;
+
+      if (reservasError || mensalistasError) {
+        const erro = reservasError || mensalistasError;
+
+        setResumoPeriodoErro(
+          `Nao foi possivel carregar o resumo do periodo. ${erro.message}`
+        );
+        setReservasPagasPeriodo(0);
+        setMensalistasPagosPeriodo(0);
+        setResumoPeriodoCarregando(false);
+        return;
+      }
+
+      setReservasPagasPeriodo(
+        (reservasData || []).reduce(
+          (total, reserva) => total + Number(reserva.valor || 0),
+          0
+        )
+      );
+      setMensalistasPagosPeriodo(
+        (mensalistasData || []).reduce(
+          (total, pagamento) => total + Number(pagamento.valor || 0),
+          0
+        )
+      );
+      setResumoPeriodoCarregando(false);
+    }
+
+    carregarResumoPeriodo();
+
+    return () => {
+      ativo = false;
+    };
+  }, [mesAno]);
 
   useEffect(() => {
     let ativo = true;
@@ -218,7 +305,8 @@ export default function FinanceiroProfissional({
 
   const totais = useMemo(() => {
     const lancamentosDoMes = lancamentos.filter((lancamento) =>
-      lancamento.data_lancamento.startsWith(mesAno)
+      lancamento.data_lancamento >= obterPeriodoMes(mesAno).inicio &&
+      lancamento.data_lancamento < obterPeriodoMes(mesAno).fim
     );
 
     const entradasManuais = lancamentosDoMes
@@ -233,13 +321,13 @@ export default function FinanceiroProfissional({
       entradasManuais,
       despesas,
       saldoLiquido:
-        Number(reservasPagas || 0) +
-        Number(mensalistasPagos || 0) +
+        Number(reservasPagasPeriodo || 0) +
+        Number(mensalistasPagosPeriodo || 0) +
         entradasManuais -
         despesas,
       lancamentosDoMes,
     };
-  }, [lancamentos, mensalistasPagos, mesAno, reservasPagas]);
+  }, [lancamentos, mensalistasPagosPeriodo, mesAno, reservasPagasPeriodo]);
 
   const categoriasDoTipo = useMemo(() => {
     return categorias.filter((categoria) => categoria.tipo === formulario.tipo);
@@ -290,6 +378,11 @@ export default function FinanceiroProfissional({
 
   async function salvarLancamento(event) {
     event.preventDefault();
+
+    if (mesEstaFechado) {
+      setLancamentosErro(mensagemMesFechado);
+      return;
+    }
 
     const descricao = formulario.descricao.trim();
     const valor = Number(String(formulario.valor).replace(",", "."));
@@ -347,6 +440,11 @@ export default function FinanceiroProfissional({
   }
 
   function editarLancamento(lancamento) {
+    if (mesEstaFechado) {
+      setLancamentosErro(mensagemMesFechado);
+      return;
+    }
+
     setFormulario({
       descricao: lancamento.descricao,
       valor: String(lancamento.valor),
@@ -360,6 +458,11 @@ export default function FinanceiroProfissional({
   }
 
   async function excluirLancamento(id) {
+    if (mesEstaFechado) {
+      setLancamentosErro(mensagemMesFechado);
+      return;
+    }
+
     const confirmar = confirm("Excluir este lancamento manual?");
 
     if (!confirmar) return;
@@ -424,8 +527,8 @@ export default function FinanceiroProfissional({
     const payload = {
       ano,
       mes,
-      total_reservas: Number(reservasPagas || 0),
-      total_mensalistas: Number(mensalistasPagos || 0),
+      total_reservas: Number(reservasPagasPeriodo || 0),
+      total_mensalistas: Number(mensalistasPagosPeriodo || 0),
       total_entradas_manuais: totais.entradasManuais,
       total_despesas: totais.despesas,
       saldo_liquido: totais.saldoLiquido,
@@ -474,8 +577,8 @@ export default function FinanceiroProfissional({
       </div>
 
       <div className="financeiro-profissional-summary">
-        <ResumoCard titulo="Reservas pagas" valor={moeda(reservasPagas)} />
-        <ResumoCard titulo="Mensalistas pagos" valor={moeda(mensalistasPagos)} />
+        <ResumoCard titulo="Reservas pagas" valor={moeda(reservasPagasPeriodo)} />
+        <ResumoCard titulo="Mensalistas pagos" valor={moeda(mensalistasPagosPeriodo)} />
         <ResumoCard
           titulo="Entradas manuais"
           valor={moeda(totais.entradasManuais)}
@@ -498,6 +601,12 @@ export default function FinanceiroProfissional({
               </button>
             )}
           </div>
+
+          {mesEstaFechado && (
+            <div className="financeiro-profissional-confirmation">
+              {mensagemMesFechado}
+            </div>
+          )}
 
           <div className="financeiro-profissional-form">
             <label>
@@ -600,10 +709,20 @@ export default function FinanceiroProfissional({
             <div className="financeiro-profissional-error">{lancamentosErro}</div>
           )}
 
+          {resumoPeriodoCarregando && (
+            <div className="financeiro-profissional-loading">
+              Carregando resumo financeiro do periodo...
+            </div>
+          )}
+
+          {resumoPeriodoErro && (
+            <div className="financeiro-profissional-error">{resumoPeriodoErro}</div>
+          )}
+
           <button
             className="financeiro-profissional-primary"
             type="submit"
-            disabled={salvandoLancamento || cadastrosCarregando}
+            disabled={salvandoLancamento || cadastrosCarregando || mesEstaFechado}
           >
             {salvandoLancamento
               ? "Salvando..."
@@ -618,14 +737,14 @@ export default function FinanceiroProfissional({
           <div className="financeiro-profissional-close-status">
             <span
               className={
-                fechamentoMensal?.fechado
+                mesEstaFechado
                   ? "financeiro-profissional-status is-closed"
                   : "financeiro-profissional-status is-open"
               }
             >
               {fechamentoCarregando
                 ? "Carregando"
-                : fechamentoMensal?.fechado
+                : mesEstaFechado
                   ? "Fechado"
                   : "Aberto"}
             </span>
@@ -641,8 +760,8 @@ export default function FinanceiroProfissional({
             <p>
               Entradas totais:{" "}
               {moeda(
-                Number(reservasPagas || 0) +
-                  Number(mensalistasPagos || 0) +
+                Number(reservasPagasPeriodo || 0) +
+                  Number(mensalistasPagosPeriodo || 0) +
                   totais.entradasManuais
               )}
             </p>
@@ -653,12 +772,14 @@ export default function FinanceiroProfissional({
             className="financeiro-profissional-primary"
             type="button"
             onClick={fecharMes}
-            disabled={fechamentoCarregando || fechamentoSalvando}
+            disabled={
+              fechamentoCarregando || fechamentoSalvando || resumoPeriodoCarregando
+            }
           >
             {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
           </button>
 
-          {fechamentoMensal?.fechado && (
+          {mesEstaFechado && (
             <div className="financeiro-profissional-confirmation">
               Este mês possui fechamento registrado.
             </div>
@@ -742,6 +863,7 @@ export default function FinanceiroProfissional({
                       <div className="financeiro-profissional-actions">
                         <button
                           type="button"
+                          disabled={mesEstaFechado}
                           onClick={() => editarLancamento(lancamento)}
                         >
                           Editar
@@ -749,6 +871,7 @@ export default function FinanceiroProfissional({
                         <button
                           type="button"
                           className="financeiro-profissional-danger"
+                          disabled={mesEstaFechado}
                           onClick={() => excluirLancamento(lancamento.id)}
                         >
                           Excluir

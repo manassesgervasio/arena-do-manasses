@@ -1081,6 +1081,11 @@ code {
   cursor: pointer;
 }
 
+.financeiro-profissional-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .financeiro-profissional-actions .financeiro-profissional-danger {
   border-color: rgba(248, 113, 113, 0.28);
   background: rgba(248, 113, 113, 0.12);
