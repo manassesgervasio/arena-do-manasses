@@ -11,6 +11,9 @@ const formularioInicial = {
   observacao: "",
 };
 
+// Senha temporaria para reabertura. Depois sera substituida por permissao real de usuario/perfil.
+const SENHA_ADMIN_FECHAMENTO = "1234";
+
 function moeda(valor) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -75,7 +78,7 @@ export default function FinanceiroProfissional({
   const [fechamentoSalvando, setFechamentoSalvando] = useState(false);
   const [fechamentoMensagem, setFechamentoMensagem] = useState("");
   const [fechamentoErro, setFechamentoErro] = useState("");
-  const mesEstaFechado = Boolean(fechamentoMensal);
+  const mesEstaFechado = Boolean(fechamentoMensal?.fechado);
   const mensagemMesFechado =
     "Este mês está fechado. Reabra o mês para alterar lançamentos.";
 
@@ -507,8 +510,11 @@ export default function FinanceiroProfissional({
       .eq("mes", mes)
       .maybeSingle();
 
+    console.log("Fechamento encontrado:", fechamentoExistente);
+
     if (verificarError) {
       console.error("Erro ao verificar fechamento mensal:", verificarError);
+      console.log("Erro no fechamento mensal:", verificarError);
       setFechamentoErro(
         `Não foi possível verificar o fechamento mensal: ${verificarError.message}`
       );
@@ -516,7 +522,8 @@ export default function FinanceiroProfissional({
       return;
     }
 
-    if (fechamentoExistente) {
+    if (fechamentoExistente?.fechado) {
+      console.log("Fechamento mensal: registro ja esta fechado, sem insert/update.");
       setFechamentoMensal(fechamentoExistente);
       setFechamentoMensagem("Este mês já possui fechamento registrado.");
       setFechamentoSalvando(false);
@@ -524,6 +531,8 @@ export default function FinanceiroProfissional({
     }
 
     const agora = new Date().toISOString();
+    const observacaoAtual = fechamentoExistente?.observacao?.trim();
+    const observacaoRefechamento = `Mes fechado novamente em ${formatarDataHora(agora)}`;
     const payload = {
       ano,
       mes,
@@ -534,18 +543,41 @@ export default function FinanceiroProfissional({
       saldo_liquido: totais.saldoLiquido,
       fechado: true,
       fechado_em: agora,
-      observacao: null,
+      observacao: fechamentoExistente
+        ? observacaoAtual
+          ? `${observacaoAtual} | ${observacaoRefechamento}`
+          : observacaoRefechamento
+        : null,
       updated_at: agora,
     };
 
-    const { data, error } = await supabase
-      .from("financeiro_fechamentos_mensais")
-      .insert(payload)
-      .select()
-      .single();
+    console.log(
+      fechamentoExistente
+        ? "Fechamento mensal: vai fazer update."
+        : "Fechamento mensal: vai fazer insert."
+    );
+    console.log("Payload do fechamento mensal:", payload);
+
+    const resultado = fechamentoExistente
+      ? await supabase
+          .from("financeiro_fechamentos_mensais")
+          .update(payload)
+          .eq("id", fechamentoExistente.id)
+          .select()
+          .single()
+      : await supabase
+          .from("financeiro_fechamentos_mensais")
+          .insert(payload)
+          .select()
+          .single();
+
+    const { data, error } = resultado;
+
+    console.log("Retorno do fechamento mensal:", data);
 
     if (error) {
       console.error("Erro ao salvar fechamento mensal:", error);
+      console.log("Erro no fechamento mensal:", error);
       setFechamentoErro(
         `Não foi possível salvar o fechamento mensal: ${error.message}`
       );
@@ -555,6 +587,53 @@ export default function FinanceiroProfissional({
 
     setFechamentoMensal(data);
     setFechamentoMensagem("Fechamento mensal salvo com sucesso.");
+    setFechamentoSalvando(false);
+  }
+
+  async function reabrirMes() {
+    if (!fechamentoMensal?.id) return;
+
+    const senha = prompt("Digite a senha de administrador para reabrir este mês.");
+
+    if (senha !== SENHA_ADMIN_FECHAMENTO) {
+      setFechamentoErro("Senha de administrador inválida.");
+      return;
+    }
+
+    const agora = new Date().toISOString();
+    const reaberturaTexto = `Mês reaberto em ${formatarDataHora(agora)}`;
+    const observacaoAtual = fechamentoMensal.observacao?.trim();
+    const observacao = observacaoAtual
+      ? `${observacaoAtual} | ${reaberturaTexto}`
+      : reaberturaTexto;
+
+    setFechamentoSalvando(true);
+    setFechamentoMensagem("");
+    setFechamentoErro("");
+
+    const { data, error } = await supabase
+      .from("financeiro_fechamentos_mensais")
+      .update({
+        fechado: false,
+        observacao,
+        updated_at: agora,
+      })
+      .eq("id", fechamentoMensal.id)
+      .select(
+        "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
+      )
+      .single();
+
+    if (error) {
+      console.error("Erro ao reabrir mês:", error);
+      setFechamentoErro(`Não foi possível reabrir o mês: ${error.message}`);
+      setFechamentoSalvando(false);
+      return;
+    }
+
+    setFechamentoMensal(data);
+    setFechamentoMensagem("Mês reaberto com sucesso.");
+    setLancamentosErro("");
     setFechamentoSalvando(false);
   }
 
@@ -768,16 +847,27 @@ export default function FinanceiroProfissional({
             <p>Despesas: {moeda(totais.despesas)}</p>
           </div>
 
-          <button
-            className="financeiro-profissional-primary"
-            type="button"
-            onClick={fecharMes}
-            disabled={
-              fechamentoCarregando || fechamentoSalvando || resumoPeriodoCarregando
-            }
-          >
-            {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
-          </button>
+          {mesEstaFechado ? (
+            <button
+              className="financeiro-profissional-secondary"
+              type="button"
+              onClick={reabrirMes}
+              disabled={fechamentoCarregando || fechamentoSalvando}
+            >
+              {fechamentoSalvando ? "Reabrindo..." : "Reabrir mês"}
+            </button>
+          ) : (
+            <button
+              className="financeiro-profissional-primary"
+              type="button"
+              onClick={fecharMes}
+              disabled={
+                fechamentoCarregando || fechamentoSalvando || resumoPeriodoCarregando
+              }
+            >
+              {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
+            </button>
+          )}
 
           {mesEstaFechado && (
             <div className="financeiro-profissional-confirmation">

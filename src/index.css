@@ -712,15 +712,25 @@ code {
 }
 
 .financeiro-profissional-access button,
-.financeiro-profissional-primary {
+.financeiro-profissional-primary,
+.financeiro-profissional-secondary {
   min-height: 42px;
   border: none;
   border-radius: 10px;
-  background: #22c55e;
-  color: #052e16;
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
+}
+
+.financeiro-profissional-primary {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.financeiro-profissional-secondary {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.32);
 }
 
 .financeiro-profissional-primary:disabled {
@@ -898,7 +908,8 @@ code {
   grid-column: span 3;
 }
 
-.financeiro-profissional-primary {
+.financeiro-profissional-primary,
+.financeiro-profissional-secondary {
   width: fit-content;
   padding: 10px 16px;
 }
@@ -1375,7 +1386,8 @@ code {
     grid-column: auto;
   }
 
-  .financeiro-profissional-primary {
+  .financeiro-profissional-primary,
+  .financeiro-profissional-secondary {
     width: 100%;
   }
 
