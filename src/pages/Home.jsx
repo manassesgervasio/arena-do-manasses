@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
 import ClientesSection from "../components/ClientesSection";
+import FinanceiroProfissional from "../components/FinanceiroProfissional";
 import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
 import ResumoCards from "../components/ResumoCards";
@@ -43,6 +44,8 @@ export default function Home({
   setClienteSelecionado,
 }) {
   const [activeMobileTab, setActiveMobileTab] = useState("agenda");
+  const [mostrarFinanceiroProfissional, setMostrarFinanceiroProfissional] =
+    useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
   );
@@ -131,7 +134,32 @@ export default function Home({
         </div>
 
         <ResumoCards resumo={resumo} moeda={moeda} />
+
+        {!isMobile && (
+          <div className="financeiro-profissional-access">
+            <button
+              type="button"
+              onClick={() =>
+                setMostrarFinanceiroProfissional((mostrar) => !mostrar)
+              }
+            >
+              {mostrarFinanceiroProfissional
+                ? "Ocultar Financeiro Profissional"
+                : "Abrir Financeiro Profissional"}
+            </button>
+          </div>
+        )}
       </section>
+    );
+  }
+
+  function renderFinanceiroProfissional() {
+    return (
+      <FinanceiroProfissional
+        reservasPagas={resumo.faturamentoMes || resumo.faturamento || 0}
+        mensalistasPagos={resumo.totalMensalistas || 0}
+        mesInicial={mesFiltro}
+      />
     );
   }
 
@@ -152,6 +180,10 @@ export default function Home({
 
     if (activeMobileTab === "financeiro") {
       return renderFinanceiro();
+    }
+
+    if (activeMobileTab === "financeiro-profissional") {
+      return renderFinanceiroProfissional();
     }
 
     if (activeMobileTab === "mensalistas") {
@@ -196,6 +228,7 @@ export default function Home({
         <>
           {renderWeekControls()}
           {renderFinanceiro()}
+          {mostrarFinanceiroProfissional && renderFinanceiroProfissional()}
           {renderAgenda()}
           {renderMensalistas()}
           {renderClientes()}
