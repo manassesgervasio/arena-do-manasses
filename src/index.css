@@ -908,6 +908,39 @@ code {
   top: 16px;
 }
 
+.financeiro-profissional-close-status {
+  display: grid;
+  gap: 7px;
+}
+
+.financeiro-profissional-close-status p {
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.financeiro-profissional-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.financeiro-profissional-status.is-open {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.financeiro-profissional-status.is-closed {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
 .financeiro-profissional-close-summary {
   display: grid;
   gap: 7px;

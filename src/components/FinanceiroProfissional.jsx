@@ -23,9 +23,22 @@ function formatarData(dataTexto) {
   return `${dia}/${mes}/${ano}`;
 }
 
+function formatarDataHora(dataTexto) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(dataTexto));
+}
+
 function obterMesAtual() {
   const hoje = new Date();
   return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function separarMesAno(mesAno) {
+  const [ano, mes] = mesAno.split("-").map(Number);
+
+  return { ano, mes };
 }
 
 export default function FinanceiroProfissional({
@@ -44,7 +57,11 @@ export default function FinanceiroProfissional({
   const [lancamentosErro, setLancamentosErro] = useState("");
   const [salvandoLancamento, setSalvandoLancamento] = useState(false);
   const [lancamentoEditandoId, setLancamentoEditandoId] = useState(null);
-  const [mesFechado, setMesFechado] = useState(false);
+  const [fechamentoMensal, setFechamentoMensal] = useState(null);
+  const [fechamentoCarregando, setFechamentoCarregando] = useState(true);
+  const [fechamentoSalvando, setFechamentoSalvando] = useState(false);
+  const [fechamentoMensagem, setFechamentoMensagem] = useState("");
+  const [fechamentoErro, setFechamentoErro] = useState("");
 
   async function carregarLancamentosManuais() {
     setLancamentosCarregando(true);
@@ -156,6 +173,48 @@ export default function FinanceiroProfissional({
       ativo = false;
     };
   }, []);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarFechamentoMensal() {
+      const { ano, mes } = separarMesAno(mesAno);
+
+      setFechamentoCarregando(true);
+      setFechamentoMensagem("");
+      setFechamentoErro("");
+
+      const { data, error } = await supabase
+        .from("financeiro_fechamentos_mensais")
+        .select(
+          "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
+        )
+        .eq("ano", ano)
+        .eq("mes", mes)
+        .maybeSingle();
+
+      if (!ativo) return;
+
+      if (error) {
+        console.error("Erro ao carregar fechamento mensal:", error);
+        setFechamentoErro(
+          `Nao foi possivel carregar o fechamento mensal. ${error.message}`
+        );
+        setFechamentoMensal(null);
+        setFechamentoCarregando(false);
+        return;
+      }
+
+      setFechamentoMensal(data || null);
+      setFechamentoCarregando(false);
+    }
+
+    carregarFechamentoMensal();
+
+    return () => {
+      ativo = false;
+    };
+  }, [mesAno]);
 
   const totais = useMemo(() => {
     const lancamentosDoMes = lancamentos.filter((lancamento) =>
@@ -283,7 +342,6 @@ export default function FinanceiroProfissional({
     }
 
     limparFormulario();
-    setMesFechado(false);
     await carregarLancamentosManuais();
     setSalvandoLancamento(false);
   }
@@ -299,7 +357,6 @@ export default function FinanceiroProfissional({
       observacao: lancamento.observacao || "",
     });
     setLancamentoEditandoId(lancamento.id);
-    setMesFechado(false);
   }
 
   async function excluirLancamento(id) {
@@ -322,11 +379,82 @@ export default function FinanceiroProfissional({
       return;
     }
 
-    setMesFechado(false);
-
     if (lancamentoEditandoId === id) limparFormulario();
 
     await carregarLancamentosManuais();
+  }
+
+  async function fecharMes() {
+    const confirmar = confirm(
+      "Tem certeza que deseja fechar este mes? O fechamento salvara o resumo financeiro atual deste periodo, mas nao bloqueara o uso do sistema nesta versao."
+    );
+
+    if (!confirmar) return;
+
+    const { ano, mes } = separarMesAno(mesAno);
+
+    setFechamentoSalvando(true);
+    setFechamentoMensagem("");
+    setFechamentoErro("");
+
+    const { data: fechamentoExistente, error: verificarError } = await supabase
+      .from("financeiro_fechamentos_mensais")
+      .select(
+        "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
+      )
+      .eq("ano", ano)
+      .eq("mes", mes)
+      .maybeSingle();
+
+    if (verificarError) {
+      console.error("Erro ao verificar fechamento mensal:", verificarError);
+      setFechamentoErro(
+        `Nao foi possivel verificar o fechamento mensal. ${verificarError.message}`
+      );
+      setFechamentoSalvando(false);
+      return;
+    }
+
+    if (fechamentoExistente) {
+      setFechamentoMensal(fechamentoExistente);
+      setFechamentoMensagem("Este mes ja possui fechamento registrado.");
+      setFechamentoSalvando(false);
+      return;
+    }
+
+    const agora = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("financeiro_fechamentos_mensais")
+      .insert({
+        ano,
+        mes,
+        total_reservas: Number(reservasPagas || 0),
+        total_mensalistas: Number(mensalistasPagos || 0),
+        total_entradas_manuais: totais.entradasManuais,
+        total_despesas: totais.despesas,
+        saldo_liquido: totais.saldoLiquido,
+        fechado: true,
+        fechado_em: agora,
+        observacao: null,
+        updated_at: agora,
+      })
+      .select(
+        "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
+      )
+      .single();
+
+    if (error) {
+      console.error("Erro ao salvar fechamento mensal:", error);
+      setFechamentoErro(
+        `Nao foi possivel salvar o fechamento mensal. ${error.message}`
+      );
+      setFechamentoSalvando(false);
+      return;
+    }
+
+    setFechamentoMensal(data);
+    setFechamentoMensagem("Fechamento mensal salvo com sucesso.");
+    setFechamentoSalvando(false);
   }
 
   return (
@@ -342,10 +470,7 @@ export default function FinanceiroProfissional({
           <input
             type="month"
             value={mesAno}
-            onChange={(event) => {
-              setMesAno(event.target.value);
-              setMesFechado(false);
-            }}
+            onChange={(event) => setMesAno(event.target.value)}
           />
         </label>
       </div>
@@ -492,6 +617,26 @@ export default function FinanceiroProfissional({
 
         <div className="financeiro-profissional-card financeiro-profissional-close">
           <h3>Fechamento mensal</h3>
+          <div className="financeiro-profissional-close-status">
+            <span
+              className={
+                fechamentoMensal?.fechado
+                  ? "financeiro-profissional-status is-closed"
+                  : "financeiro-profissional-status is-open"
+              }
+            >
+              {fechamentoCarregando
+                ? "Carregando"
+                : fechamentoMensal?.fechado
+                  ? "Fechado"
+                  : "Aberto"}
+            </span>
+
+            {fechamentoMensal?.fechado_em && (
+              <p>Fechado em {formatarDataHora(fechamentoMensal.fechado_em)}</p>
+            )}
+          </div>
+
           <div className="financeiro-profissional-close-summary">
             <span>Resumo do mes</span>
             <strong>{moeda(totais.saldoLiquido)}</strong>
@@ -509,15 +654,26 @@ export default function FinanceiroProfissional({
           <button
             className="financeiro-profissional-primary"
             type="button"
-            onClick={() => setMesFechado(true)}
+            onClick={fecharMes}
+            disabled={fechamentoCarregando || fechamentoSalvando}
           >
-            Fechar mes
+            {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
           </button>
 
-          {mesFechado && (
+          {fechamentoMensal?.fechado && (
             <div className="financeiro-profissional-confirmation">
-              Fechamento confirmado visualmente. Nenhum dado foi gravado no banco.
+              Este mes possui fechamento registrado.
             </div>
+          )}
+
+          {fechamentoMensagem && (
+            <div className="financeiro-profissional-confirmation">
+              {fechamentoMensagem}
+            </div>
+          )}
+
+          {fechamentoErro && (
+            <div className="financeiro-profissional-error">{fechamentoErro}</div>
           )}
         </div>
       </div>
