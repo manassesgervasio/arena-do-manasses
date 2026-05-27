@@ -1,45 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 
-const lancamentosIniciais = [
-  {
-    id: 1,
-    data: "2026-05-03",
-    descricao: "Venda de bebidas no torneio",
-    tipo: "Entrada",
-    categoria: "Bar",
-    formaPagamento: "Pix",
-    valor: 380,
-    observacao: "Movimento do domingo",
-  },
-  {
-    id: 2,
-    data: "2026-05-08",
-    descricao: "Manutencao da iluminacao",
-    tipo: "Despesa",
-    categoria: "Manutencao",
-    formaPagamento: "Cartao",
-    valor: 240,
-    observacao: "Troca de refletores",
-  },
-  {
-    id: 3,
-    data: "2026-05-14",
-    descricao: "Patrocinio local",
-    tipo: "Entrada",
-    categoria: "Patrocinio",
-    formaPagamento: "Transferencia",
-    valor: 600,
-    observacao: "Apoio mensal",
-  },
-];
-
 const formularioInicial = {
   descricao: "",
   valor: "",
-  tipo: "Entrada",
-  categoria: "",
-  formaPagamento: "Pix",
+  tipo: "entrada",
+  categoriaId: "",
+  formaPagamentoId: "",
   data: new Date().toISOString().split("T")[0],
   observacao: "",
 };
@@ -67,14 +34,42 @@ export default function FinanceiroProfissional({
   mesInicial = obterMesAtual(),
 }) {
   const [mesAno, setMesAno] = useState(mesInicial);
-  const [lancamentos, setLancamentos] = useState(lancamentosIniciais);
+  const [lancamentos, setLancamentos] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [categorias, setCategorias] = useState([]);
   const [formasPagamento, setFormasPagamento] = useState([]);
   const [cadastrosCarregando, setCadastrosCarregando] = useState(true);
   const [cadastrosErro, setCadastrosErro] = useState("");
+  const [lancamentosCarregando, setLancamentosCarregando] = useState(true);
+  const [lancamentosErro, setLancamentosErro] = useState("");
+  const [salvandoLancamento, setSalvandoLancamento] = useState(false);
   const [lancamentoEditandoId, setLancamentoEditandoId] = useState(null);
   const [mesFechado, setMesFechado] = useState(false);
+
+  async function carregarLancamentosManuais() {
+    setLancamentosCarregando(true);
+    setLancamentosErro("");
+
+    const { data, error } = await supabase
+      .from("financeiro_lancamentos")
+      .select(
+        "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
+      )
+      .eq("origem", "manual")
+      .order("data_lancamento", { ascending: false });
+
+    if (error) {
+      setLancamentosErro(
+        `Nao foi possivel carregar os lancamentos manuais. ${error.message}`
+      );
+      setLancamentos([]);
+      setLancamentosCarregando(false);
+      return;
+    }
+
+    setLancamentos(data || []);
+    setLancamentosCarregando(false);
+  }
 
   useEffect(() => {
     let ativo = true;
@@ -125,17 +120,54 @@ export default function FinanceiroProfissional({
     };
   }, []);
 
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarComControle() {
+      setLancamentosCarregando(true);
+      setLancamentosErro("");
+
+      const { data, error } = await supabase
+        .from("financeiro_lancamentos")
+        .select(
+          "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
+        )
+        .eq("origem", "manual")
+        .order("data_lancamento", { ascending: false });
+
+      if (!ativo) return;
+
+      if (error) {
+        setLancamentosErro(
+          `Nao foi possivel carregar os lancamentos manuais. ${error.message}`
+        );
+        setLancamentos([]);
+        setLancamentosCarregando(false);
+        return;
+      }
+
+      setLancamentos(data || []);
+      setLancamentosCarregando(false);
+    }
+
+    carregarComControle();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
   const totais = useMemo(() => {
     const lancamentosDoMes = lancamentos.filter((lancamento) =>
-      lancamento.data.startsWith(mesAno)
+      lancamento.data_lancamento.startsWith(mesAno)
     );
 
     const entradasManuais = lancamentosDoMes
-      .filter((lancamento) => lancamento.tipo === "Entrada")
+      .filter((lancamento) => lancamento.tipo === "entrada")
       .reduce((total, lancamento) => total + Number(lancamento.valor || 0), 0);
 
     const despesas = lancamentosDoMes
-      .filter((lancamento) => lancamento.tipo === "Despesa")
+      .filter((lancamento) => lancamento.tipo === "despesa")
       .reduce((total, lancamento) => total + Number(lancamento.valor || 0), 0);
 
     return {
@@ -151,23 +183,34 @@ export default function FinanceiroProfissional({
   }, [lancamentos, mensalistasPagos, mesAno, reservasPagas]);
 
   const categoriasDoTipo = useMemo(() => {
-    const tipoAtual = formulario.tipo.toLowerCase();
-
-    return categorias.filter((categoria) => categoria.tipo === tipoAtual);
+    return categorias.filter((categoria) => categoria.tipo === formulario.tipo);
   }, [categorias, formulario.tipo]);
+
+  const categoriasPorId = useMemo(() => {
+    return categorias.reduce((mapa, categoria) => {
+      mapa[categoria.id] = categoria;
+      return mapa;
+    }, {});
+  }, [categorias]);
+
+  const formasPagamentoPorId = useMemo(() => {
+    return formasPagamento.reduce((mapa, formaPagamento) => {
+      mapa[formaPagamento.id] = formaPagamento;
+      return mapa;
+    }, {});
+  }, [formasPagamento]);
 
   function atualizarCampo(campo, valor) {
     if (campo === "tipo") {
-      const tipoSelecionado = valor.toLowerCase();
       const categoriaAtualValida = categorias.some(
         (categoria) =>
-          categoria.tipo === tipoSelecionado && categoria.nome === formulario.categoria
+          categoria.tipo === valor && categoria.id === formulario.categoriaId
       );
 
       setFormulario((anterior) => ({
         ...anterior,
         tipo: valor,
-        categoria: categoriaAtualValida ? anterior.categoria : "",
+        categoriaId: categoriaAtualValida ? anterior.categoriaId : "",
       }));
       return;
     }
@@ -186,35 +229,63 @@ export default function FinanceiroProfissional({
     setLancamentoEditandoId(null);
   }
 
-  function salvarLancamento(event) {
+  async function salvarLancamento(event) {
     event.preventDefault();
 
     const descricao = formulario.descricao.trim();
-    const categoria = formulario.categoria.trim();
     const valor = Number(String(formulario.valor).replace(",", "."));
 
-    if (!descricao || !categoria || !valor || valor <= 0) return;
+    if (
+      !descricao ||
+      !valor ||
+      valor <= 0 ||
+      !formulario.tipo ||
+      !formulario.categoriaId ||
+      !formulario.formaPagamentoId ||
+      !formulario.data
+    ) {
+      setLancamentosErro("Preencha descricao, valor, tipo, categoria, forma de pagamento e data.");
+      return;
+    }
 
-    const proximoLancamento = {
-      ...formulario,
-      id: lancamentoEditandoId || Date.now(),
+    setSalvandoLancamento(true);
+    setLancamentosErro("");
+
+    const dadosLancamento = {
       descricao,
-      categoria,
       valor,
+      tipo: formulario.tipo,
+      categoria_id: formulario.categoriaId,
+      forma_pagamento_id: formulario.formaPagamentoId,
+      data_lancamento: formulario.data,
+      observacao: formulario.observacao.trim() || null,
+      updated_at: new Date().toISOString(),
     };
 
-    setLancamentos((anteriores) => {
-      if (!lancamentoEditandoId) {
-        return [proximoLancamento, ...anteriores];
-      }
+    const { error } = lancamentoEditandoId
+      ? await supabase
+          .from("financeiro_lancamentos")
+          .update(dadosLancamento)
+          .eq("id", lancamentoEditandoId)
+          .eq("origem", "manual")
+      : await supabase.from("financeiro_lancamentos").insert({
+          ...dadosLancamento,
+          origem: "manual",
+          referencia_id: null,
+        });
 
-      return anteriores.map((lancamento) =>
-        lancamento.id === lancamentoEditandoId ? proximoLancamento : lancamento
+    if (error) {
+      setLancamentosErro(
+        `Nao foi possivel salvar o lancamento manual. ${error.message}`
       );
-    });
+      setSalvandoLancamento(false);
+      return;
+    }
 
     limparFormulario();
     setMesFechado(false);
+    await carregarLancamentosManuais();
+    setSalvandoLancamento(false);
   }
 
   function editarLancamento(lancamento) {
@@ -222,24 +293,40 @@ export default function FinanceiroProfissional({
       descricao: lancamento.descricao,
       valor: String(lancamento.valor),
       tipo: lancamento.tipo,
-      categoria: lancamento.categoria,
-      formaPagamento: lancamento.formaPagamento,
-      data: lancamento.data,
-      observacao: lancamento.observacao,
+      categoriaId: lancamento.categoria_id || "",
+      formaPagamentoId: lancamento.forma_pagamento_id || "",
+      data: lancamento.data_lancamento,
+      observacao: lancamento.observacao || "",
     });
     setLancamentoEditandoId(lancamento.id);
     setMesFechado(false);
   }
 
-  function excluirLancamento(id) {
-    setLancamentos((anteriores) =>
-      anteriores.filter((lancamento) => lancamento.id !== id)
-    );
+  async function excluirLancamento(id) {
+    const confirmar = confirm("Excluir este lancamento manual?");
+
+    if (!confirmar) return;
+
+    setLancamentosErro("");
+
+    const { error } = await supabase
+      .from("financeiro_lancamentos")
+      .delete()
+      .eq("id", id)
+      .eq("origem", "manual");
+
+    if (error) {
+      setLancamentosErro(
+        `Nao foi possivel excluir o lancamento manual. ${error.message}`
+      );
+      return;
+    }
+
     setMesFechado(false);
 
-    if (lancamentoEditandoId === id) {
-      limparFormulario();
-    }
+    if (lancamentoEditandoId === id) limparFormulario();
+
+    await carregarLancamentosManuais();
   }
 
   return (
@@ -318,21 +405,21 @@ export default function FinanceiroProfissional({
                 value={formulario.tipo}
                 onChange={(event) => atualizarCampo("tipo", event.target.value)}
               >
-                <option>Entrada</option>
-                <option>Despesa</option>
+                <option value="entrada">Entrada</option>
+                <option value="despesa">Despesa</option>
               </select>
             </label>
 
             <label>
               <span>Categoria</span>
               <select
-                value={formulario.categoria}
-                onChange={(event) => atualizarCampo("categoria", event.target.value)}
+                value={formulario.categoriaId}
+                onChange={(event) => atualizarCampo("categoriaId", event.target.value)}
                 disabled={cadastrosCarregando || Boolean(cadastrosErro)}
               >
                 <option value="">Selecione</option>
                 {categoriasDoTipo.map((categoria) => (
-                  <option key={categoria.id} value={categoria.nome}>
+                  <option key={categoria.id} value={categoria.id}>
                     {categoria.nome}
                   </option>
                 ))}
@@ -342,14 +429,15 @@ export default function FinanceiroProfissional({
             <label>
               <span>Forma de pagamento</span>
               <select
-                value={formulario.formaPagamento}
+                value={formulario.formaPagamentoId}
                 onChange={(event) =>
-                  atualizarCampo("formaPagamento", event.target.value)
+                  atualizarCampo("formaPagamentoId", event.target.value)
                 }
                 disabled={cadastrosCarregando || Boolean(cadastrosErro)}
               >
+                <option value="">Selecione</option>
                 {formasPagamento.map((formaPagamento) => (
-                  <option key={formaPagamento.id} value={formaPagamento.nome}>
+                  <option key={formaPagamento.id} value={formaPagamento.id}>
                     {formaPagamento.nome}
                   </option>
                 ))}
@@ -385,8 +473,20 @@ export default function FinanceiroProfissional({
             <div className="financeiro-profissional-error">{cadastrosErro}</div>
           )}
 
-          <button className="financeiro-profissional-primary" type="submit">
-            {lancamentoEditandoId ? "Salvar alteracoes" : "Adicionar lancamento"}
+          {lancamentosErro && (
+            <div className="financeiro-profissional-error">{lancamentosErro}</div>
+          )}
+
+          <button
+            className="financeiro-profissional-primary"
+            type="submit"
+            disabled={salvandoLancamento || cadastrosCarregando}
+          >
+            {salvandoLancamento
+              ? "Salvando..."
+              : lancamentoEditandoId
+                ? "Salvar alteracoes"
+                : "Adicionar lancamento"}
           </button>
         </form>
 
@@ -428,6 +528,16 @@ export default function FinanceiroProfissional({
           <span>{totais.lancamentosDoMes.length} no mes</span>
         </div>
 
+        {lancamentosCarregando && (
+          <div className="financeiro-profissional-loading">
+            Carregando lancamentos manuais...
+          </div>
+        )}
+
+        {lancamentosErro && (
+          <div className="financeiro-profissional-error">{lancamentosErro}</div>
+        )}
+
         <div className="financeiro-profissional-table-wrap">
           <table className="financeiro-profissional-table">
             <thead>
@@ -442,52 +552,62 @@ export default function FinanceiroProfissional({
               </tr>
             </thead>
             <tbody>
-              {totais.lancamentosDoMes.map((lancamento) => (
-                <tr key={lancamento.id}>
-                  <td>{formatarData(lancamento.data)}</td>
-                  <td>
-                    <strong>{lancamento.descricao}</strong>
-                    {lancamento.observacao && <small>{lancamento.observacao}</small>}
-                  </td>
-                  <td>
-                    <span
-                      className={`financeiro-profissional-badge financeiro-profissional-badge-${lancamento.tipo.toLowerCase()}`}
-                    >
-                      {lancamento.tipo}
-                    </span>
-                  </td>
-                  <td>{lancamento.categoria}</td>
-                  <td>{lancamento.formaPagamento}</td>
-                  <td
-                    className={
-                      lancamento.tipo === "Despesa"
-                        ? "financeiro-profissional-value-out"
-                        : "financeiro-profissional-value-in"
-                    }
-                  >
-                    {moeda(lancamento.valor)}
-                  </td>
-                  <td>
-                    <div className="financeiro-profissional-actions">
-                      <button type="button" onClick={() => editarLancamento(lancamento)}>
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        className="financeiro-profissional-danger"
-                        onClick={() => excluirLancamento(lancamento.id)}
+              {!lancamentosCarregando &&
+                totais.lancamentosDoMes.map((lancamento) => (
+                  <tr key={lancamento.id}>
+                    <td>{formatarData(lancamento.data_lancamento)}</td>
+                    <td>
+                      <strong>{lancamento.descricao}</strong>
+                      {lancamento.observacao && <small>{lancamento.observacao}</small>}
+                    </td>
+                    <td>
+                      <span
+                        className={`financeiro-profissional-badge financeiro-profissional-badge-${lancamento.tipo}`}
                       >
-                        Excluir
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {lancamento.tipo === "entrada" ? "Entrada" : "Despesa"}
+                      </span>
+                    </td>
+                    <td>
+                      {categoriasPorId[lancamento.categoria_id]?.nome ||
+                        "Categoria nao encontrada"}
+                    </td>
+                    <td>
+                      {formasPagamentoPorId[lancamento.forma_pagamento_id]?.nome ||
+                        "Forma nao encontrada"}
+                    </td>
+                    <td
+                      className={
+                        lancamento.tipo === "despesa"
+                          ? "financeiro-profissional-value-out"
+                          : "financeiro-profissional-value-in"
+                      }
+                    >
+                      {moeda(lancamento.valor)}
+                    </td>
+                    <td>
+                      <div className="financeiro-profissional-actions">
+                        <button
+                          type="button"
+                          onClick={() => editarLancamento(lancamento)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="financeiro-profissional-danger"
+                          onClick={() => excluirLancamento(lancamento.id)}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
 
-              {totais.lancamentosDoMes.length === 0 && (
+              {!lancamentosCarregando && totais.lancamentosDoMes.length === 0 && (
                 <tr>
                   <td colSpan="7" className="financeiro-profissional-empty">
-                    Nenhum lancamento mockado para este mes.
+                    Nenhum lancamento manual para este mes.
                   </td>
                 </tr>
               )}

@@ -723,6 +723,11 @@ code {
   cursor: pointer;
 }
 
+.financeiro-profissional-primary:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .financeiro-profissional-access button {
   padding: 10px 14px;
 }
