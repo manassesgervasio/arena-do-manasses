@@ -386,7 +386,7 @@ export default function FinanceiroProfissional({
 
   async function fecharMes() {
     const confirmar = confirm(
-      "Tem certeza que deseja fechar este mes? O fechamento salvara o resumo financeiro atual deste periodo, mas nao bloqueara o uso do sistema nesta versao."
+      "Tem certeza que deseja fechar este mês? O fechamento salvará o resumo financeiro atual deste período, mas não bloqueará o uso do sistema nesta versão."
     );
 
     if (!confirmar) return;
@@ -399,9 +399,7 @@ export default function FinanceiroProfissional({
 
     const { data: fechamentoExistente, error: verificarError } = await supabase
       .from("financeiro_fechamentos_mensais")
-      .select(
-        "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
-      )
+      .select("*")
       .eq("ano", ano)
       .eq("mes", mes)
       .maybeSingle();
@@ -409,7 +407,7 @@ export default function FinanceiroProfissional({
     if (verificarError) {
       console.error("Erro ao verificar fechamento mensal:", verificarError);
       setFechamentoErro(
-        `Nao foi possivel verificar o fechamento mensal. ${verificarError.message}`
+        `Não foi possível verificar o fechamento mensal: ${verificarError.message}`
       );
       setFechamentoSalvando(false);
       return;
@@ -417,36 +415,36 @@ export default function FinanceiroProfissional({
 
     if (fechamentoExistente) {
       setFechamentoMensal(fechamentoExistente);
-      setFechamentoMensagem("Este mes ja possui fechamento registrado.");
+      setFechamentoMensagem("Este mês já possui fechamento registrado.");
       setFechamentoSalvando(false);
       return;
     }
 
     const agora = new Date().toISOString();
+    const payload = {
+      ano,
+      mes,
+      total_reservas: Number(reservasPagas || 0),
+      total_mensalistas: Number(mensalistasPagos || 0),
+      total_entradas_manuais: totais.entradasManuais,
+      total_despesas: totais.despesas,
+      saldo_liquido: totais.saldoLiquido,
+      fechado: true,
+      fechado_em: agora,
+      observacao: null,
+      updated_at: agora,
+    };
+
     const { data, error } = await supabase
       .from("financeiro_fechamentos_mensais")
-      .insert({
-        ano,
-        mes,
-        total_reservas: Number(reservasPagas || 0),
-        total_mensalistas: Number(mensalistasPagos || 0),
-        total_entradas_manuais: totais.entradasManuais,
-        total_despesas: totais.despesas,
-        saldo_liquido: totais.saldoLiquido,
-        fechado: true,
-        fechado_em: agora,
-        observacao: null,
-        updated_at: agora,
-      })
-      .select(
-        "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
-      )
+      .insert(payload)
+      .select()
       .single();
 
     if (error) {
       console.error("Erro ao salvar fechamento mensal:", error);
       setFechamentoErro(
-        `Nao foi possivel salvar o fechamento mensal. ${error.message}`
+        `Não foi possível salvar o fechamento mensal: ${error.message}`
       );
       setFechamentoSalvando(false);
       return;
@@ -662,7 +660,7 @@ export default function FinanceiroProfissional({
 
           {fechamentoMensal?.fechado && (
             <div className="financeiro-profissional-confirmation">
-              Este mes possui fechamento registrado.
+              Este mês possui fechamento registrado.
             </div>
           )}
 
