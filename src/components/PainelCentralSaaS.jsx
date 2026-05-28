@@ -29,6 +29,10 @@ function criarFormularioInicial() {
     dataInicio: obterDataHoje(),
     dataVencimento: "",
     observacaoAdmin: "",
+    responsavelNome: "",
+    responsavelEmail: "",
+    responsavelTelefone: "",
+    responsavelPerfil: "admin_arena",
   };
 }
 
@@ -76,6 +80,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [senhaTemporariaAuth, setSenhaTemporariaAuth] = useState("");
+  const [resultadoCriacaoArena, setResultadoCriacaoArena] = useState(null);
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("todos");
   const [planoFiltro, setPlanoFiltro] = useState("todos");
@@ -167,6 +172,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setErroCadastro("");
     setMensagem("");
     setSenhaTemporariaAuth("");
+    setResultadoCriacaoArena(null);
     setMostrarFormulario(true);
   }
 
@@ -218,6 +224,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setErroCadastro("");
     setMensagem("");
     setSenhaTemporariaAuth("");
+    setResultadoCriacaoArena(null);
 
     const payload = {
       nome,
@@ -234,7 +241,24 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       updated_at: new Date().toISOString(),
     };
 
-    const { error } = await supabase.from("arenas").insert(payload);
+    const responsavelNome = formulario.responsavelNome.trim();
+    const responsavelEmail = formulario.responsavelEmail.trim().toLowerCase();
+    const responsavelTelefone = formulario.responsavelTelefone.trim();
+    const responsavelPerfil = formulario.responsavelPerfil || "admin_arena";
+
+    if (!responsavelNome || !responsavelEmail || !responsavelPerfil) {
+      setErroCadastro("Preencha nome, e-mail e perfil do responsavel.");
+      setSalvandoArena(false);
+      return;
+    }
+
+    const { data: arenaCriada, error } = await supabase
+      .from("arenas")
+      .insert(payload)
+      .select(
+        "id,nome,slug,telefone,cidade,estado,ativa,plano,status_assinatura,data_inicio,data_vencimento,observacao_admin,created_at,updated_at"
+      )
+      .single();
 
     if (error) {
       console.error("Erro ao cadastrar arena:", error);
@@ -248,7 +272,171 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       return;
     }
 
-    setMensagem("Arena cadastrada com sucesso.");
+    const agora = new Date().toISOString();
+    const { data: usuarioExistente, error: buscarUsuarioError } = await supabase
+      .from("usuarios_sistema")
+      .select("id,nome,email,telefone,tipo_usuario,ativo")
+      .eq("email", responsavelEmail)
+      .maybeSingle();
+
+    if (buscarUsuarioError) {
+      console.error("Erro ao buscar usuario responsavel da nova arena:", buscarUsuarioError);
+      setErroCadastro(
+        `Arena cadastrada, mas nao foi possivel verificar o responsavel. ${buscarUsuarioError.message}`
+      );
+      setResultadoCriacaoArena({
+        arenaNome: arenaCriada.nome,
+        responsavelEmail,
+        status: "Arena criada. Responsavel nao vinculado.",
+      });
+      setSalvandoArena(false);
+      return;
+    }
+
+    let usuario = usuarioExistente;
+
+    if (usuarioExistente) {
+      const { data: usuarioAtualizado, error: atualizarUsuarioError } =
+        await supabase
+          .from("usuarios_sistema")
+          .update({
+            nome: responsavelNome,
+            telefone: responsavelTelefone || null,
+            ativo: true,
+            updated_at: agora,
+          })
+          .eq("id", usuarioExistente.id)
+          .select("id,nome,email,telefone,tipo_usuario,ativo")
+          .single();
+
+      if (atualizarUsuarioError) {
+        console.error("Erro ao atualizar responsavel da nova arena:", atualizarUsuarioError);
+        setErroCadastro(
+          `Arena cadastrada, mas nao foi possivel atualizar o responsavel. ${atualizarUsuarioError.message}`
+        );
+        setResultadoCriacaoArena({
+          arenaNome: arenaCriada.nome,
+          responsavelEmail,
+          status: "Arena criada. Responsavel nao vinculado.",
+        });
+        setSalvandoArena(false);
+        return;
+      }
+
+      usuario = usuarioAtualizado;
+    } else {
+      const { data: usuarioInserido, error: inserirUsuarioError } = await supabase
+        .from("usuarios_sistema")
+        .insert({
+          nome: responsavelNome,
+          email: responsavelEmail,
+          telefone: responsavelTelefone || null,
+          tipo_usuario: "arena",
+          ativo: true,
+          updated_at: agora,
+        })
+        .select("id,nome,email,telefone,tipo_usuario,ativo")
+        .single();
+
+      if (inserirUsuarioError) {
+        console.error("Erro ao cadastrar responsavel da nova arena:", inserirUsuarioError);
+        setErroCadastro(
+          `Arena cadastrada, mas nao foi possivel cadastrar o responsavel. ${inserirUsuarioError.message}`
+        );
+        setResultadoCriacaoArena({
+          arenaNome: arenaCriada.nome,
+          responsavelEmail,
+          status: "Arena criada. Responsavel nao vinculado.",
+        });
+        setSalvandoArena(false);
+        return;
+      }
+
+      usuario = usuarioInserido;
+    }
+
+    const { data: vinculoExistente, error: buscarVinculoError } = await supabase
+      .from("usuarios_arenas")
+      .select("id,usuario_id,arena_id,perfil,ativo")
+      .eq("usuario_id", usuario.id)
+      .eq("arena_id", arenaCriada.id)
+      .maybeSingle();
+
+    if (buscarVinculoError) {
+      console.error("Erro ao buscar vinculo da nova arena:", buscarVinculoError);
+      setErroCadastro(
+        `Arena e responsavel cadastrados, mas nao foi possivel verificar o vinculo. ${buscarVinculoError.message}`
+      );
+      setResultadoCriacaoArena({
+        arenaNome: arenaCriada.nome,
+        responsavelEmail,
+        status: "Arena criada. Responsavel cadastrado sem vinculo.",
+      });
+      setSalvandoArena(false);
+      return;
+    }
+
+    const operacaoVinculo = vinculoExistente
+      ? supabase
+          .from("usuarios_arenas")
+          .update({
+            perfil: responsavelPerfil,
+            ativo: true,
+            updated_at: agora,
+          })
+          .eq("id", vinculoExistente.id)
+      : supabase.from("usuarios_arenas").insert({
+          usuario_id: usuario.id,
+          arena_id: arenaCriada.id,
+          perfil: responsavelPerfil,
+          ativo: true,
+          updated_at: agora,
+        });
+
+    const { error: salvarVinculoError } = await operacaoVinculo;
+
+    if (salvarVinculoError) {
+      console.error("Erro ao vincular responsavel a nova arena:", salvarVinculoError);
+      setErroCadastro(
+        `Arena e responsavel cadastrados, mas nao foi possivel vincular o responsavel. ${salvarVinculoError.message}`
+      );
+      setResultadoCriacaoArena({
+        arenaNome: arenaCriada.nome,
+        responsavelEmail,
+        status: "Arena criada. Responsavel cadastrado sem vinculo.",
+      });
+      setSalvandoArena(false);
+      return;
+    }
+
+    let statusCriacao = "Arena criada, responsavel vinculado e login Auth criado.";
+    let senhaTemporaria = "";
+
+    try {
+      const resultadoAuth = await criarUsuarioAuth({
+        email: responsavelEmail,
+        nome: responsavelNome,
+      });
+
+      if (resultadoAuth.auth_existia) {
+        statusCriacao = "Arena criada e responsavel vinculado. O login Auth ja existia.";
+      } else if (resultadoAuth.senha_temporaria) {
+        senhaTemporaria = resultadoAuth.senha_temporaria;
+      }
+    } catch (authError) {
+      console.error("Erro ao criar login Auth para responsavel da nova arena:", authError);
+      statusCriacao =
+        "Arena criada e responsavel vinculado, mas nao foi possivel criar o login automaticamente.";
+    }
+
+    setMensagem("Nova arena funcional cadastrada com sucesso.");
+    setSenhaTemporariaAuth(senhaTemporaria);
+    setResultadoCriacaoArena({
+      arenaNome: arenaCriada.nome,
+      responsavelEmail,
+      senhaTemporaria,
+      status: statusCriacao,
+    });
     fecharFormulario();
     await carregarArenas();
     setSalvandoArena(false);
@@ -515,6 +703,17 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
         </div>
       )}
 
+      {resultadoCriacaoArena && (
+        <div className="painel-saas-created-result">
+          <strong>{resultadoCriacaoArena.arenaNome}</strong>
+          <span>Responsavel: {resultadoCriacaoArena.responsavelEmail}</span>
+          <span>Status: {resultadoCriacaoArena.status}</span>
+          {resultadoCriacaoArena.senhaTemporaria && (
+            <span>Senha temporaria: {resultadoCriacaoArena.senhaTemporaria}</span>
+          )}
+        </div>
+      )}
+
       {mostrarFormulario && (
         <form className="painel-saas-form" onSubmit={salvarArena}>
           <div className="painel-saas-form-header">
@@ -525,6 +724,10 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
           </div>
 
           {erroCadastro && <div className="painel-saas-error">{erroCadastro}</div>}
+
+          <div className="painel-saas-form-context">
+            A nova arena sera criada vazia, sem reservas, mensalistas, clientes ou financeiro.
+          </div>
 
           <label>
             <span>Nome da arena</span>
@@ -635,8 +838,68 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
             />
           </label>
 
+          <div className="painel-saas-form-context">
+            Responsavel principal da nova arena
+          </div>
+
+          <label>
+            <span>Nome do responsavel</span>
+            <input
+              type="text"
+              value={formulario.responsavelNome}
+              onChange={(event) =>
+                atualizarFormulario("responsavelNome", event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>E-mail do responsavel</span>
+            <input
+              type="email"
+              value={formulario.responsavelEmail}
+              onChange={(event) =>
+                atualizarFormulario(
+                  "responsavelEmail",
+                  event.target.value.toLowerCase()
+                )
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>Telefone do responsavel</span>
+            <input
+              type="text"
+              value={formulario.responsavelTelefone}
+              onChange={(event) =>
+                atualizarFormulario("responsavelTelefone", event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            <span>Perfil do responsavel</span>
+            <select
+              value={formulario.responsavelPerfil}
+              onChange={(event) =>
+                atualizarFormulario("responsavelPerfil", event.target.value)
+              }
+              disabled
+              required
+            >
+              {perfilResponsavelOpcoes.map((perfil) => (
+                <option key={perfil} value={perfil}>
+                  {rotulo(perfil)}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <button type="submit" disabled={salvandoArena}>
-            {salvandoArena ? "Salvando..." : "Salvar arena"}
+            {salvandoArena ? "Salvando..." : "Criar arena funcional"}
           </button>
         </form>
       )}
