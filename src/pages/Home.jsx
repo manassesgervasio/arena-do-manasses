@@ -7,6 +7,7 @@ import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
 import PainelCentralSaaS from "../components/PainelCentralSaaS";
 import ResumoCards from "../components/ResumoCards";
+import UsuariosArena from "../components/UsuariosArena";
 import WeekControls from "../components/WeekControls";
 
 export default function Home({
@@ -49,6 +50,7 @@ export default function Home({
   const [mostrarFinanceiroProfissional, setMostrarFinanceiroProfissional] =
     useState(false);
   const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
+  const [mostrarUsuariosArena, setMostrarUsuariosArena] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
   );
@@ -186,6 +188,15 @@ export default function Home({
       );
     }
 
+    if (mostrarUsuariosArena) {
+      return (
+        <UsuariosArena
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarUsuariosArena(false)}
+        />
+      );
+    }
+
     if (activeMobileTab === "clientes") {
       return renderClientes();
     }
@@ -226,7 +237,14 @@ export default function Home({
         perfilLogado={perfilLogado}
         permissoesLogado={permissoesLogado}
         contextoArena={contextoArena}
-        onAbrirPainelSaaS={() => setMostrarPainelSaaS(true)}
+        onAbrirPainelSaaS={() => {
+          setMostrarUsuariosArena(false);
+          setMostrarPainelSaaS(true);
+        }}
+        onAbrirUsuariosArena={() => {
+          setMostrarPainelSaaS(false);
+          setMostrarUsuariosArena(true);
+        }}
         onSair={onSair}
       />
       {isMobile && (
@@ -234,6 +252,7 @@ export default function Home({
           activeTab={activeMobileTab}
           onTabChange={(tab) => {
             setMostrarPainelSaaS(false);
+            setMostrarUsuariosArena(false);
             setActiveMobileTab(tab);
           }}
         />
@@ -245,6 +264,11 @@ export default function Home({
         <PainelCentralSaaS
           contextoArena={contextoArena}
           onVoltar={() => setMostrarPainelSaaS(false)}
+        />
+      ) : mostrarUsuariosArena ? (
+        <UsuariosArena
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarUsuariosArena(false)}
         />
       ) : (
         <>
