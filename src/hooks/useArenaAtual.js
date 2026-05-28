@@ -48,7 +48,7 @@ export function useArenaAtual(ativo = true) {
 
       const { data: usuario, error: usuarioError } = await supabase
         .from("usuarios_sistema")
-        .select("id,nome,email,ativo")
+        .select("id,nome,email,ativo,tipo_usuario")
         .eq("email", USUARIO_EMAIL_TEMPORARIO)
         .eq("ativo", true)
         .maybeSingle();

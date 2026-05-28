@@ -5,6 +5,7 @@ import ClientesSection from "../components/ClientesSection";
 import FinanceiroProfissional from "../components/FinanceiroProfissional";
 import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
+import PainelCentralSaaS from "../components/PainelCentralSaaS";
 import ResumoCards from "../components/ResumoCards";
 import WeekControls from "../components/WeekControls";
 
@@ -47,6 +48,7 @@ export default function Home({
   const [activeMobileTab, setActiveMobileTab] = useState("agenda");
   const [mostrarFinanceiroProfissional, setMostrarFinanceiroProfissional] =
     useState(false);
+  const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
   );
@@ -175,6 +177,10 @@ export default function Home({
   }
 
   function renderMobileContent() {
+    if (mostrarPainelSaaS) {
+      return <PainelCentralSaaS onVoltar={() => setMostrarPainelSaaS(false)} />;
+    }
+
     if (activeMobileTab === "clientes") {
       return renderClientes();
     }
@@ -215,17 +221,23 @@ export default function Home({
         perfilLogado={perfilLogado}
         permissoesLogado={permissoesLogado}
         contextoArena={contextoArena}
+        onAbrirPainelSaaS={() => setMostrarPainelSaaS(true)}
         onSair={onSair}
       />
       {isMobile && (
         <MobileNavigation
           activeTab={activeMobileTab}
-          onTabChange={setActiveMobileTab}
+          onTabChange={(tab) => {
+            setMostrarPainelSaaS(false);
+            setActiveMobileTab(tab);
+          }}
         />
       )}
 
       {isMobile ? (
         renderMobileContent()
+      ) : mostrarPainelSaaS ? (
+        <PainelCentralSaaS onVoltar={() => setMostrarPainelSaaS(false)} />
       ) : (
         <>
           {renderWeekControls()}

@@ -2,14 +2,17 @@ export default function AppHeader({
   perfilLogado,
   permissoesLogado,
   contextoArena,
+  onAbrirPainelSaaS,
   onSair,
 }) {
   const {
     arenaAtual,
+    usuarioAtual,
     perfilAtual,
     carregandoContexto,
     erroContexto,
   } = contextoArena || {};
+  const podeAcessarPainelSaaS = usuarioAtual?.tipo_usuario === "super_admin";
 
   return (
     <>
@@ -60,6 +63,15 @@ export default function AppHeader({
           <span>
             Perfil logado: <strong>{perfilLogado}</strong>
           </span>
+          {podeAcessarPainelSaaS && (
+            <button
+              type="button"
+              className="logged-profile-secondary"
+              onClick={onAbrirPainelSaaS}
+            >
+              Painel SaaS
+            </button>
+          )}
           <button type="button" onClick={onSair}>
             Sair
           </button>
