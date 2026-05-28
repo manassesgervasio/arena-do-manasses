@@ -973,6 +973,26 @@ code {
   color: #bbf7d0;
 }
 
+.painel-saas-auth-secret,
+.usuarios-arena-auth-secret {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.34);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.painel-saas-auth-secret small,
+.usuarios-arena-auth-secret small {
+  color: #fde68a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .painel-saas-table-wrap {
   overflow-x: auto;
   border: 1px solid rgba(255, 255, 255, 0.14);

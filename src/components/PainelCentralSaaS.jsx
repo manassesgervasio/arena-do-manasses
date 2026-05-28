@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
+import { criarUsuarioAuth } from "../utils/criarUsuarioAuth";
 
 const statusOpcoes = ["todos", "teste", "ativo", "suspenso", "cancelado"];
 const planoOpcoes = ["todos", "teste", "basico", "profissional", "premium"];
@@ -74,6 +75,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [senhaTemporariaAuth, setSenhaTemporariaAuth] = useState("");
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("todos");
   const [planoFiltro, setPlanoFiltro] = useState("todos");
@@ -164,6 +166,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setSlugEditadoManual(false);
     setErroCadastro("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
     setMostrarFormulario(true);
   }
 
@@ -179,6 +182,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setFormularioResponsavel(criarFormularioResponsavelInicial());
     setErroResponsavel("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
   }
 
   function fecharFormularioResponsavel() {
@@ -213,6 +217,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setSalvandoArena(true);
     setErroCadastro("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
 
     const payload = {
       nome,
@@ -275,6 +280,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setSalvandoResponsavel(true);
     setErroResponsavel("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
 
     const agora = new Date().toISOString();
     const { data: usuarioExistente, error: buscarUsuarioError } = await supabase
@@ -388,7 +394,24 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       return;
     }
 
-    setMensagem("Responsavel vinculado a arena com sucesso.");
+    try {
+      const resultadoAuth = await criarUsuarioAuth({ email, nome });
+
+      if (resultadoAuth.auth_existia) {
+        setMensagem("Usuario vinculado com sucesso. O login Auth ja existia.");
+      } else {
+        setMensagem("Usuario cadastrado e login criado com sucesso.");
+        if (resultadoAuth.senha_temporaria) {
+          setSenhaTemporariaAuth(resultadoAuth.senha_temporaria);
+        }
+      }
+    } catch (authError) {
+      console.error("Erro ao criar login Auth automaticamente:", authError);
+      setMensagem(
+        "Usuario vinculado a arena, mas nao foi possivel criar o login automaticamente. Crie o acesso manualmente no Supabase Auth."
+      );
+    }
+
     fecharFormularioResponsavel();
     await carregarArenas();
     setSalvandoResponsavel(false);
@@ -485,6 +508,12 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       )}
 
       {mensagem && <div className="painel-saas-confirmation">{mensagem}</div>}
+      {senhaTemporariaAuth && (
+        <div className="painel-saas-auth-secret">
+          <span>Senha temporaria: {senhaTemporariaAuth}</span>
+          <small>Anote esta senha. Ela sera exibida apenas agora.</small>
+        </div>
+      )}
 
       {mostrarFormulario && (
         <form className="painel-saas-form" onSubmit={salvarArena}>

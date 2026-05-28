@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
+import { criarUsuarioAuth } from "../utils/criarUsuarioAuth";
 
 const perfilOpcoes = ["atendente", "gerente", "financeiro", "admin_arena"];
 
@@ -36,6 +37,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [senhaTemporariaAuth, setSenhaTemporariaAuth] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [formulario, setFormulario] = useState(criarFormularioInicial);
   const [salvando, setSalvando] = useState(false);
@@ -143,6 +145,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     setFormulario(criarFormularioInicial());
     setErro("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
     setMostrarFormulario(true);
   }
 
@@ -177,6 +180,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     setSalvando(true);
     setErro("");
     setMensagem("");
+    setSenhaTemporariaAuth("");
 
     const agora = new Date().toISOString();
     const { data: usuarioExistente, error: buscarUsuarioError } = await supabase
@@ -279,7 +283,24 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       return;
     }
 
-    setMensagem("Usuario vinculado a arena com sucesso.");
+    try {
+      const resultadoAuth = await criarUsuarioAuth({ email, nome });
+
+      if (resultadoAuth.auth_existia) {
+        setMensagem("Usuario vinculado com sucesso. O login Auth ja existia.");
+      } else {
+        setMensagem("Usuario cadastrado e login criado com sucesso.");
+        if (resultadoAuth.senha_temporaria) {
+          setSenhaTemporariaAuth(resultadoAuth.senha_temporaria);
+        }
+      }
+    } catch (authError) {
+      console.error("Erro ao criar login Auth automaticamente:", authError);
+      setMensagem(
+        "Usuario vinculado a arena, mas nao foi possivel criar o login automaticamente. Crie o acesso manualmente no Supabase Auth."
+      );
+    }
+
     fecharFormulario();
     await carregarUsuarios();
     setSalvando(false);
@@ -376,6 +397,12 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       </div>
 
       {mensagem && <div className="usuarios-arena-confirmation">{mensagem}</div>}
+      {senhaTemporariaAuth && (
+        <div className="usuarios-arena-auth-secret">
+          <span>Senha temporaria: {senhaTemporariaAuth}</span>
+          <small>Anote esta senha. Ela sera exibida apenas agora.</small>
+        </div>
+      )}
       {erro && <div className="usuarios-arena-error">{erro}</div>}
 
       {mostrarFormulario && (
