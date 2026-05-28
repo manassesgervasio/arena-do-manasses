@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
+import { useArenaAtual } from "./hooks/useArenaAtual";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import Home from "./pages/Home";
@@ -37,6 +38,7 @@ export default function App() {
   const [sessaoAuth, setSessaoAuth] = useState(null);
   const [authCarregando, setAuthCarregando] = useState(true);
   const [perfilLogado, setPerfilLogado] = useState(null);
+  const contextoArena = useArenaAtual(Boolean(sessaoAuth));
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -638,6 +640,7 @@ return "#14532d";
     <Home
       perfilLogado={perfilLogado}
       permissoesLogado={permissoesLogado}
+      contextoArena={contextoArena}
       onSair={sair}
       dataBase={dataBase}
       mesFiltro={mesFiltro}

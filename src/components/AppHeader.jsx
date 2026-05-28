@@ -1,4 +1,16 @@
-export default function AppHeader({ perfilLogado, permissoesLogado, onSair }) {
+export default function AppHeader({
+  perfilLogado,
+  permissoesLogado,
+  contextoArena,
+  onSair,
+}) {
+  const {
+    arenaAtual,
+    perfilAtual,
+    carregandoContexto,
+    erroContexto,
+  } = contextoArena || {};
+
   return (
     <>
       <h1
@@ -25,6 +37,23 @@ export default function AppHeader({ perfilLogado, permissoesLogado, onSair }) {
       >
         Agenda por datas reais
       </p>
+
+      <div className="arena-context">
+        {carregandoContexto ? (
+          <span>Carregando arena...</span>
+        ) : erroContexto ? (
+          <span>{erroContexto}</span>
+        ) : arenaAtual && perfilAtual ? (
+          <>
+            <span>
+              Arena: <strong>{arenaAtual.nome}</strong>
+            </span>
+            <span>
+              Perfil: <strong>{perfilAtual}</strong>
+            </span>
+          </>
+        ) : null}
+      </div>
 
       {perfilLogado && permissoesLogado && (
         <div className="logged-profile" aria-label="Perfil logado">
