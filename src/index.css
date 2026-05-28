@@ -864,8 +864,23 @@ code {
 }
 
 .painel-saas-form-observacao,
+.painel-saas-form-context,
 .painel-saas-form .painel-saas-error {
   grid-column: 1 / -1;
+}
+
+.painel-saas-form-context {
+  padding: 11px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.74);
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.painel-saas-form-context strong {
+  color: white;
 }
 
 .painel-saas-summary {
@@ -967,7 +982,7 @@ code {
 
 .painel-saas-table {
   width: 100%;
-  min-width: 920px;
+  min-width: 1120px;
   border-collapse: collapse;
 }
 
@@ -991,6 +1006,36 @@ code {
 .painel-saas-table td strong {
   color: white;
   font-weight: 900;
+}
+
+.painel-saas-responsaveis {
+  display: grid;
+  gap: 8px;
+  min-width: 190px;
+}
+
+.painel-saas-responsaveis div {
+  display: grid;
+  gap: 3px;
+}
+
+.painel-saas-responsaveis span,
+.painel-saas-responsaveis small {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.painel-saas-action {
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .painel-saas-badge,
@@ -1701,6 +1746,7 @@ code {
 
   .painel-saas-form-header button,
   .painel-saas-form-observacao,
+  .painel-saas-form-context,
   .painel-saas-form .painel-saas-error {
     grid-column: auto;
   }
@@ -1725,7 +1771,7 @@ code {
   }
 
   .painel-saas-table {
-    min-width: 860px;
+    min-width: 1060px;
   }
 
   .financeiro-profissional {

@@ -5,6 +5,12 @@ const statusOpcoes = ["todos", "teste", "ativo", "suspenso", "cancelado"];
 const planoOpcoes = ["todos", "teste", "basico", "profissional", "premium"];
 const statusCadastroOpcoes = ["teste", "ativo", "suspenso", "cancelado"];
 const planoCadastroOpcoes = ["teste", "basico", "profissional", "premium"];
+const perfilResponsavelOpcoes = [
+  "admin_arena",
+  "gerente",
+  "financeiro",
+  "atendente",
+];
 
 function obterDataHoje() {
   return new Date().toISOString().split("T")[0];
@@ -22,6 +28,15 @@ function criarFormularioInicial() {
     dataInicio: obterDataHoje(),
     dataVencimento: "",
     observacaoAdmin: "",
+  };
+}
+
+function criarFormularioResponsavelInicial() {
+  return {
+    nome: "",
+    email: "",
+    telefone: "",
+    perfil: "admin_arena",
   };
 }
 
@@ -54,6 +69,8 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   const podeCadastrarArena =
     contextoArena?.usuarioAtual?.tipo_usuario === "super_admin";
   const [arenas, setArenas] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [vinculos, setVinculos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
@@ -65,27 +82,53 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   const [slugEditadoManual, setSlugEditadoManual] = useState(false);
   const [salvandoArena, setSalvandoArena] = useState(false);
   const [erroCadastro, setErroCadastro] = useState("");
+  const [arenaResponsavel, setArenaResponsavel] = useState(null);
+  const [formularioResponsavel, setFormularioResponsavel] = useState(
+    criarFormularioResponsavelInicial
+  );
+  const [salvandoResponsavel, setSalvandoResponsavel] = useState(false);
+  const [erroResponsavel, setErroResponsavel] = useState("");
 
   async function carregarArenas() {
     setCarregando(true);
     setErro("");
 
-    const { data, error } = await supabase
-      .from("arenas")
-      .select(
-        "id,nome,slug,telefone,cidade,estado,ativa,plano,status_assinatura,data_inicio,data_vencimento,observacao_admin,created_at,updated_at"
-      )
-      .order("created_at", { ascending: false });
+    const [
+      { data, error },
+      { data: vinculosData, error: vinculosError },
+      { data: usuariosData, error: usuariosError },
+    ] = await Promise.all([
+      supabase
+        .from("arenas")
+        .select(
+          "id,nome,slug,telefone,cidade,estado,ativa,plano,status_assinatura,data_inicio,data_vencimento,observacao_admin,created_at,updated_at"
+        )
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("usuarios_arenas")
+        .select("id,usuario_id,arena_id,perfil,ativo,created_at,updated_at")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("usuarios_sistema")
+        .select("id,nome,email,telefone,tipo_usuario,ativo,created_at,updated_at")
+        .order("nome", { ascending: true }),
+    ]);
 
-    if (error) {
-      console.error("Erro ao carregar arenas do Painel SaaS:", error);
-      setErro(`Nao foi possivel carregar as arenas. ${error.message}`);
+    if (error || vinculosError || usuariosError) {
+      const erroCarregamento = error || vinculosError || usuariosError;
+
+      console.error("Erro ao carregar dados do Painel SaaS:", erroCarregamento);
+      setErro(`Nao foi possivel carregar os dados do Painel SaaS. ${erroCarregamento.message}`);
       setArenas([]);
+      setVinculos([]);
+      setUsuarios([]);
       setCarregando(false);
       return;
     }
 
     setArenas(data || []);
+    setVinculos(vinculosData || []);
+    setUsuarios(usuariosData || []);
     setCarregando(false);
   }
 
@@ -129,6 +172,26 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setErroCadastro("");
     setSlugEditadoManual(false);
     setFormulario(criarFormularioInicial());
+  }
+
+  function abrirFormularioResponsavel(arena) {
+    setArenaResponsavel(arena);
+    setFormularioResponsavel(criarFormularioResponsavelInicial());
+    setErroResponsavel("");
+    setMensagem("");
+  }
+
+  function fecharFormularioResponsavel() {
+    setArenaResponsavel(null);
+    setFormularioResponsavel(criarFormularioResponsavelInicial());
+    setErroResponsavel("");
+  }
+
+  function atualizarFormularioResponsavel(campo, valor) {
+    setFormularioResponsavel((anterior) => ({
+      ...anterior,
+      [campo]: campo === "email" ? valor.toLowerCase() : valor,
+    }));
   }
 
   async function salvarArena(event) {
@@ -186,6 +249,151 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setSalvandoArena(false);
   }
 
+  async function salvarResponsavel(event) {
+    event.preventDefault();
+
+    if (!podeCadastrarArena) {
+      setErroResponsavel("Apenas super_admin pode cadastrar responsaveis.");
+      return;
+    }
+
+    if (!arenaResponsavel?.id) {
+      setErroResponsavel("Selecione uma arena para vincular o responsavel.");
+      return;
+    }
+
+    const nome = formularioResponsavel.nome.trim();
+    const email = formularioResponsavel.email.trim().toLowerCase();
+    const telefone = formularioResponsavel.telefone.trim();
+    const perfil = formularioResponsavel.perfil;
+
+    if (!nome || !email || !perfil) {
+      setErroResponsavel("Preencha nome, e-mail e perfil.");
+      return;
+    }
+
+    setSalvandoResponsavel(true);
+    setErroResponsavel("");
+    setMensagem("");
+
+    const agora = new Date().toISOString();
+    const { data: usuarioExistente, error: buscarUsuarioError } = await supabase
+      .from("usuarios_sistema")
+      .select("id,nome,email,telefone,tipo_usuario,ativo")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (buscarUsuarioError) {
+      console.error("Erro ao buscar usuario responsavel:", buscarUsuarioError);
+      setErroResponsavel(
+        `Nao foi possivel verificar o usuario responsavel. ${buscarUsuarioError.message}`
+      );
+      setSalvandoResponsavel(false);
+      return;
+    }
+
+    let usuario = usuarioExistente;
+
+    if (usuarioExistente) {
+      const { data: usuarioAtualizado, error: atualizarUsuarioError } =
+        await supabase
+          .from("usuarios_sistema")
+          .update({
+            nome,
+            telefone: telefone || null,
+            ativo: true,
+            updated_at: agora,
+          })
+          .eq("id", usuarioExistente.id)
+          .select("id,nome,email,telefone,tipo_usuario,ativo")
+          .single();
+
+      if (atualizarUsuarioError) {
+        console.error("Erro ao atualizar usuario responsavel:", atualizarUsuarioError);
+        setErroResponsavel(
+          `Nao foi possivel atualizar o usuario responsavel. ${atualizarUsuarioError.message}`
+        );
+        setSalvandoResponsavel(false);
+        return;
+      }
+
+      usuario = usuarioAtualizado;
+    } else {
+      const { data: usuarioInserido, error: inserirUsuarioError } = await supabase
+        .from("usuarios_sistema")
+        .insert({
+          nome,
+          email,
+          telefone: telefone || null,
+          tipo_usuario: "arena",
+          ativo: true,
+          updated_at: agora,
+        })
+        .select("id,nome,email,telefone,tipo_usuario,ativo")
+        .single();
+
+      if (inserirUsuarioError) {
+        console.error("Erro ao cadastrar usuario responsavel:", inserirUsuarioError);
+        setErroResponsavel(
+          `Nao foi possivel cadastrar o usuario responsavel. ${inserirUsuarioError.message}`
+        );
+        setSalvandoResponsavel(false);
+        return;
+      }
+
+      usuario = usuarioInserido;
+    }
+
+    const { data: vinculoExistente, error: buscarVinculoError } = await supabase
+      .from("usuarios_arenas")
+      .select("id,usuario_id,arena_id,perfil,ativo")
+      .eq("usuario_id", usuario.id)
+      .eq("arena_id", arenaResponsavel.id)
+      .maybeSingle();
+
+    if (buscarVinculoError) {
+      console.error("Erro ao buscar vinculo usuario-arena:", buscarVinculoError);
+      setErroResponsavel(
+        `Nao foi possivel verificar o vinculo com a arena. ${buscarVinculoError.message}`
+      );
+      setSalvandoResponsavel(false);
+      return;
+    }
+
+    const operacaoVinculo = vinculoExistente
+      ? supabase
+          .from("usuarios_arenas")
+          .update({
+            perfil,
+            ativo: true,
+            updated_at: agora,
+          })
+          .eq("id", vinculoExistente.id)
+      : supabase.from("usuarios_arenas").insert({
+          usuario_id: usuario.id,
+          arena_id: arenaResponsavel.id,
+          perfil,
+          ativo: true,
+          updated_at: agora,
+        });
+
+    const { error: salvarVinculoError } = await operacaoVinculo;
+
+    if (salvarVinculoError) {
+      console.error("Erro ao salvar vinculo usuario-arena:", salvarVinculoError);
+      setErroResponsavel(
+        `Nao foi possivel vincular o responsavel a arena. ${salvarVinculoError.message}`
+      );
+      setSalvandoResponsavel(false);
+      return;
+    }
+
+    setMensagem("Responsavel vinculado a arena com sucesso.");
+    fecharFormularioResponsavel();
+    await carregarArenas();
+    setSalvandoResponsavel(false);
+  }
+
   const resumo = useMemo(() => {
     return arenas.reduce(
       (total, arena) => {
@@ -221,6 +429,39 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       return combinaBusca && combinaStatus && combinaPlano;
     });
   }, [arenas, busca, planoFiltro, statusFiltro]);
+
+  const usuariosPorId = useMemo(() => {
+    return usuarios.reduce((mapa, usuario) => {
+      mapa[usuario.id] = usuario;
+      return mapa;
+    }, {});
+  }, [usuarios]);
+
+  const responsaveisPorArena = useMemo(() => {
+    return vinculos.reduce((mapa, vinculo) => {
+      if (!vinculo.ativo) return mapa;
+
+      const usuario = usuariosPorId[vinculo.usuario_id];
+      if (!usuario) return mapa;
+
+      if (!mapa[vinculo.arena_id]) {
+        mapa[vinculo.arena_id] = [];
+      }
+
+      mapa[vinculo.arena_id].push({
+        ...vinculo,
+        usuario,
+      });
+
+      mapa[vinculo.arena_id].sort((a, b) => {
+        if (a.perfil === "admin_arena" && b.perfil !== "admin_arena") return -1;
+        if (a.perfil !== "admin_arena" && b.perfil === "admin_arena") return 1;
+        return a.usuario.nome.localeCompare(b.usuario.nome);
+      });
+
+      return mapa;
+    }, {});
+  }, [usuariosPorId, vinculos]);
 
   return (
     <section className="painel-saas">
@@ -371,6 +612,81 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
         </form>
       )}
 
+      {arenaResponsavel && (
+        <form className="painel-saas-form" onSubmit={salvarResponsavel}>
+          <div className="painel-saas-form-header">
+            <h3>Cadastrar responsável</h3>
+            <button type="button" onClick={fecharFormularioResponsavel}>
+              Cancelar
+            </button>
+          </div>
+
+          <div className="painel-saas-form-context">
+            Arena: <strong>{arenaResponsavel.nome}</strong>
+          </div>
+
+          {erroResponsavel && (
+            <div className="painel-saas-error">{erroResponsavel}</div>
+          )}
+
+          <label>
+            <span>Nome do responsável</span>
+            <input
+              type="text"
+              value={formularioResponsavel.nome}
+              onChange={(event) =>
+                atualizarFormularioResponsavel("nome", event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>E-mail</span>
+            <input
+              type="email"
+              value={formularioResponsavel.email}
+              onChange={(event) =>
+                atualizarFormularioResponsavel("email", event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>Telefone</span>
+            <input
+              type="text"
+              value={formularioResponsavel.telefone}
+              onChange={(event) =>
+                atualizarFormularioResponsavel("telefone", event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            <span>Perfil</span>
+            <select
+              value={formularioResponsavel.perfil}
+              onChange={(event) =>
+                atualizarFormularioResponsavel("perfil", event.target.value)
+              }
+              required
+            >
+              {perfilResponsavelOpcoes.map((perfil) => (
+                <option key={perfil} value={perfil}>
+                  {rotulo(perfil)}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button type="submit" disabled={salvandoResponsavel}>
+            {salvandoResponsavel ? "Salvando..." : "Salvar responsável"}
+          </button>
+        </form>
+      )}
+
       <div className="painel-saas-summary">
         <PainelResumoCard titulo="Total de arenas" valor={resumo.total} />
         <PainelResumoCard titulo="Arenas ativas" valor={resumo.ativas} />
@@ -436,12 +752,17 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                 <th>Plano</th>
                 <th>Status</th>
                 <th>Ativa</th>
+                <th>Responsaveis</th>
                 <th>Data de início</th>
                 <th>Data de vencimento</th>
+                <th>Acoes</th>
               </tr>
             </thead>
             <tbody>
-              {arenasFiltradas.map((arena) => (
+              {arenasFiltradas.map((arena) => {
+                const responsaveis = responsaveisPorArena[arena.id] || [];
+
+                return (
                 <tr key={arena.id}>
                   <td>
                     <strong>{arena.nome}</strong>
@@ -461,10 +782,37 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                     </span>
                   </td>
                   <td>{arena.ativa ? "Sim" : "Não"}</td>
+                  <td>
+                    {responsaveis.length > 0 ? (
+                      <div className="painel-saas-responsaveis">
+                        {responsaveis.map((responsavel) => (
+                          <div key={responsavel.id}>
+                            <strong>{responsavel.usuario.nome}</strong>
+                            <span>{responsavel.usuario.email}</span>
+                            <small>{rotulo(responsavel.perfil)}</small>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td>{formatarData(arena.data_inicio)}</td>
                   <td>{formatarData(arena.data_vencimento)}</td>
+                  <td>
+                    {podeCadastrarArena && (
+                      <button
+                        type="button"
+                        className="painel-saas-action"
+                        onClick={() => abrirFormularioResponsavel(arena)}
+                      >
+                        Adicionar responsavel
+                      </button>
+                    )}
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
 
