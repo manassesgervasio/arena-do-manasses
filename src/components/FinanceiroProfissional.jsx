@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
+import { canManageFechamento } from "../utils/permissoes";
 
 const formularioInicial = {
   descricao: "",
@@ -59,8 +60,11 @@ export default function FinanceiroProfissional({
   mesInicial = obterMesAtual(),
 }) {
   const arenaAtualId = contextoArena?.arenaAtual?.id;
+  const usuarioAtual = contextoArena?.usuarioAtual;
+  const perfilAtual = contextoArena?.perfilAtual;
   const carregandoContexto = contextoArena?.carregandoContexto;
   const erroContexto = contextoArena?.erroContexto;
+  const podeGerenciarFechamento = canManageFechamento(usuarioAtual, perfilAtual);
   const [mesAno, setMesAno] = useState(mesInicial);
   const [lancamentos, setLancamentos] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -551,6 +555,11 @@ export default function FinanceiroProfissional({
   }
 
   async function fecharMes() {
+    if (!podeGerenciarFechamento) {
+      setFechamentoErro("Você não tem permissão para acessar esta área.");
+      return;
+    }
+
     if (!arenaAtualId) {
       setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
       return;
@@ -659,6 +668,11 @@ export default function FinanceiroProfissional({
   }
 
   async function reabrirMes() {
+    if (!podeGerenciarFechamento) {
+      setFechamentoErro("Você não tem permissão para acessar esta área.");
+      return;
+    }
+
     if (!arenaAtualId) {
       setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
       return;
@@ -921,7 +935,7 @@ export default function FinanceiroProfissional({
             <p>Despesas: {moeda(totais.despesas)}</p>
           </div>
 
-          {mesEstaFechado ? (
+          {podeGerenciarFechamento && (mesEstaFechado ? (
             <button
               className="financeiro-profissional-secondary"
               type="button"
@@ -941,7 +955,7 @@ export default function FinanceiroProfissional({
             >
               {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
             </button>
-          )}
+          ))}
 
           {mesEstaFechado && (
             <div className="financeiro-profissional-confirmation">

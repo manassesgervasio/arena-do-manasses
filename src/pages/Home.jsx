@@ -9,6 +9,14 @@ import PainelCentralSaaS from "../components/PainelCentralSaaS";
 import ResumoCards from "../components/ResumoCards";
 import UsuariosArena from "../components/UsuariosArena";
 import WeekControls from "../components/WeekControls";
+import { navigationItems } from "../navigation";
+import {
+  canAccessClientes,
+  canAccessFinanceiro,
+  canAccessMensalistas,
+  canAccessPainelSaaS,
+  canAccessUsuariosArena,
+} from "../utils/permissoes";
 
 export default function Home({
   perfilLogado,
@@ -54,6 +62,23 @@ export default function Home({
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
   );
+  const usuarioAtual = contextoArena?.usuarioAtual;
+  const perfilAtual = contextoArena?.perfilAtual;
+  const permissoesArena = {
+    clientes: canAccessClientes(usuarioAtual, perfilAtual),
+    financeiro: canAccessFinanceiro(usuarioAtual, perfilAtual),
+    mensalistas: canAccessMensalistas(usuarioAtual, perfilAtual),
+    painelSaaS: canAccessPainelSaaS(usuarioAtual),
+    usuarios: canAccessUsuariosArena(usuarioAtual, perfilAtual),
+  };
+  const mobileNavigationItems = navigationItems.filter((item) => {
+    if (item.id === "clientes") return permissoesArena.clientes;
+    if (item.id === "financeiro" || item.id === "financeiro-profissional") {
+      return permissoesArena.financeiro;
+    }
+    if (item.id === "mensalistas") return permissoesArena.mensalistas;
+    return true;
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 640px)");
@@ -68,6 +93,30 @@ export default function Home({
       mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!mobileNavigationItems.some((item) => item.id === activeMobileTab)) {
+      setActiveMobileTab("agenda");
+    }
+
+    if (!permissoesArena.financeiro) {
+      setMostrarFinanceiroProfissional(false);
+    }
+
+    if (!permissoesArena.painelSaaS) {
+      setMostrarPainelSaaS(false);
+    }
+
+    if (!permissoesArena.usuarios) {
+      setMostrarUsuariosArena(false);
+    }
+  }, [
+    activeMobileTab,
+    mobileNavigationItems,
+    permissoesArena.financeiro,
+    permissoesArena.painelSaaS,
+    permissoesArena.usuarios,
+  ]);
 
   function renderWeekControls() {
     return (
@@ -109,6 +158,8 @@ export default function Home({
   }
 
   function renderClientes() {
+    if (!permissoesArena.clientes) return <AccessDenied />;
+
     return (
       <ClientesSection
         clientes={clientes}
@@ -131,6 +182,8 @@ export default function Home({
   }
 
   function renderFinanceiro() {
+    if (!permissoesArena.financeiro) return <AccessDenied />;
+
     return (
       <section className="financeiro-mobile-section">
         <div className="financeiro-mobile-header">
@@ -159,6 +212,8 @@ export default function Home({
   }
 
   function renderFinanceiroProfissional() {
+    if (!permissoesArena.financeiro) return <AccessDenied />;
+
     return (
       <FinanceiroProfissional
         contextoArena={contextoArena}
@@ -168,6 +223,8 @@ export default function Home({
   }
 
   function renderMensalistas() {
+    if (!permissoesArena.mensalistas) return <AccessDenied />;
+
     return (
       <MensalistasSection
         moeda={moeda}
@@ -180,6 +237,8 @@ export default function Home({
 
   function renderMobileContent() {
     if (mostrarPainelSaaS) {
+      if (!permissoesArena.painelSaaS) return <AccessDenied />;
+
       return (
         <PainelCentralSaaS
           contextoArena={contextoArena}
@@ -189,6 +248,8 @@ export default function Home({
     }
 
     if (mostrarUsuariosArena) {
+      if (!permissoesArena.usuarios) return <AccessDenied />;
+
       return (
         <UsuariosArena
           contextoArena={contextoArena}
@@ -238,10 +299,14 @@ export default function Home({
         permissoesLogado={permissoesLogado}
         contextoArena={contextoArena}
         onAbrirPainelSaaS={() => {
+          if (!permissoesArena.painelSaaS) return;
+
           setMostrarUsuariosArena(false);
           setMostrarPainelSaaS(true);
         }}
         onAbrirUsuariosArena={() => {
+          if (!permissoesArena.usuarios) return;
+
           setMostrarPainelSaaS(false);
           setMostrarUsuariosArena(true);
         }}
@@ -250,6 +315,7 @@ export default function Home({
       {isMobile && (
         <MobileNavigation
           activeTab={activeMobileTab}
+          items={mobileNavigationItems}
           onTabChange={(tab) => {
             setMostrarPainelSaaS(false);
             setMostrarUsuariosArena(false);
@@ -261,26 +327,44 @@ export default function Home({
       {isMobile ? (
         renderMobileContent()
       ) : mostrarPainelSaaS ? (
+        permissoesArena.painelSaaS ? (
         <PainelCentralSaaS
           contextoArena={contextoArena}
           onVoltar={() => setMostrarPainelSaaS(false)}
         />
+        ) : (
+          <AccessDenied />
+        )
       ) : mostrarUsuariosArena ? (
+        permissoesArena.usuarios ? (
         <UsuariosArena
           contextoArena={contextoArena}
           onVoltar={() => setMostrarUsuariosArena(false)}
         />
+        ) : (
+          <AccessDenied />
+        )
       ) : (
         <>
           {renderWeekControls()}
-          {renderFinanceiro()}
-          {mostrarFinanceiroProfissional && renderFinanceiroProfissional()}
+          {permissoesArena.financeiro && renderFinanceiro()}
+          {permissoesArena.financeiro &&
+            mostrarFinanceiroProfissional &&
+            renderFinanceiroProfissional()}
           {renderAgenda()}
-          {renderMensalistas()}
-          {renderClientes()}
+          {permissoesArena.mensalistas && renderMensalistas()}
+          {permissoesArena.clientes && renderClientes()}
         </>
       )}
 </div>
 </>
 );
+}
+
+function AccessDenied() {
+  return (
+    <section className="access-denied">
+      Você não tem permissão para acessar esta área.
+    </section>
+  );
 }

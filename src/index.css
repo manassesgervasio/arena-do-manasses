@@ -1294,6 +1294,18 @@ code {
   text-transform: capitalize;
 }
 
+.access-denied {
+  margin-top: 28px;
+  padding: 14px 16px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .financeiro-profissional-access {
   display: flex;
   justify-content: flex-end;

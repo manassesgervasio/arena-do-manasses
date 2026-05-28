@@ -1,3 +1,8 @@
+import {
+  canAccessPainelSaaS,
+  canAccessUsuariosArena,
+} from "../utils/permissoes";
+
 export default function AppHeader({
   perfilLogado,
   permissoesLogado,
@@ -13,9 +18,11 @@ export default function AppHeader({
     carregandoContexto,
     erroContexto,
   } = contextoArena || {};
-  const podeAcessarPainelSaaS = usuarioAtual?.tipo_usuario === "super_admin";
-  const podeAcessarUsuariosArena =
-    perfilAtual === "admin_arena" || usuarioAtual?.tipo_usuario === "super_admin";
+  const podeAcessarPainelSaaS = canAccessPainelSaaS(usuarioAtual);
+  const podeAcessarUsuariosArena = canAccessUsuariosArena(
+    usuarioAtual,
+    perfilAtual
+  );
 
   return (
     <>
@@ -61,11 +68,18 @@ export default function AppHeader({
         ) : null}
       </div>
 
-      {perfilLogado && permissoesLogado && (
+      {(usuarioAtual || (perfilLogado && permissoesLogado)) && (
         <div className="logged-profile" aria-label="Perfil logado">
-          <span>
-            Perfil logado: <strong>{perfilLogado}</strong>
-          </span>
+          {usuarioAtual?.nome && (
+            <span>
+              Usuario: <strong>{usuarioAtual.nome}</strong>
+            </span>
+          )}
+          {perfilAtual && (
+            <span>
+              Perfil: <strong>{perfilAtual}</strong>
+            </span>
+          )}
           {podeAcessarPainelSaaS && (
             <button
               type="button"

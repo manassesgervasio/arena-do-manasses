@@ -2,20 +2,19 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 const ARENA_SLUG_ATUAL = "arena-do-manasses";
-const USUARIO_EMAIL_TEMPORARIO = "manassesgervasio@hotmail.com";
 
-export function useArenaAtual(ativo = true) {
+export function useArenaAtual(session) {
   const [arenaAtual, setArenaAtual] = useState(null);
   const [usuarioAtual, setUsuarioAtual] = useState(null);
   const [perfilAtual, setPerfilAtual] = useState(null);
-  const [carregandoContexto, setCarregandoContexto] = useState(Boolean(ativo));
+  const [carregandoContexto, setCarregandoContexto] = useState(Boolean(session));
   const [erroContexto, setErroContexto] = useState("");
 
   useEffect(() => {
     let montado = true;
 
     async function carregarContexto() {
-      if (!ativo) {
+      if (!session?.user?.email) {
         setArenaAtual(null);
         setUsuarioAtual(null);
         setPerfilAtual(null);
@@ -27,29 +26,12 @@ export function useArenaAtual(ativo = true) {
       setCarregandoContexto(true);
       setErroContexto("");
 
-      const { data: arena, error: arenaError } = await supabase
-        .from("arenas")
-        .select("id,nome,slug,ativa")
-        .eq("slug", ARENA_SLUG_ATUAL)
-        .eq("ativa", true)
-        .maybeSingle();
-
-      if (!montado) return;
-
-      if (arenaError || !arena) {
-        console.error("Erro ao carregar arena atual:", arenaError);
-        setErroContexto("Nao foi possivel carregar o contexto da arena.");
-        setArenaAtual(null);
-        setUsuarioAtual(null);
-        setPerfilAtual(null);
-        setCarregandoContexto(false);
-        return;
-      }
+      const emailAuth = session.user.email.toLowerCase();
 
       const { data: usuario, error: usuarioError } = await supabase
         .from("usuarios_sistema")
         .select("id,nome,email,ativo,tipo_usuario")
-        .eq("email", USUARIO_EMAIL_TEMPORARIO)
+        .eq("email", emailAuth)
         .eq("ativo", true)
         .maybeSingle();
 
@@ -57,37 +39,101 @@ export function useArenaAtual(ativo = true) {
 
       if (usuarioError || !usuario) {
         console.error("Erro ao carregar usuario atual:", usuarioError);
-        setErroContexto("Nao foi possivel carregar o contexto da arena.");
-        setArenaAtual(arena);
+        setErroContexto(
+          "Usuario autenticado, mas sem cadastro no sistema. Procure o administrador."
+        );
+        setArenaAtual(null);
         setUsuarioAtual(null);
         setPerfilAtual(null);
         setCarregandoContexto(false);
         return;
       }
 
-      const { data: vinculo, error: vinculoError } = await supabase
+      if (usuario.tipo_usuario === "super_admin") {
+        const { data: arenaPadrao, error: arenaPadraoError } = await supabase
+          .from("arenas")
+          .select("id,nome,slug,ativa")
+          .eq("slug", ARENA_SLUG_ATUAL)
+          .eq("ativa", true)
+          .maybeSingle();
+
+        if (!montado) return;
+
+        if (arenaPadraoError || !arenaPadrao) {
+          console.error("Erro ao carregar arena padrao:", arenaPadraoError);
+          setErroContexto("Nao foi possivel carregar o contexto da arena.");
+          setArenaAtual(null);
+          setUsuarioAtual(usuario);
+          setPerfilAtual("super_admin");
+          setCarregandoContexto(false);
+          return;
+        }
+
+        setArenaAtual(arenaPadrao);
+        setUsuarioAtual(usuario);
+        setPerfilAtual("super_admin");
+        setCarregandoContexto(false);
+        return;
+      }
+
+      const { data: vinculos, error: vinculosError } = await supabase
         .from("usuarios_arenas")
-        .select("id,usuario_id,arena_id,perfil,ativo")
+        .select("id,usuario_id,arena_id,perfil,ativo,created_at")
         .eq("usuario_id", usuario.id)
-        .eq("arena_id", arena.id)
         .eq("ativo", true)
-        .maybeSingle();
+        .order("created_at", { ascending: true });
 
       if (!montado) return;
 
-      if (vinculoError || !vinculo) {
-        console.error("Erro ao carregar vinculo usuario-arena:", vinculoError);
+      if (vinculosError) {
+        console.error("Erro ao carregar vinculos usuario-arena:", vinculosError);
         setErroContexto("Nao foi possivel carregar o contexto da arena.");
-        setArenaAtual(arena);
+        setArenaAtual(null);
         setUsuarioAtual(usuario);
         setPerfilAtual(null);
         setCarregandoContexto(false);
         return;
       }
 
-      setArenaAtual(arena);
+      if (!vinculos?.length) {
+        setErroContexto("Usuario sem vinculo ativo com arena.");
+        setArenaAtual(null);
+        setUsuarioAtual(usuario);
+        setPerfilAtual(null);
+        setCarregandoContexto(false);
+        return;
+      }
+
+      const arenaIds = vinculos.map((vinculo) => vinculo.arena_id);
+      const { data: arenas, error: arenasError } = await supabase
+        .from("arenas")
+        .select("id,nome,slug,ativa")
+        .in("id", arenaIds)
+        .eq("ativa", true);
+
+      if (!montado) return;
+
+      if (arenasError || !arenas?.length) {
+        console.error("Erro ao carregar arenas vinculadas:", arenasError);
+        setErroContexto("Usuario sem vinculo ativo com arena.");
+        setArenaAtual(null);
+        setUsuarioAtual(usuario);
+        setPerfilAtual(null);
+        setCarregandoContexto(false);
+        return;
+      }
+
+      const arenaSelecionada =
+        vinculos
+          .map((vinculo) => arenas.find((arena) => arena.id === vinculo.arena_id))
+          .find(Boolean) || arenas[0];
+      const vinculoSelecionado = vinculos.find(
+        (vinculo) => vinculo.arena_id === arenaSelecionada.id
+      );
+
+      setArenaAtual(arenaSelecionada);
       setUsuarioAtual(usuario);
-      setPerfilAtual(vinculo.perfil);
+      setPerfilAtual(vinculoSelecionado?.perfil || null);
       setCarregandoContexto(false);
     }
 
@@ -96,7 +142,7 @@ export function useArenaAtual(ativo = true) {
     return () => {
       montado = false;
     };
-  }, [ativo]);
+  }, [session]);
 
   return {
     arenaAtual,

@@ -1,9 +1,13 @@
 import { navigationItems } from "../navigation";
 
-export default function MobileNavigation({ activeTab, onTabChange }) {
+export default function MobileNavigation({
+  activeTab,
+  items = navigationItems,
+  onTabChange,
+}) {
   return (
     <nav className="mobile-navigation" aria-label="Navegação principal">
-      {navigationItems.map((item) => (
+      {items.map((item) => (
         <button
           key={item.id}
           type="button"

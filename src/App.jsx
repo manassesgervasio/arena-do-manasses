@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
 import { useArenaAtual } from "./hooks/useArenaAtual";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
+import Login from "./components/Login";
 import Home from "./pages/Home";
-import LoginPage from "./pages/LoginPage";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
 const STORAGE_KEY = "arena-manasses-reservas-v2";
-const PERFIL_PADRAO = "Funcionário";
+const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
   Administrador: {
     podeLimparPago: true,
     podeEditarTudo: true,
   },
-  Funcionário: {
+  Funcionario: {
     podeLimparPago: false,
     podeEditarTudo: false,
   },
@@ -38,7 +38,7 @@ export default function App() {
   const [sessaoAuth, setSessaoAuth] = useState(null);
   const [authCarregando, setAuthCarregando] = useState(true);
   const [perfilLogado, setPerfilLogado] = useState(null);
-  const contextoArena = useArenaAtual(Boolean(sessaoAuth));
+  const contextoArena = useArenaAtual(sessaoAuth);
   const arenaAtualId = contextoArena.arenaAtual?.id;
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
@@ -228,7 +228,7 @@ export default function App() {
     if (!ativo) return;
 
     if (horariosError) {
-      console.log("Erro ao carregar horários de mensalistas:", horariosError);
+      console.log("Erro ao carregar horÃ¡rios de mensalistas:", horariosError);
       setHorariosMensalistas({});
       return;
     }
@@ -393,19 +393,19 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
 }
 
   async function copiarFixosProximaSemana() {
-  const quantidade = prompt("Quantas semanas deseja repetir os horários fixos?", "4");
+  const quantidade = prompt("Quantas semanas deseja repetir os horÃ¡rios fixos?", "4");
 
   if (!quantidade) return;
 
   const semanas = Number(quantidade);
 
   if (!semanas || semanas < 1) {
-    alert("Informe uma quantidade válida de semanas.");
+    alert("Informe uma quantidade vÃ¡lida de semanas.");
     return;
   }
 
   const confirmar = confirm(
-    `Copiar todos os horários FIXOS por ${semanas} semana(s)?`
+    `Copiar todos os horÃ¡rios FIXOS por ${semanas} semana(s)?`
   );
 
   if (!confirmar) return;
@@ -462,7 +462,7 @@ novasReservas[novaChave] = {
     ...novasReservas,
   }));
 
-  alert(`Horários fixos copiados por ${semanas} semana(s)!`);
+  alert(`HorÃ¡rios fixos copiados por ${semanas} semana(s)!`);
 }
 
 
@@ -523,23 +523,23 @@ return "#14532d";
       grupo_fixo: reserva.grupoFixo || "",
     });
 
-    alert("Horário reservado!");
+    alert("HorÃ¡rio reservado!");
     return;
   }
 
-  const quantidade = prompt("Quantas semanas deseja repetir este horário fixo?", "24");
+  const quantidade = prompt("Quantas semanas deseja repetir este horÃ¡rio fixo?", "24");
 
   if (!quantidade) return;
 
   const semanas = Number(quantidade);
 
   if (!semanas || semanas < 1) {
-    alert("Informe uma quantidade válida de semanas.");
+    alert("Informe uma quantidade vÃ¡lida de semanas.");
     return;
   }
 
   const confirmar = confirm(
-    `Reservar este horário fixo por ${semanas} semana(s)?`
+    `Reservar este horÃ¡rio fixo por ${semanas} semana(s)?`
   );
 
   if (!confirmar) return;
@@ -581,7 +581,7 @@ return "#14532d";
     ...novasReservas,
   }));
 
-  alert(`Horário fixo reservado por ${semanas} semana(s)!`);
+  alert(`HorÃ¡rio fixo reservado por ${semanas} semana(s)!`);
 }
 
   async function alugarMensalistaComoAvulso(dataTexto, horario, dadosReserva) {
@@ -594,7 +594,7 @@ return "#14532d";
     Number(reservaAtual.valor || 0) > 0;
 
   if (temReservaReal) {
-    return "Este horÃ¡rio jÃ¡ possui uma reserva real.";
+    return "Este horÃƒÂ¡rio jÃƒÂ¡ possui uma reserva real.";
   }
 
   const novaReserva = {
@@ -610,7 +610,7 @@ return "#14532d";
   const error = await salvarReservaBanco(novaReserva);
 
   if (error) {
-    return "NÃ£o foi possÃ­vel alugar este horÃ¡rio como avulso. Tente novamente.";
+    return "NÃƒÂ£o foi possÃƒÂ­vel alugar este horÃƒÂ¡rio como avulso. Tente novamente.";
   }
 
   setReservas((anterior) => ({
@@ -633,12 +633,13 @@ return "#14532d";
 
   async function entrarComEmailSenha({ email, senha }) {
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.toLowerCase(),
       password: senha,
     });
 
     if (error) {
-      return "E-mail ou senha inválidos. Confira os dados e tente novamente.";
+      console.error("Erro ao fazer login:", error);
+      return "E-mail ou senha invalidos.";
     }
 
     return "";
@@ -651,10 +652,10 @@ return "#14532d";
   if (authCarregando) {
     return (
       <main className="login-page">
-        <section className="login-panel" aria-label="Carregando sessão">
+        <section className="login-panel" aria-label="Carregando sessÃ£o">
           <div className="login-brand">
-            <h1>Arena do Manassés</h1>
-            <p>Carregando sessão...</p>
+            <h1>Arena do ManassÃ©s</h1>
+            <p>Carregando sessÃ£o...</p>
           </div>
         </section>
       </main>
@@ -663,9 +664,45 @@ return "#14532d";
 
   if (!sessaoAuth) {
     return (
-      <LoginPage
+      <Login
         onEntrar={entrarComEmailSenha}
       />
+    );
+  }
+
+  if (contextoArena.carregandoContexto) {
+    return (
+      <main className="login-page">
+        <section className="login-panel" aria-label="Carregando contexto">
+          <div className="login-brand">
+            <h1>Arena do Manasses</h1>
+            <p>Carregando contexto da arena...</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (
+    contextoArena.erroContexto ||
+    !contextoArena.usuarioAtual ||
+    !contextoArena.arenaAtual
+  ) {
+    return (
+      <main className="login-page">
+        <section className="login-panel" aria-label="Erro de contexto">
+          <div className="login-brand">
+            <h1>Arena do Manasses</h1>
+            <p>
+              {contextoArena.erroContexto ||
+                "Nao foi possivel carregar o contexto da arena."}
+            </p>
+          </div>
+          <button className="login-button" type="button" onClick={sair}>
+            Sair
+          </button>
+        </section>
+      </main>
     );
   }
 
@@ -718,4 +755,6 @@ const horarioStyle = {
   fontWeight: "bold",
   fontSize: "14px",
 };
+
+
 
