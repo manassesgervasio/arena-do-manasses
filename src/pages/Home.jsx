@@ -178,7 +178,12 @@ export default function Home({
 
   function renderMobileContent() {
     if (mostrarPainelSaaS) {
-      return <PainelCentralSaaS onVoltar={() => setMostrarPainelSaaS(false)} />;
+      return (
+        <PainelCentralSaaS
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarPainelSaaS(false)}
+        />
+      );
     }
 
     if (activeMobileTab === "clientes") {
@@ -237,7 +242,10 @@ export default function Home({
       {isMobile ? (
         renderMobileContent()
       ) : mostrarPainelSaaS ? (
-        <PainelCentralSaaS onVoltar={() => setMostrarPainelSaaS(false)} />
+        <PainelCentralSaaS
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarPainelSaaS(false)}
+        />
       ) : (
         <>
           {renderWeekControls()}

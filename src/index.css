@@ -773,6 +773,101 @@ code {
   cursor: pointer;
 }
 
+.painel-saas-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.painel-saas-toolbar button,
+.painel-saas-form > button {
+  min-height: 42px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.painel-saas-form > button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.painel-saas-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: #111827;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.painel-saas-form-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.painel-saas-form-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.painel-saas-form-header button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 9px;
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.painel-saas-form label {
+  display: grid;
+  gap: 7px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.painel-saas-form input,
+.painel-saas-form select,
+.painel-saas-form textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: white;
+  color: #0f172a;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.painel-saas-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.painel-saas-form-observacao,
+.painel-saas-form .painel-saas-error {
+  grid-column: 1 / -1;
+}
+
 .painel-saas-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -836,7 +931,8 @@ code {
 
 .painel-saas-loading,
 .painel-saas-error,
-.painel-saas-empty {
+.painel-saas-empty,
+.painel-saas-confirmation {
   padding: 11px 12px;
   border-radius: 12px;
   font-size: 13px;
@@ -854,6 +950,12 @@ code {
   border: 1px solid rgba(248, 113, 113, 0.35);
   background: rgba(248, 113, 113, 0.12);
   color: #fecaca;
+}
+
+.painel-saas-confirmation {
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  background: rgba(34, 197, 94, 0.12);
+  color: #bbf7d0;
 }
 
 .painel-saas-table-wrap {
@@ -1580,6 +1682,27 @@ code {
 
   .painel-saas-header button {
     width: 100%;
+  }
+
+  .painel-saas-toolbar button,
+  .painel-saas-form > button {
+    width: 100%;
+  }
+
+  .painel-saas-form {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .painel-saas-form-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .painel-saas-form-header button,
+  .painel-saas-form-observacao,
+  .painel-saas-form .painel-saas-error {
+    grid-column: auto;
   }
 
   .painel-saas-summary {
