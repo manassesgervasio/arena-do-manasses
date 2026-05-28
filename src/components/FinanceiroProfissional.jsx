@@ -55,8 +55,12 @@ function obterPeriodoMes(mesAno) {
 }
 
 export default function FinanceiroProfissional({
+  contextoArena,
   mesInicial = obterMesAtual(),
 }) {
+  const arenaAtualId = contextoArena?.arenaAtual?.id;
+  const carregandoContexto = contextoArena?.carregandoContexto;
+  const erroContexto = contextoArena?.erroContexto;
   const [mesAno, setMesAno] = useState(mesInicial);
   const [lancamentos, setLancamentos] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
@@ -83,6 +87,11 @@ export default function FinanceiroProfissional({
     "Este mês está fechado. Reabra o mês para alterar lançamentos.";
 
   async function carregarLancamentosManuais() {
+    if (!arenaAtualId) {
+      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     const { inicio, fim } = obterPeriodoMes(mesAno);
 
     setLancamentosCarregando(true);
@@ -94,6 +103,7 @@ export default function FinanceiroProfissional({
         "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
       )
       .eq("origem", "manual")
+      .eq("arena_id", arenaAtualId)
       .gte("data_lancamento", inicio)
       .lt("data_lancamento", fim)
       .order("data_lancamento", { ascending: false });
@@ -164,6 +174,15 @@ export default function FinanceiroProfissional({
     let ativo = true;
 
     async function carregarLancamentosDoPeriodo() {
+      if (carregandoContexto) return;
+
+      if (!arenaAtualId) {
+        setLancamentos([]);
+        setLancamentosErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setLancamentosCarregando(false);
+        return;
+      }
+
       const { inicio, fim } = obterPeriodoMes(mesAno);
 
       setLancamentosCarregando(true);
@@ -175,6 +194,7 @@ export default function FinanceiroProfissional({
           "id,descricao,valor,tipo,categoria_id,forma_pagamento_id,data_lancamento,observacao,origem,referencia_id,created_at,updated_at"
         )
         .eq("origem", "manual")
+        .eq("arena_id", arenaAtualId)
         .gte("data_lancamento", inicio)
         .lt("data_lancamento", fim)
         .order("data_lancamento", { ascending: false });
@@ -199,12 +219,22 @@ export default function FinanceiroProfissional({
     return () => {
       ativo = false;
     };
-  }, [mesAno]);
+  }, [arenaAtualId, carregandoContexto, erroContexto, mesAno]);
 
   useEffect(() => {
     let ativo = true;
 
     async function carregarResumoPeriodo() {
+      if (carregandoContexto) return;
+
+      if (!arenaAtualId) {
+        setResumoPeriodoErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setReservasPagasPeriodo(0);
+        setMensalistasPagosPeriodo(0);
+        setResumoPeriodoCarregando(false);
+        return;
+      }
+
       const { inicio, fim } = obterPeriodoMes(mesAno);
 
       setResumoPeriodoCarregando(true);
@@ -218,12 +248,14 @@ export default function FinanceiroProfissional({
           .from("reservas")
           .select("id,data,valor,status")
           .eq("status", "Pago")
+          .eq("arena_id", arenaAtualId)
           .gte("data", inicio)
           .lt("data", fim),
         supabase
           .from("mensalista_pagamentos")
           .select("id,valor,situacao,data_pagamento")
           .eq("situacao", "Pago")
+          .eq("arena_id", arenaAtualId)
           .gte("data_pagamento", inicio)
           .lt("data_pagamento", fim),
       ]);
@@ -262,12 +294,21 @@ export default function FinanceiroProfissional({
     return () => {
       ativo = false;
     };
-  }, [mesAno]);
+  }, [arenaAtualId, carregandoContexto, erroContexto, mesAno]);
 
   useEffect(() => {
     let ativo = true;
 
     async function carregarFechamentoMensal() {
+      if (carregandoContexto) return;
+
+      if (!arenaAtualId) {
+        setFechamentoErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setFechamentoMensal(null);
+        setFechamentoCarregando(false);
+        return;
+      }
+
       const { ano, mes } = separarMesAno(mesAno);
 
       setFechamentoCarregando(true);
@@ -279,6 +320,7 @@ export default function FinanceiroProfissional({
         .select(
           "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"
         )
+        .eq("arena_id", arenaAtualId)
         .eq("ano", ano)
         .eq("mes", mes)
         .maybeSingle();
@@ -304,7 +346,7 @@ export default function FinanceiroProfissional({
     return () => {
       ativo = false;
     };
-  }, [mesAno]);
+  }, [arenaAtualId, carregandoContexto, erroContexto, mesAno]);
 
   const totais = useMemo(() => {
     const lancamentosDoMes = lancamentos.filter((lancamento) =>
@@ -382,6 +424,11 @@ export default function FinanceiroProfissional({
   async function salvarLancamento(event) {
     event.preventDefault();
 
+    if (!arenaAtualId) {
+      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     if (mesEstaFechado) {
       setLancamentosErro(mensagemMesFechado);
       return;
@@ -414,6 +461,7 @@ export default function FinanceiroProfissional({
       forma_pagamento_id: formulario.formaPagamentoId,
       data_lancamento: formulario.data,
       observacao: formulario.observacao.trim() || null,
+      arena_id: arenaAtualId,
       updated_at: new Date().toISOString(),
     };
 
@@ -421,6 +469,7 @@ export default function FinanceiroProfissional({
       ? await supabase
           .from("financeiro_lancamentos")
           .update(dadosLancamento)
+          .eq("arena_id", arenaAtualId)
           .eq("id", lancamentoEditandoId)
           .eq("origem", "manual")
       : await supabase.from("financeiro_lancamentos").insert({
@@ -443,6 +492,11 @@ export default function FinanceiroProfissional({
   }
 
   function editarLancamento(lancamento) {
+    if (!arenaAtualId) {
+      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     if (mesEstaFechado) {
       setLancamentosErro(mensagemMesFechado);
       return;
@@ -461,6 +515,11 @@ export default function FinanceiroProfissional({
   }
 
   async function excluirLancamento(id) {
+    if (!arenaAtualId) {
+      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     if (mesEstaFechado) {
       setLancamentosErro(mensagemMesFechado);
       return;
@@ -475,6 +534,7 @@ export default function FinanceiroProfissional({
     const { error } = await supabase
       .from("financeiro_lancamentos")
       .delete()
+      .eq("arena_id", arenaAtualId)
       .eq("id", id)
       .eq("origem", "manual");
 
@@ -491,6 +551,11 @@ export default function FinanceiroProfissional({
   }
 
   async function fecharMes() {
+    if (!arenaAtualId) {
+      setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     const confirmar = confirm(
       "Tem certeza que deseja fechar este mês? O fechamento salvará o resumo financeiro atual deste período, mas não bloqueará o uso do sistema nesta versão."
     );
@@ -506,6 +571,7 @@ export default function FinanceiroProfissional({
     const { data: fechamentoExistente, error: verificarError } = await supabase
       .from("financeiro_fechamentos_mensais")
       .select("*")
+      .eq("arena_id", arenaAtualId)
       .eq("ano", ano)
       .eq("mes", mes)
       .maybeSingle();
@@ -536,6 +602,7 @@ export default function FinanceiroProfissional({
     const payload = {
       ano,
       mes,
+      arena_id: arenaAtualId,
       total_reservas: Number(reservasPagasPeriodo || 0),
       total_mensalistas: Number(mensalistasPagosPeriodo || 0),
       total_entradas_manuais: totais.entradasManuais,
@@ -562,6 +629,7 @@ export default function FinanceiroProfissional({
       ? await supabase
           .from("financeiro_fechamentos_mensais")
           .update(payload)
+          .eq("arena_id", arenaAtualId)
           .eq("id", fechamentoExistente.id)
           .select()
           .single()
@@ -591,6 +659,11 @@ export default function FinanceiroProfissional({
   }
 
   async function reabrirMes() {
+    if (!arenaAtualId) {
+      setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     if (!fechamentoMensal?.id) return;
 
     const senha = prompt("Digite a senha de administrador para reabrir este mês.");
@@ -618,6 +691,7 @@ export default function FinanceiroProfissional({
         observacao,
         updated_at: agora,
       })
+      .eq("arena_id", arenaAtualId)
       .eq("id", fechamentoMensal.id)
       .select(
         "id,ano,mes,total_reservas,total_mensalistas,total_entradas_manuais,total_despesas,saldo_liquido,fechado,fechado_em,observacao,created_at,updated_at"

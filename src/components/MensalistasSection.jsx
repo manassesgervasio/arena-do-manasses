@@ -60,9 +60,13 @@ function criarFormularioVazio() {
 export default function MensalistasSection({
   moeda,
   perfilLogado,
+  contextoArena,
   onMensalistasChange,
 }) {
   const competenciaAtual = obterCompetenciaAtual();
+  const arenaAtualId = contextoArena?.arenaAtual?.id;
+  const carregandoContexto = contextoArena?.carregandoContexto;
+  const erroContexto = contextoArena?.erroContexto;
   const podeExcluirMensalista = perfilLogado === "Administrador";
   const [mensalistas, setMensalistas] = useState([]);
   const [horariosContratados, setHorariosContratados] = useState({});
@@ -84,12 +88,25 @@ export default function MensalistasSection({
     let ativo = true;
 
     async function carregarMensalistas() {
+      if (carregandoContexto) return;
+
+      if (!arenaAtualId) {
+        setMensalistas([]);
+        setHorariosContratados({});
+        setPagamentos({});
+        setHistoricoPagamentos({});
+        setErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setCarregando(false);
+        return;
+      }
+
       setCarregando(true);
       setErro("");
 
       const { data, error } = await supabase
         .from("mensalistas")
         .select(mensalistaSelect)
+        .eq("arena_id", arenaAtualId)
         .order("nome", { ascending: true });
 
       if (!ativo) return;
@@ -114,11 +131,13 @@ export default function MensalistasSection({
           supabase
           .from("mensalista_pagamentos")
           .select(pagamentoSelect)
+          .eq("arena_id", arenaAtualId)
           .in("mensalista_id", mensalistaIds)
             .order("competencia", { ascending: false }),
           supabase
             .from("mensalista_horarios")
             .select(horarioContratadoSelect)
+            .eq("arena_id", arenaAtualId)
             .in("mensalista_id", mensalistaIds)
             .eq("ativo", true),
         ]);
@@ -169,7 +188,7 @@ export default function MensalistasSection({
     return () => {
       ativo = false;
     };
-  }, [competenciaAtual]);
+  }, [arenaAtualId, carregandoContexto, competenciaAtual, erroContexto]);
 
   function atualizarCampo(campo, valor) {
     setNovoMensalista((anterior) => ({
@@ -200,6 +219,12 @@ export default function MensalistasSection({
 
   async function salvarMensalista(event) {
     event.preventDefault();
+
+    if (!arenaAtualId) {
+      setErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     setErro("");
     setSalvando(true);
 
@@ -209,12 +234,14 @@ export default function MensalistasSection({
       valor_mensal: Number(novoMensalista.valorMensal || 0),
       dia_vencimento: Number(novoMensalista.vencimento || 1),
       status: novoMensalista.status,
+      arena_id: arenaAtualId,
     };
 
     const operacao = mensalistaEditandoId
       ? supabase
           .from("mensalistas")
           .update(mensalistaBanco)
+          .eq("arena_id", arenaAtualId)
           .eq("id", mensalistaEditandoId)
       : supabase.from("mensalistas").insert([mensalistaBanco]);
 
@@ -230,6 +257,7 @@ export default function MensalistasSection({
     const horarioAtual = horariosContratados[mensalistaSalvo.id];
     const horarioBanco = {
       mensalista_id: mensalistaSalvo.id,
+      arena_id: arenaAtualId,
       dia_semana: Number(novoMensalista.diaSemana),
       horario: novoMensalista.horario,
       ativo: true,
@@ -239,6 +267,7 @@ export default function MensalistasSection({
       ? supabase
           .from("mensalista_horarios")
           .update(horarioBanco)
+          .eq("arena_id", arenaAtualId)
           .eq("id", horarioAtual.id)
       : supabase.from("mensalista_horarios").insert([horarioBanco]);
 
@@ -300,12 +329,18 @@ export default function MensalistasSection({
   }
 
   async function marcarMensalidadeComoPaga(mensalista) {
+    if (!arenaAtualId) {
+      setErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     setErro("");
     setPagamentoSalvandoId(mensalista.id);
 
     const pagamentoAtual = pagamentos[mensalista.id];
     const pagamentoBanco = {
       mensalista_id: mensalista.id,
+      arena_id: arenaAtualId,
       competencia: competenciaAtual,
       valor: mensalista.valorMensal,
       data_vencimento: obterDataVencimento(competenciaAtual, mensalista.vencimento),
@@ -317,6 +352,7 @@ export default function MensalistasSection({
       ? await supabase
           .from("mensalista_pagamentos")
           .update(pagamentoBanco)
+          .eq("arena_id", arenaAtualId)
           .eq("id", pagamentoAtual.id)
           .select(pagamentoSelect)
           .single()
@@ -342,6 +378,11 @@ export default function MensalistasSection({
   }
 
   async function excluirMensalista(mensalista) {
+    if (!arenaAtualId) {
+      setErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     if (!podeExcluirMensalista) {
       setErro("Apenas administradores podem excluir mensalistas.");
       return;
@@ -366,6 +407,7 @@ export default function MensalistasSection({
     const { error: pagamentosError } = await supabase
       .from("mensalista_pagamentos")
       .delete()
+      .eq("arena_id", arenaAtualId)
       .eq("mensalista_id", mensalista.id);
 
     if (pagamentosError) {
@@ -377,6 +419,7 @@ export default function MensalistasSection({
     const { error: horariosError } = await supabase
       .from("mensalista_horarios")
       .delete()
+      .eq("arena_id", arenaAtualId)
       .eq("mensalista_id", mensalista.id);
 
     if (horariosError) {
@@ -388,6 +431,7 @@ export default function MensalistasSection({
     const { error } = await supabase
       .from("mensalistas")
       .delete()
+      .eq("arena_id", arenaAtualId)
       .eq("id", mensalista.id);
 
     if (error) {
@@ -401,14 +445,20 @@ export default function MensalistasSection({
       { data: pagamentosRestantes, error: pagamentosVerificacaoError },
       { data: horariosRestantes, error: horariosVerificacaoError },
     ] = await Promise.all([
-      supabase.from("mensalistas").select("id").eq("id", mensalista.id),
+      supabase
+        .from("mensalistas")
+        .select("id")
+        .eq("arena_id", arenaAtualId)
+        .eq("id", mensalista.id),
       supabase
         .from("mensalista_pagamentos")
         .select("id")
+        .eq("arena_id", arenaAtualId)
         .eq("mensalista_id", mensalista.id),
       supabase
         .from("mensalista_horarios")
         .select("id")
+        .eq("arena_id", arenaAtualId)
         .eq("mensalista_id", mensalista.id),
     ]);
 
@@ -453,6 +503,11 @@ export default function MensalistasSection({
   }
 
   async function excluirPagamentoMensal(mensalista) {
+    if (!arenaAtualId) {
+      setErro("Nao foi possivel carregar o contexto da arena.");
+      return;
+    }
+
     const pagamento = pagamentos[mensalista.id];
 
     if (!pagamento?.id) return;
@@ -469,6 +524,7 @@ export default function MensalistasSection({
     const { error } = await supabase
       .from("mensalista_pagamentos")
       .delete()
+      .eq("arena_id", arenaAtualId)
       .eq("id", pagamento.id);
 
     setPagamentoExcluindoId(null);

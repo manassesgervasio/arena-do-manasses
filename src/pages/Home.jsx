@@ -157,8 +157,7 @@ export default function Home({
   function renderFinanceiroProfissional() {
     return (
       <FinanceiroProfissional
-        reservasPagas={resumo.faturamentoMes || resumo.faturamento || 0}
-        mensalistasPagos={resumo.totalMensalistas || 0}
+        contextoArena={contextoArena}
         mesInicial={mesFiltro}
       />
     );
@@ -169,6 +168,7 @@ export default function Home({
       <MensalistasSection
         moeda={moeda}
         perfilLogado={perfilLogado}
+        contextoArena={contextoArena}
         onMensalistasChange={onMensalistasChange}
       />
     );

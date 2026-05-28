@@ -39,6 +39,7 @@ export default function App() {
   const [authCarregando, setAuthCarregando] = useState(true);
   const [perfilLogado, setPerfilLogado] = useState(null);
   const contextoArena = useArenaAtual(Boolean(sessaoAuth));
+  const arenaAtualId = contextoArena.arenaAtual?.id;
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
   const hoje = new Date();
@@ -89,9 +90,12 @@ export default function App() {
 
   useEffect(() => {
   async function carregarReservas() {
+    if (!sessaoAuth || !arenaAtualId) return;
+
     const { data, error } = await supabase
       .from("reservas")
-      .select("*");
+      .select("*")
+      .eq("arena_id", arenaAtualId);
 
     if (error) {
       console.log("Erro ao carregar reservas:", error);
@@ -116,10 +120,10 @@ export default function App() {
   }
 
   carregarReservas();
-}, []);
+}, [sessaoAuth, arenaAtualId]);
 
   useEffect(() => {
-  if (!sessaoAuth) {
+  if (!sessaoAuth || !arenaAtualId) {
     setTotalMensalistasPago(0);
     return;
   }
@@ -131,10 +135,14 @@ export default function App() {
       { data: mensalistasData, error: mensalistasError },
       { data, error },
     ] = await Promise.all([
-      supabase.from("mensalistas").select("id"),
+      supabase
+        .from("mensalistas")
+        .select("id")
+        .eq("arena_id", arenaAtualId),
       supabase
         .from("mensalista_pagamentos")
         .select("id,mensalista_id,competencia,valor,situacao")
+        .eq("arena_id", arenaAtualId)
         .eq("competencia", mesFiltro)
         .eq("situacao", "Pago"),
     ]);
@@ -173,10 +181,10 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, mesFiltro, versaoHorariosMensalistas]);
+}, [sessaoAuth, arenaAtualId, mesFiltro, versaoHorariosMensalistas]);
 
   useEffect(() => {
-  if (!sessaoAuth) {
+  if (!sessaoAuth || !arenaAtualId) {
     setHorariosMensalistas({});
     return;
   }
@@ -187,6 +195,7 @@ export default function App() {
     const { data: mensalistasData, error: mensalistasError } = await supabase
       .from("mensalistas")
       .select("id,nome,status")
+      .eq("arena_id", arenaAtualId)
       .eq("status", "Ativo");
 
     if (!ativo) return;
@@ -212,6 +221,7 @@ export default function App() {
     const { data: horariosData, error: horariosError } = await supabase
       .from("mensalista_horarios")
       .select("id,mensalista_id,dia_semana,horario,ativo")
+      .eq("arena_id", arenaAtualId)
       .in("mensalista_id", mensalistaIds)
       .eq("ativo", true);
 
@@ -248,7 +258,7 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, versaoHorariosMensalistas]);
+}, [sessaoAuth, arenaAtualId, versaoHorariosMensalistas]);
 
   function recarregarHorariosMensalistas() {
     setVersaoHorariosMensalistas((versao) => versao + 1);
@@ -272,17 +282,40 @@ export default function App() {
 );
   }
 async function salvarReservaBanco(reserva) {
-  const { error } = await supabase
-    .from("reservas")
-    .upsert([reserva], {
-  onConflict: "data,horario",
-});
-
-  if (error) {
-    console.log(error);
+  if (!arenaAtualId) {
+    return { message: "Contexto da arena nao carregado." };
   }
 
-  return error;
+  const reservaComArena = {
+    ...reserva,
+    arena_id: arenaAtualId,
+  };
+
+  const { data, error: updateError } = await supabase
+    .from("reservas")
+    .update(reservaComArena)
+    .eq("arena_id", arenaAtualId)
+    .eq("data", reserva.data)
+    .eq("horario", reserva.horario)
+    .select("id")
+    .maybeSingle();
+
+  if (updateError) {
+    console.log(updateError);
+    return updateError;
+  }
+
+  if (data) return null;
+
+  const { error: insertError } = await supabase
+    .from("reservas")
+    .insert([reservaComArena]);
+
+  if (insertError) {
+    console.log(insertError);
+  }
+
+  return insertError;
 }
   function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
