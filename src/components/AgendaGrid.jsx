@@ -151,6 +151,7 @@ const jogosDia = horarios.filter((horaAtual) => {
 
   return (
     <div
+      className="agenda-shell"
       style={{
         marginTop: "30px",
         overflowX: "auto",
@@ -185,6 +186,7 @@ const jogosDia = horarios.filter((horaAtual) => {
 
       <div className="agenda-mobile">
         <div
+          className="agenda-mobile-day-selector"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, minmax(42px, 1fr))",
@@ -197,6 +199,7 @@ const jogosDia = horarios.filter((horaAtual) => {
 
             return (
               <button
+                className="agenda-mobile-day-button"
                 key={textoData}
                 type="button"
                 onClick={() => setDiaMobileIndex(index)}
@@ -228,6 +231,7 @@ const jogosDia = horarios.filter((horaAtual) => {
             {renderDiaCabecalho(diaMobile)}
 
             <div
+              className="agenda-mobile-horarios"
               style={{
                 display: "grid",
                 gap: "10px",

@@ -1779,6 +1779,33 @@ code {
     display: block;
   }
 
+  .agenda-shell {
+    max-height: none !important;
+    margin-top: 20px !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    border-radius: 12px !important;
+  }
+
+  .agenda-mobile-day-selector {
+    display: flex !important;
+    gap: 8px !important;
+    margin: 0 -2px 12px !important;
+    padding: 2px 2px 8px !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .agenda-mobile-day-button {
+    flex: 0 0 74px;
+    min-height: 50px !important;
+    padding: 7px 6px !important;
+    font-size: 12px !important;
+    line-height: 15px !important;
+  }
+
   .agenda-mobile .dia-cabecalho {
     display: grid;
     gap: 2px;
@@ -1811,6 +1838,55 @@ code {
     margin-top: 0 !important;
     font-size: 11px !important;
     line-height: 13px !important;
+  }
+
+  .agenda-mobile-horarios {
+    gap: 12px !important;
+    margin-top: 12px !important;
+  }
+
+  .agenda-mobile .horario-card {
+    transform: none !important;
+    padding: 14px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14) !important;
+  }
+
+  .agenda-mobile .horario-card-time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+  }
+
+  .agenda-mobile .horario-card input,
+  .agenda-mobile .horario-card select {
+    min-height: 44px !important;
+    margin-bottom: 8px !important;
+    padding: 10px !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .agenda-mobile .horario-action-button {
+    width: calc(50% - 5px) !important;
+    min-height: 48px !important;
+    margin: 4px 0 0 !important;
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    line-height: 16px !important;
+  }
+
+  .agenda-mobile .horario-action-button + .horario-action-button {
+    margin-left: 10px !important;
+  }
+
+  .agenda-mobile .horario-action-full {
+    width: 100% !important;
+    margin-left: 0 !important;
   }
 
   .mobile-tab-panel {

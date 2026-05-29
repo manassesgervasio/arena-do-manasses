@@ -66,6 +66,7 @@ export default function HorarioCard({
 
   return (
     <div
+      className="horario-card"
       style={{
         background:
           mensalistaContratado
@@ -104,6 +105,7 @@ export default function HorarioCard({
       }}
     >
       <div
+        className="horario-card-time"
         style={{
           fontSize: "11px",
           fontWeight: "bold",
@@ -137,7 +139,7 @@ export default function HorarioCard({
         <>
           {!mostrandoAluguelAvulso ? (
             <button
-              className="horario-action-button"
+              className="horario-action-button horario-action-full"
               type="button"
               onClick={() => setMostrandoAluguelAvulso(true)}
               style={{
