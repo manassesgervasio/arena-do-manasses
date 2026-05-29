@@ -311,33 +311,19 @@ async function salvarReservaBanco(reserva) {
 
   const reservaComArena = normalizarReservaParaBanco(reserva);
 
-  const { data, error: updateError } = await supabase
+  const { error } = await supabase
     .from("reservas")
-    .update(reservaComArena)
-    .eq("arena_id", arenaAtualId)
-    .eq("data", reserva.data)
-    .eq("horario", reserva.horario)
-    .select("id")
-    .maybeSingle();
-
-  if (updateError) {
-    console.error("Erro ao atualizar reserva:", updateError);
-    return updateError;
-  }
-
-  if (data) return null;
-
-  const { error: insertError } = await supabase
-    .from("reservas")
-    .insert([reservaComArena])
+    .upsert(reservaComArena, {
+      onConflict: "arena_id,data,horario",
+    })
     .select("id")
     .single();
 
-  if (insertError) {
-    console.error("Erro ao inserir reserva:", insertError);
+  if (error) {
+    console.error("Erro ao salvar reserva:", error);
   }
 
-  return insertError;
+  return error;
 }
   async function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
