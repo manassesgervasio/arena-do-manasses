@@ -9,7 +9,6 @@ import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
 
-const STORAGE_KEY = "arena-manasses-reservas-v2";
 const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
   Administrador: {
@@ -46,11 +45,7 @@ export default function App() {
   return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
 });
 
-  const [reservas, setReservas] = useState(() => {
-    const salvas = localStorage.getItem(STORAGE_KEY);
-
-    return salvas ? JSON.parse(salvas) : {};
-  });
+  const [reservas, setReservas] = useState({});
   const [totalMensalistasPago, setTotalMensalistasPago] = useState(0);
   const [horariosMensalistas, setHorariosMensalistas] = useState({});
   const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
@@ -89,7 +84,11 @@ export default function App() {
 }, []);
 
   useEffect(() => {
+  let ativo = true;
+
   async function carregarReservas() {
+    setReservas({});
+
     if (!sessaoAuth || !arenaAtualId) return;
 
     const { data, error } = await supabase
@@ -97,8 +96,11 @@ export default function App() {
       .select("*")
       .eq("arena_id", arenaAtualId);
 
+    if (!ativo) return;
+
     if (error) {
       console.log("Erro ao carregar reservas:", error);
+      setReservas({});
       return;
     }
 
@@ -108,18 +110,23 @@ export default function App() {
       const chave = `${reserva.data}_${reserva.horario}`;
 
       reservasFormatadas[chave] = {
-  cliente: reserva.cliente || "",
-  telefone: reserva.telefone || "",
-  valor: reserva.valor || "",
-  status: reserva.status || "Livre",
-  tipo: reserva.tipo || "Avulso",
-};
+        cliente: reserva.cliente || "",
+        telefone: reserva.telefone || "",
+        valor: reserva.valor || "",
+        status: reserva.status || "Livre",
+        tipo: reserva.tipo || "Avulso",
+        grupoFixo: reserva.grupo_fixo || "",
+      };
     });
 
     setReservas(reservasFormatadas);
   }
 
   carregarReservas();
+
+  return () => {
+    ativo = false;
+  };
 }, [sessaoAuth, arenaAtualId]);
 
   useEffect(() => {
@@ -272,24 +279,37 @@ export default function App() {
     const chave = chaveReserva(dataTexto, horario);
 
     return (
-  reservas[chave] || {
-    cliente: "",
-    telefone: "",
-    valor: "",
-    status: "Livre",
-    tipo: "Avulso",
+      reservas[chave] || {
+        cliente: "",
+        telefone: "",
+        valor: "",
+        status: "Livre",
+        tipo: "Avulso",
+        grupoFixo: "",
+      }
+    );
   }
-);
-  }
+
+function normalizarReservaParaBanco(reserva) {
+  return {
+    cliente: reserva.cliente || "",
+    telefone: reserva.telefone || "",
+    data: reserva.data,
+    horario: reserva.horario,
+    valor: Number(reserva.valor || 0),
+    status: reserva.status || "Livre",
+    tipo: reserva.tipo || "Avulso",
+    grupo_fixo: reserva.grupo_fixo || reserva.grupoFixo || "",
+    arena_id: arenaAtualId,
+  };
+}
+
 async function salvarReservaBanco(reserva) {
   if (!arenaAtualId) {
     return { message: "Contexto da arena nao carregado." };
   }
 
-  const reservaComArena = {
-    ...reserva,
-    arena_id: arenaAtualId,
-  };
+  const reservaComArena = normalizarReservaParaBanco(reserva);
 
   const { data, error: updateError } = await supabase
     .from("reservas")
@@ -301,7 +321,7 @@ async function salvarReservaBanco(reserva) {
     .maybeSingle();
 
   if (updateError) {
-    console.log(updateError);
+    console.error("Erro ao atualizar reserva:", updateError);
     return updateError;
   }
 
@@ -309,39 +329,52 @@ async function salvarReservaBanco(reserva) {
 
   const { error: insertError } = await supabase
     .from("reservas")
-    .insert([reservaComArena]);
+    .insert([reservaComArena])
+    .select("id")
+    .single();
 
   if (insertError) {
-    console.log(insertError);
+    console.error("Erro ao inserir reserva:", insertError);
   }
 
   return insertError;
 }
-  function atualizarReserva(dataTexto, horario, campo, valor) {
+  async function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
-  
+  const reservaAnterior = pegarReserva(dataTexto, horario);
+  const proximaReserva = {
+    ...reservaAnterior,
+    [campo]: valor,
+  };
 
   setReservas((anterior) => ({
     ...anterior,
-    [chave]: {
-      ...pegarReserva(dataTexto, horario),
-      [campo]: valor,
-    },
+    [chave]: proximaReserva,
   }));
 
   const reservaAtual = {
-    cliente: pegarReserva(dataTexto, horario).cliente || "",
-    telefone: pegarReserva(dataTexto, horario).telefone || "",
+    cliente: proximaReserva.cliente || "",
+    telefone: proximaReserva.telefone || "",
     data: dataTexto,
     horario,
-    valor: Number(pegarReserva(dataTexto, horario).valor || 0),
-    status: pegarReserva(dataTexto, horario).status || "Livre",
-    tipo: pegarReserva(dataTexto, horario).tipo || "Avulso",
+    valor: Number(proximaReserva.valor || 0),
+    status: proximaReserva.status || "Livre",
+    tipo: proximaReserva.tipo || "Avulso",
+    grupo_fixo: proximaReserva.grupoFixo || "",
   };
 
-  reservaAtual[campo] = valor;
+  const error = await salvarReservaBanco(reservaAtual);
 
-  salvarReservaBanco(reservaAtual);
+  if (error) {
+    setReservas((anterior) => ({
+      ...anterior,
+      [chave]: reservaAnterior,
+    }));
+
+    alert(
+      `Nao foi possivel salvar a reserva no banco: ${error.message || "erro desconhecido"}`
+    );
+  }
 }
 function limparReserva(dataTexto, horario) {
 console.log("CLICOU NO LIMPAR", dataTexto, horario);
