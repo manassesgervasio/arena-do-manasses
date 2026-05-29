@@ -25,6 +25,9 @@ export function useArenaAtual(session) {
 
       setCarregandoContexto(true);
       setErroContexto("");
+      setArenaAtual(null);
+      setUsuarioAtual(null);
+      setPerfilAtual(null);
 
       const emailAuth = session.user.email.toLowerCase();
 

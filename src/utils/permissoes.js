@@ -28,6 +28,14 @@ export function canManageFechamento(usuarioAtual, perfilAtual) {
   return isSuperAdmin(usuarioAtual) || perfilAtual === "admin_arena";
 }
 
+export function canLimparHorarioPago(usuarioAtual, perfilAtual, permissoesLogado) {
+  return (
+    isSuperAdmin(usuarioAtual) ||
+    perfilAtual === "admin_arena" ||
+    Boolean(permissoesLogado?.podeLimparPago)
+  );
+}
+
 export function canAccessAgenda() {
   return true;
 }

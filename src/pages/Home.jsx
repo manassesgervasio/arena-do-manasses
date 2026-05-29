@@ -16,6 +16,7 @@ import {
   canAccessMensalistas,
   canAccessPainelSaaS,
   canAccessUsuariosArena,
+  canLimparHorarioPago,
 } from "../utils/permissoes";
 
 export default function Home({
@@ -152,7 +153,11 @@ export default function Home({
         reservarHorario={reservarHorario}
         alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
         limparReserva={limparReserva}
-        permissoesLogado={permissoesLogado}
+        podeLimparHorarioPago={canLimparHorarioPago(
+          usuarioAtual,
+          perfilAtual,
+          permissoesLogado
+        )}
       />
     );
   }

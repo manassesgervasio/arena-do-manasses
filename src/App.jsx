@@ -46,6 +46,7 @@ export default function App() {
 });
 
   const [reservas, setReservas] = useState({});
+  const [reservasArenaId, setReservasArenaId] = useState(null);
   const [totalMensalistasPago, setTotalMensalistasPago] = useState(0);
   const [horariosMensalistas, setHorariosMensalistas] = useState({});
   const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
@@ -88,6 +89,7 @@ export default function App() {
 
   async function carregarReservas() {
     setReservas({});
+    setReservasArenaId(null);
 
     if (!sessaoAuth || !arenaAtualId) return;
 
@@ -101,6 +103,7 @@ export default function App() {
     if (error) {
       console.log("Erro ao carregar reservas:", error);
       setReservas({});
+      setReservasArenaId(null);
       return;
     }
 
@@ -120,6 +123,7 @@ export default function App() {
     });
 
     setReservas(reservasFormatadas);
+    setReservasArenaId(arenaAtualId);
   }
 
   carregarReservas();
@@ -276,6 +280,17 @@ export default function App() {
   }
 
   function pegarReserva(dataTexto, horario) {
+    if (reservasArenaId !== arenaAtualId) {
+      return {
+        cliente: "",
+        telefone: "",
+        valor: "",
+        status: "Livre",
+        tipo: "Avulso",
+        grupoFixo: "",
+      };
+    }
+
     const chave = chaveReserva(dataTexto, horario);
 
     return (
@@ -325,6 +340,92 @@ async function salvarReservaBanco(reserva) {
 
   return error;
 }
+
+async function excluirReservaBanco(dataTexto, horario) {
+  if (!arenaAtualId) {
+    return { ok: false, error: { message: "Contexto da arena nao carregado." } };
+  }
+
+  const { data: existente, error: erroBusca } = await supabase
+    .from("reservas")
+    .select("*")
+    .eq("arena_id", arenaAtualId)
+    .eq("data", dataTexto)
+    .eq("horario", horario);
+
+  if (erroBusca) {
+    console.error("Erro ao buscar reserva antes de excluir:", erroBusca);
+    return { ok: false, error: erroBusca };
+  }
+
+  if (!existente || existente.length === 0) {
+    return {
+      ok: false,
+      error: {
+        message: "Reserva não encontrada antes do delete.",
+      },
+      reservaNaoEncontrada: true,
+    };
+  }
+
+  const reservaEncontrada = existente[0];
+
+  if (!reservaEncontrada.id) {
+    return {
+      ok: false,
+      error: {
+        message: "Reserva encontrada, mas sem id.",
+      },
+      reservaSemId: true,
+    };
+  }
+
+  const { data: removida, error: erroDelete } = await supabase
+    .from("reservas")
+    .delete()
+    .eq("id", reservaEncontrada.id)
+    .select("*");
+
+  if (erroDelete) {
+    console.error("Erro ao excluir reserva:", erroDelete);
+    return { ok: false, error: erroDelete };
+  }
+
+  if (!removida || removida.length === 0) {
+    const { data: aindaExiste, error: erroVerificacao } = await supabase
+      .from("reservas")
+      .select("*")
+      .eq("id", reservaEncontrada.id);
+
+    if (erroVerificacao) {
+      console.error("Erro na verificação pós-delete:", erroVerificacao);
+      return { ok: false, error: erroVerificacao };
+    }
+
+    if (aindaExiste?.length) {
+      return {
+        ok: false,
+        error: {
+          message:
+            "Reserva encontrada, mas o banco não permitiu remover. Verifique RLS/policy de DELETE.",
+        },
+        deleteBloqueado: true,
+      };
+    }
+
+    return {
+      ok: false,
+      error: {
+        message:
+          "Nenhuma reserva foi removida no banco. Verifique arena_id, data e horário.",
+      },
+      nenhumRegistroRemovido: true,
+    };
+  }
+
+  return { ok: true, data: removida };
+}
+
   async function atualizarReserva(dataTexto, horario, campo, valor) {
   const chave = chaveReserva(dataTexto, horario);
   const reservaAnterior = pegarReserva(dataTexto, horario);
@@ -362,52 +463,25 @@ async function salvarReservaBanco(reserva) {
     );
   }
 }
-function limparReserva(dataTexto, horario) {
-console.log("CLICOU NO LIMPAR", dataTexto, horario);
+async function limparReserva(dataTexto, horario) {
   const chave = chaveReserva(dataTexto, horario);
-  const reservaAtual = pegarReserva(dataTexto, horario);
+  const resultado = await excluirReservaBanco(dataTexto, horario);
 
-  const reservaLimpa = {
-  cliente: "",
-  telefone: "",
-  valor: "",
-  status: "Livre",
-  tipo: "Avulso",
-};
+  if (!resultado.ok) {
+    alert(
+      resultado.error?.message
+        ? resultado.error.message
+        : "Nao foi possivel limpar a reserva no banco: erro desconhecido"
+    );
+    return;
+  }
 
   setReservas((anterior) => {
   const copia = { ...anterior };
 
-  copia[chave] = reservaLimpa;
-
-  if (reservaAtual.grupoFixo) {
-    Object.keys(copia).forEach((itemChave) => {
-      const item = copia[itemChave];
-
-      if (item.grupoFixo === reservaAtual.grupoFixo) {
-        copia[itemChave] = {
-          cliente: "",
-          telefone: "",
-          valor: "",
-          status: "Livre",
-          tipo: "Avulso",
-          grupoFixo: "",
-        };
-      }
-    });
-  }
+  delete copia[chave];
 
   return copia;
-});
-
-  salvarReservaBanco({
-  cliente: "",
-  telefone: "",
-  data: dataTexto,
-  horario,
-  valor: 0,
-  status: "Livre",
-  tipo: "Avulso",
 });
 }
 
@@ -431,7 +505,7 @@ console.log("CLICOU NO LIMPAR", dataTexto, horario);
 
   const novasReservas = {};
 
-  Object.entries(reservas).forEach(([chave, reserva]) => {
+  Object.entries(reservasDaArenaAtual).forEach(([chave, reserva]) => {
     if (reserva.tipo !== "Fixo") return;
 
     const [dataTexto, horario] = chave.split("_");
@@ -486,7 +560,9 @@ novasReservas[novaChave] = {
 
 
 
-  const resumo = useResumoReservas(reservas, mesFiltro);
+  const reservasDaArenaAtual =
+    reservasArenaId === arenaAtualId ? reservas : {};
+  const resumo = useResumoReservas(reservasDaArenaAtual, mesFiltro);
   const resumoFinanceiro = {
     ...resumo,
     totalMensalistas: totalMensalistasPago,

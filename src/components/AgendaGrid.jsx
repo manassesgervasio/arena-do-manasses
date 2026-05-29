@@ -17,7 +17,7 @@ export default function AgendaGrid({
   reservarHorario,
   alugarMensalistaComoAvulso,
   limparReserva,
-  permissoesLogado,
+  podeLimparHorarioPago,
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
   const diaMobile = dias[diaMobileIndex] || dias[0];
@@ -130,17 +130,10 @@ const jogosDia = horarios.filter((horaAtual) => {
         onAlugarComoAvulso={(dadosReserva) =>
           alugarMensalistaComoAvulso(dataTexto, hora, dadosReserva)
         }
-        onLimpar={() => {
+        onLimpar={async () => {
   if (item.status === "Pago") {
-    if (!permissoesLogado?.podeLimparPago) {
-      alert("Seu perfil não permite limpar horários pagos. Peça ajuda a um administrador.");
-      return;
-    }
-
-    const senha = prompt("Digite a senha de administrador para limpar horário pago:");
-
-    if (senha !== "1234") {
-      alert("Senha incorreta.");
+    if (!podeLimparHorarioPago) {
+      alert("Seu perfil nao permite limpar horarios pagos. Peca ajuda a um administrador.");
       return;
     }
   }
@@ -149,7 +142,7 @@ const jogosDia = horarios.filter((horaAtual) => {
     "Tem certeza que deseja limpar esta reserva?");
 
   if (confirmar) {
-    limparReserva(dataTexto, hora);
+    await limparReserva(dataTexto, hora);
   }
 }}
       />
