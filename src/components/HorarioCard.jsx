@@ -8,6 +8,7 @@ export default function HorarioCard({
   tipoLista,
   statusLista,
   expandido,
+  compactoLivre,
   onToggleExpandido,
   onClienteChange,
   onTelefoneChange,
@@ -87,6 +88,7 @@ export default function HorarioCard({
   const cardClasse = [
     "horario-card",
     `horario-card-${statusClasse}`,
+    compactoLivre ? "horario-card-livre-compacto" : "",
     mensalistaContratado ? "horario-card-mensalista" : "",
     expandido ? "is-expanded" : "",
   ]
@@ -124,10 +126,10 @@ export default function HorarioCard({
           ? "1px solid #0891b2"
           : "1px solid rgba(148, 163, 184, 0.32)",
         borderRadius: "14px",
-        padding: "10px",
+        padding: compactoLivre && !expandido ? "6px 9px" : "10px",
         boxShadow:
-          item.status === "Livre" && !mensalistaContratado
-            ? "0 3px 10px rgba(15, 23, 42, 0.06)"
+          compactoLivre && !expandido
+            ? "0 2px 6px rgba(15, 23, 42, 0.05)"
             : "0 8px 18px rgba(15, 23, 42, 0.14)",
       }}
     >
@@ -140,7 +142,7 @@ export default function HorarioCard({
         style={{
           width: "100%",
           display: "grid",
-          gap: item.status === "Livre" && !mensalistaContratado ? "3px" : "6px",
+          gap: compactoLivre && !expandido ? "1px" : "6px",
           border: "none",
           background: "transparent",
           padding: 0,
@@ -171,8 +173,8 @@ export default function HorarioCard({
           style={{
             overflow: "hidden",
             color: "#0f172a",
-            fontSize: item.status === "Livre" && !mensalistaContratado ? "13px" : "14px",
-            lineHeight: "18px",
+            fontSize: compactoLivre && !expandido ? "12px" : "14px",
+            lineHeight: compactoLivre && !expandido ? "15px" : "18px",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}

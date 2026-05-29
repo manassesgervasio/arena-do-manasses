@@ -189,6 +189,34 @@ code {
   cursor: default;
 }
 
+.agenda-filter-toggle {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  gap: 8px;
+  margin: 0 0 12px auto;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.agenda-filter-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #22c55e;
+}
+
+.horario-card-livre-compacto .horario-card-time {
+  min-height: 34px;
+}
+
 .reserva-badge {
   display: inline-flex;
   align-items: center;
@@ -1855,6 +1883,14 @@ code {
     border-radius: 12px !important;
   }
 
+  .agenda-filter-toggle {
+    width: 100%;
+    justify-content: center;
+    margin: 0 0 10px;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
   .agenda-mobile-day-selector {
     display: flex !important;
     gap: 8px !important;
@@ -1917,6 +1953,11 @@ code {
     padding: 12px !important;
     border-radius: 14px !important;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14) !important;
+  }
+
+  .agenda-mobile .horario-card-livre-compacto:not(.is-expanded) {
+    padding: 6px 10px !important;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.06) !important;
   }
 
   .agenda-mobile .horario-card-time {
