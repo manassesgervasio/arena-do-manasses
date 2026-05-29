@@ -171,6 +171,12 @@ code {
   display: none;
 }
 
+.horario-compact-button:focus-visible {
+  outline: 3px solid rgba(34, 197, 94, 0.5);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
 .mensalistas-section {
   display: grid;
   gap: 16px;

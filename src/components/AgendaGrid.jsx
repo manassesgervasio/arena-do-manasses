@@ -20,7 +20,15 @@ export default function AgendaGrid({
   podeLimparHorarioPago,
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
+  const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
   const diaMobile = dias[diaMobileIndex] || dias[0];
+
+  function alternarHorarioAberto(dataTexto, hora) {
+    setHorarioAbertoPorDia((anterior) => ({
+      ...anterior,
+      [dataTexto]: anterior[dataTexto] === hora ? "" : hora,
+    }));
+  }
 
   function calcularResumoDia(data) {
     const textoData = formatarData(data);
@@ -86,6 +94,8 @@ const jogosDia = horarios.filter((horaAtual) => {
         mensalistaContratado={mensalistaContratado}
         tipoLista={tipoLista}
         statusLista={statusLista}
+        expandido={horarioAbertoPorDia[dataTexto] === hora}
+        onToggleExpandido={() => alternarHorarioAberto(dataTexto, hora)}
         onClienteChange={(e) =>
           atualizarReserva(
             dataTexto,

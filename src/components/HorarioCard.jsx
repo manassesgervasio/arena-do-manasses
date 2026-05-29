@@ -7,6 +7,8 @@ export default function HorarioCard({
   mensalistaContratado,
   tipoLista,
   statusLista,
+  expandido,
+  onToggleExpandido,
   onClienteChange,
   onTelefoneChange,
   onValorChange,
@@ -63,6 +65,21 @@ export default function HorarioCard({
   }
 
   const statusAvulsoLista = statusLista.filter((status) => status !== "Livre");
+  const statusIcones = {
+    Livre: "⚪",
+    Reservado: "📌",
+    Pago: "✅",
+    Pendente: "⏳",
+    Cancelado: "❌",
+    Faltou: "⚠️",
+  };
+  const statusVisual = mensalistaContratado
+    ? "Mensalista"
+    : item.status || "Livre";
+  const statusIcone = mensalistaContratado
+    ? "⭐"
+    : statusIcones[item.status] || "⚪";
+  const tipoIcone = item.tipo === "Fixo" ? "📍" : "";
 
   return (
     <div
@@ -104,19 +121,70 @@ export default function HorarioCard({
             : "0 8px 20px rgba(15, 23, 42, 0.18)",
       }}
     >
-      <div
-        className="horario-card-time"
+      <button
+        className="horario-compact-button horario-card-time"
+        type="button"
+        onClick={onToggleExpandido}
         style={{
-          fontSize: "11px",
-          fontWeight: "bold",
-          color: "#475569",
-          marginBottom: "4px",
+          width: "100%",
+          display: "grid",
+          gap: "6px",
+          border: "none",
+          background: "transparent",
+          padding: 0,
+          textAlign: "left",
+          cursor: "pointer",
+          font: "inherit",
+          color: "inherit",
+          marginBottom: expandido ? "10px" : 0,
         }}
       >
-        {hora.split(" - ")[0]}
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "8px",
+            color: "#475569",
+            fontSize: "12px",
+            fontWeight: "bold",
+          }}
+        >
+          <span>
+            {statusIcone} {hora.split(" - ")[0]} {tipoIcone}
+          </span>
+          <span>{expandido ? "Fechar" : "Abrir"}</span>
+        </span>
+        <strong
+          style={{
+            overflow: "hidden",
+            color: "#0f172a",
+            fontSize: "14px",
+            lineHeight: "18px",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {mensalistaContratado?.nome || item.cliente || statusVisual}
+        </strong>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "8px",
+            color: "#64748b",
+            fontSize: "12px",
+            fontWeight: 800,
+          }}
+        >
+          <span>{statusVisual}</span>
+          {item.valor ? <span>R$ {item.valor}</span> : null}
+        </span>
         <ReservaBadges tipo={item.tipo} />
-      </div>
-      {mensalistaContratado && (
+      </button>
+
+      {expandido && mensalistaContratado && (
         <div
           style={{
             background: "#cffafe",
@@ -135,7 +203,7 @@ export default function HorarioCard({
           </div>
         </div>
       )}
-      {mensalistaContratado && (
+      {expandido && mensalistaContratado && (
         <>
           {!mostrandoAluguelAvulso ? (
             <button
@@ -237,7 +305,7 @@ export default function HorarioCard({
           )}
         </>
       )}
-      {!mensalistaContratado && (
+      {expandido && !mensalistaContratado && (
         <>
       <input
         placeholder="cliente/Time"
