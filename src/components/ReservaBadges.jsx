@@ -2,28 +2,12 @@ export default function ReservaBadges({ tipo }) {
   return (
     <>
       {tipo === "Mensalista" && (
-        <div
-          style={{
-            fontSize: "10px",
-            fontWeight: "bold",
-            color: "#2563eb",
-            marginBottom: "4px",
-          }}
-        >
-          ⭐ Mensalista
-        </div>
+        <span className="reserva-badge reserva-badge-mensalista">
+          ⭐ MENSALISTA
+        </span>
       )}
       {tipo === "Fixo" && (
-        <div
-          style={{
-            fontSize: "10px",
-            fontWeight: "bold",
-            color: "#2563eb",
-            marginBottom: "4px",
-          }}
-        >
-          🔒 Fixo
-        </div>
+        <span className="reserva-badge reserva-badge-fixo">📍 FIXO</span>
       )}
     </>
   );

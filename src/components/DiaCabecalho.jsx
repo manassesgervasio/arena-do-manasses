@@ -5,20 +5,19 @@ export default function DiaCabecalho({
   jogosDia,
   moeda,
 }) {
+  const dataCurta = dataFormatada.split("/").slice(0, 2).join("/");
+
   return (
     <div className="dia-cabecalho" style={cabecalho}>
-      <div className="dia-cabecalho-semana">{diaSemana}</div>
-      <div
-        className="dia-cabecalho-data"
-        style={{ marginTop: "4px", fontSize: "12px" }}
-      >
-        {dataFormatada}
+      <div className="dia-cabecalho-linha">
+        <span className="dia-cabecalho-semana">{diaSemana}</span>
+        <span className="dia-cabecalho-data">{dataCurta}</span>
       </div>
 
       <div
         className="dia-cabecalho-resumo"
         style={{
-          marginTop: "4px",
+          marginTop: "3px",
           fontWeight: "bold",
           color: "#86efac",
           fontSize: "12px",
@@ -26,13 +25,8 @@ export default function DiaCabecalho({
           wordBreak: "break-word",
         }}
       >
-        {moeda(totalDia)}
-        <div
-          className="dia-cabecalho-jogos"
-          style={{ fontSize: "11px", marginTop: "2px" }}
-        >
-          {jogosDia} jogos
-        </div>
+        {moeda(totalDia)} <span className="dia-cabecalho-separador">•</span>{" "}
+        <span className="dia-cabecalho-jogos">{jogosDia} jogos</span>
       </div>
     </div>
   );
@@ -41,11 +35,11 @@ export default function DiaCabecalho({
 const cabecalho = {
   background: "#020617",
   color: "white",
-  padding: "10px 6px",
-  borderRadius: "12px",
+  padding: "7px 6px",
+  borderRadius: "10px",
   textAlign: "center",
   fontWeight: "bold",
-  fontSize: "14px",
+  fontSize: "13px",
   position: "sticky",
   top: "10px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
