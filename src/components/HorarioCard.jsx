@@ -79,12 +79,12 @@ export default function HorarioCard({
     : item.status || "Livre";
   const statusIcone = mensalistaContratado
     ? "⭐"
+    : item.tipo === "Fixo"
+    ? "📍"
     : statusIcones[item.status] || "⚪";
-  const tipoIcone = item.tipo === "Fixo" ? "📍" : "";
   const statusClasse = String(item.status || "Livre").toLowerCase();
   const tituloResumo =
     mensalistaContratado?.nome || item.cliente || "Disponível";
-  const valorResumo = item.valor ? `R$ ${item.valor}` : "";
   const cardClasse = [
     "horario-card",
     `horario-card-${statusClasse}`,
@@ -126,11 +126,10 @@ export default function HorarioCard({
           ? "1px solid #0891b2"
           : "1px solid rgba(148, 163, 184, 0.32)",
         borderRadius: "14px",
-        padding: compactoLivre && !expandido ? "6px 9px" : "10px",
-        boxShadow:
-          compactoLivre && !expandido
-            ? "0 2px 6px rgba(15, 23, 42, 0.05)"
-            : "0 8px 18px rgba(15, 23, 42, 0.14)",
+        padding: !expandido ? "8px 10px" : "10px",
+        boxShadow: !expandido
+          ? "0 2px 6px rgba(15, 23, 42, 0.05)"
+          : "0 8px 18px rgba(15, 23, 42, 0.14)",
       }}
     >
       <button
@@ -142,7 +141,7 @@ export default function HorarioCard({
         style={{
           width: "100%",
           display: "grid",
-          gap: compactoLivre && !expandido ? "1px" : "6px",
+          gap: !expandido ? "3px" : "6px",
           border: "none",
           background: "transparent",
           padding: 0,
@@ -165,7 +164,7 @@ export default function HorarioCard({
           }}
         >
           <span>
-            {statusIcone} {hora.split(" - ")[0]} {tipoIcone}
+            {statusIcone} {hora.split(" - ")[0]}
           </span>
           <span aria-hidden="true">{expandido ? "▲" : "▼"}</span>
         </span>
@@ -173,15 +172,15 @@ export default function HorarioCard({
           style={{
             overflow: "hidden",
             color: "#0f172a",
-            fontSize: compactoLivre && !expandido ? "12px" : "14px",
-            lineHeight: compactoLivre && !expandido ? "15px" : "18px",
+            fontSize: !expandido ? "13px" : "14px",
+            lineHeight: !expandido ? "16px" : "18px",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}
         >
           {tituloResumo}
         </strong>
-        {(statusVisual !== "Livre" || valorResumo) && (
+        {expandido && (
           <span
             style={{
               display: "flex",
@@ -194,10 +193,10 @@ export default function HorarioCard({
             }}
           >
             <span>{statusVisual}</span>
-            {valorResumo ? <span>{valorResumo}</span> : null}
+            {item.valor ? <span>R$ {item.valor}</span> : null}
           </span>
         )}
-        <ReservaBadges tipo={item.tipo} />
+        {expandido && <ReservaBadges tipo={item.tipo} />}
       </button>
 
       {expandido && (
