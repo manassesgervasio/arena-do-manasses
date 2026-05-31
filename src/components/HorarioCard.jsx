@@ -103,6 +103,7 @@ export default function HorarioCard({
   const cardClasse = [
     "horario-card",
     `horario-card-${statusClasse}`,
+    item.tipo === "Fixo" ? "horario-card-fixo" : "",
     compactoLivre ? "horario-card-livre-compacto" : "",
     mensalistaContratado ? "horario-card-mensalista" : "",
     expandido ? "is-expanded" : "",
@@ -175,9 +176,6 @@ export default function HorarioCard({
               minWidth: 0,
             }}
           >
-            {!expandido && statusSelo && (
-              <span className="horario-status-pill">{statusSelo}</span>
-            )}
             <span aria-hidden="true">{expandido ? "▲" : "▼"}</span>
           </span>
         </span>
@@ -193,6 +191,11 @@ export default function HorarioCard({
         >
           {tituloResumo}
         </strong>
+        {!expandido && statusSelo && (
+          <span className="horario-status-pill horario-status-pill-row">
+            {statusSelo}
+          </span>
+        )}
         {expandido && (
           <span
             style={{

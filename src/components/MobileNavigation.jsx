@@ -6,6 +6,7 @@ export default function MobileNavigation({
   items = navigationItems,
   onTabChange,
   extraItems = [],
+  arenaNome,
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
 
@@ -48,6 +49,15 @@ export default function MobileNavigation({
                 ×
               </button>
             </div>
+
+            {arenaNome && (
+              <div className="main-menu-arena">
+                <span>Arena</span>
+                <strong>{arenaNome}</strong>
+              </div>
+            )}
+
+            <div className="main-menu-section-label">Módulos</div>
 
             {[...items, ...extraItems].map((item) => (
               <button

@@ -11,10 +11,8 @@ export default function DiaCabecalho({
       <div className="dia-cabecalho-linha">
         <span className="dia-cabecalho-semana">{diaSemana}</span>
         <span className="dia-cabecalho-data">{dataCurta}</span>
-      </div>
-
-      <div className="dia-cabecalho-resumo">
-        <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")} hoje</span>
+        <span className="dia-cabecalho-separador">{"\u2022"}</span>
+        <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")}</span>
         <span className="dia-cabecalho-separador">{"\u2022"}</span>
         <span>{jogosDia} jogos</span>
       </div>
@@ -25,7 +23,7 @@ export default function DiaCabecalho({
 const cabecalho = {
   background: "white",
   color: "#0f172a",
-  padding: "6px 7px",
+  padding: "5px 7px",
   borderRadius: "12px",
   textAlign: "center",
   fontWeight: "bold",

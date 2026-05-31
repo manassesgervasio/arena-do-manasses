@@ -243,6 +243,189 @@
   }
 }
 
+/* Sixth visual refinement */
+.app-header {
+  min-height: 43px !important;
+  padding-top: 8px !important;
+  padding-bottom: 7px !important;
+}
+
+.main-menu-trigger {
+  top: 8px !important;
+}
+
+.app-account-button {
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+.dia-cabecalho {
+  padding: 5px 8px !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.dia-cabecalho-linha {
+  gap: 5px !important;
+  white-space: nowrap;
+}
+
+.dia-cabecalho-semana,
+.dia-cabecalho-data,
+.dia-cabecalho-resumo,
+.dia-cabecalho-linha span {
+  font-size: 12px !important;
+  line-height: 14px !important;
+}
+
+.dia-cabecalho-semana {
+  color: #0f172a;
+}
+
+.dia-cabecalho-resumo {
+  margin-top: 0 !important;
+  color: #166534 !important;
+}
+
+.main-menu-arena {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: left;
+}
+
+.main-menu-arena span,
+.main-menu-section-label {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.main-menu-arena strong {
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 950;
+}
+
+.main-menu-section-label {
+  margin: 2px 0 6px;
+  padding-left: 4px;
+}
+
+.horario-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.horario-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: #cbd5e1;
+}
+
+.horario-card-reservado::before {
+  background: #60a5fa;
+}
+
+.horario-card-pago::before {
+  background: #22c55e;
+}
+
+.horario-card-pendente::before {
+  background: #eab308;
+}
+
+.horario-card-faltou::before {
+  background: #f97316;
+}
+
+.horario-card-cancelado::before {
+  background: #ef4444;
+}
+
+.horario-card-fixo::before {
+  background: #9333ea;
+}
+
+.horario-card-mensalista::before {
+  background: #d97706;
+}
+
+.horario-card:not(.is-expanded) {
+  height: 58px !important;
+  min-height: 58px !important;
+  padding-left: 12px !important;
+}
+
+.agenda-mobile .horario-card:not(.is-expanded) {
+  height: 58px !important;
+  min-height: 58px !important;
+  padding-left: 12px !important;
+}
+
+.horario-card-time {
+  grid-template-rows: auto auto auto;
+}
+
+.horario-card-hour {
+  font-size: 16px !important;
+  line-height: 18px !important;
+}
+
+.horario-card:not(.is-expanded) strong {
+  color: #0f172a !important;
+  font-size: 12px !important;
+  line-height: 14px !important;
+  font-weight: 950 !important;
+  text-transform: uppercase;
+}
+
+.horario-card-livre-compacto:not(.is-expanded) strong {
+  color: #64748b !important;
+  font-weight: 850 !important;
+  text-transform: none;
+}
+
+.horario-status-pill-row {
+  width: fit-content;
+  max-width: 100% !important;
+  min-height: 13px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    min-height: 38px !important;
+    padding-top: 7px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .main-menu-trigger {
+    top: 6px !important;
+  }
+
+  .dia-cabecalho-linha {
+    justify-content: flex-start !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;

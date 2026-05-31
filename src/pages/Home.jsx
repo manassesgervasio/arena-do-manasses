@@ -365,6 +365,7 @@ export default function Home({
         activeTab={activeMobileTab}
         items={mobileNavigationItems}
         extraItems={menuExtraItems}
+        arenaNome={contextoArena?.arenaAtual?.nome}
         onTabChange={(tab) => {
           setMostrarPainelSaaS(false);
           setMostrarUsuariosArena(false);
