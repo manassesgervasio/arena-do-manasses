@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
+import { notificarGestorNovaReserva } from "./services/whatsappService";
 
 const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
@@ -524,6 +525,20 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     },
   }));
   setReservasArenaId(arenaAtualId);
+
+  await notificarGestorNovaReserva({
+    arena: contextoArena.arenaAtual,
+    reserva: {
+      ...reservaCriada,
+      data: reservaCriada.data || dataTexto,
+      horario: reservaCriada.horario || horario,
+      status: reservaCriada.status || "Pendente",
+    },
+    cliente: {
+      nome,
+      telefone,
+    },
+  });
 
   return {
     ok: true,
