@@ -20,6 +20,7 @@ export default function HorarioCard({
   onAlugarComoAvulso,
   onLimpar,
   modoPublico,
+  dataFormatada,
   reservaIndisponivel,
 }) {
   const [mostrandoAluguelAvulso, setMostrandoAluguelAvulso] = useState(false);
@@ -322,7 +323,7 @@ export default function HorarioCard({
               >
                 {enviandoSolicitacaoPublica
                   ? "Enviando..."
-                  : "Reservar pelo WhatsApp"}
+                  : "Agendar e enviar WhatsApp"}
               </button>
             </form>
           )}
@@ -531,6 +532,39 @@ export default function HorarioCard({
                 {item.status === "Pendente" ? "Confirmar" : "Reservar"}
               </button>
 
+              {item.telefone && (
+                <a
+                  className="horario-action-button"
+                  href={criarLinkConfirmacaoCliente({
+                    nome: item.cliente,
+                    telefone: item.telefone,
+                    dataFormatada,
+                    hora,
+                    status: item.status,
+                  })}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: "6px",
+                    marginTop: "6px",
+                    background: "#0f766e",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "8px 10px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    minHeight: "40px",
+                    textDecoration: "none",
+                  }}
+                >
+                  Enviar confirmação pelo WhatsApp
+                </a>
+              )}
+
               <button
                 className="horario-action-button"
                 type="button"
@@ -563,3 +597,44 @@ const inputStyle = {
   fontSize: "12px",
   minHeight: "34px",
 };
+
+function criarLinkConfirmacaoCliente({
+  nome,
+  telefone,
+  dataFormatada,
+  hora,
+  status,
+}) {
+  const telefoneWhatsApp = formatarTelefoneWhatsApp(telefone);
+  const mensagem =
+    status === "Reservado"
+      ? [
+          `Olá, ${nome || "tudo bem"}! Sua reserva foi confirmada.`,
+          "",
+          `Data: ${dataFormatada || ""}`,
+          `Horário: ${hora || ""}`,
+          "",
+          "Até lá!",
+        ].join("\n")
+      : [
+          `Olá, ${nome || "tudo bem"}! Sua solicitação de reserva foi recebida.`,
+          "",
+          `Data: ${dataFormatada || ""}`,
+          `Horário: ${hora || ""}`,
+          `Status: ${status || "Pendente"}`,
+          "",
+          "A arena vai confirmar/confirmou seu horário por aqui.",
+        ].join("\n");
+
+  return `https://wa.me/${telefoneWhatsApp}?text=${encodeURIComponent(
+    mensagem
+  )}`;
+}
+
+function formatarTelefoneWhatsApp(telefone) {
+  const digitos = String(telefone || "").replace(/\D/g, "");
+
+  if (digitos.startsWith("55")) return digitos;
+
+  return `55${digitos}`;
+}

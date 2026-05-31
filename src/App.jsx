@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
+import { WHATSAPP_ARENA } from "./config/arenaConfig";
 
 const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
@@ -407,47 +408,6 @@ async function atualizarReservaBancoPorHorario(dataTexto, horario, campos) {
   return { data, error };
 }
 
-async function criarOuAtualizarClientePublico({ nome, telefone }) {
-  if (!arenaAtualId) return null;
-
-  const { data: clienteExistente, error: erroBusca } = await supabase
-    .from("clientes")
-    .select("*")
-    .eq("arena_id", arenaAtualId)
-    .eq("telefone", telefone)
-    .maybeSingle();
-
-  if (erroBusca) {
-    console.warn(
-      "Cadastro publico de cliente ignorado. A tabela clientes pode nao existir ou ter outra estrutura:",
-      erroBusca
-    );
-    return null;
-  }
-
-  if (clienteExistente) return clienteExistente;
-
-  const { data: novoCliente, error: erroInsert } = await supabase
-    .from("clientes")
-    .insert({
-      nome,
-      telefone,
-      arena_id: arenaAtualId,
-    })
-    .select("*")
-    .single();
-
-  if (erroInsert) {
-    console.warn(
-      "Nao foi possivel criar cadastro publico de cliente. A reserva seguira com cliente e telefone:",
-      erroInsert
-    );
-    return null;
-  }
-
-  return novoCliente;
-}
-
 async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
   if (!arenaAtualId) {
     return {
@@ -497,7 +457,6 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     };
   }
 
-  await criarOuAtualizarClientePublico({ nome, telefone });
   const reservaPublica = {
     cliente: nome,
     telefone,
@@ -550,7 +509,6 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
       telefone,
       dataFormatada: formatarDataBR(dataTexto),
       horario,
-      arenaNome: contextoArena.arenaAtual?.nome,
     }),
   };
 }
@@ -1143,24 +1101,20 @@ function criarLinkWhatsAppSolicitacao({
   telefone,
   dataFormatada,
   horario,
-  arenaNome,
 }) {
   const mensagem = [
-    "Olá! Acabei de solicitar uma reserva pela agenda online.",
+    "Olá! Nova solicitação de reserva pela agenda online.",
     "",
     `Nome: ${nome}`,
     `Telefone: ${telefone}`,
-    `Arena: ${arenaNome || "Arena"}`,
     `Data: ${dataFormatada}`,
     `Horário: ${horario}`,
-    "Status: Pendente de confirmação da arena.",
+    "Status: Pendente",
     "",
-    "Aguardo a confirmação.",
+    "Por favor, confirme a disponibilidade.",
   ].join("\n");
 
-  return `https://wa.me/${WHATSAPP_ARENA_PUBLICO}?text=${encodeURIComponent(
+  return `https://wa.me/${WHATSAPP_ARENA}?text=${encodeURIComponent(
     mensagem
   )}`;
 }
-
-const WHATSAPP_ARENA_PUBLICO = "5598999999999";
