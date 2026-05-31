@@ -528,7 +528,7 @@ export default function HorarioCard({
                   minHeight: "40px",
                 }}
               >
-                Reservar
+                {item.status === "Pendente" ? "Confirmar" : "Reservar"}
               </button>
 
               <button

@@ -383,6 +383,30 @@ async function salvarReservaBanco(reserva) {
   return error;
 }
 
+async function atualizarReservaBancoPorHorario(dataTexto, horario, campos) {
+  if (!arenaAtualId) {
+    return {
+      data: null,
+      error: { message: "Contexto da arena nao carregado." },
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("reservas")
+    .update(campos)
+    .eq("arena_id", arenaAtualId)
+    .eq("data", dataTexto)
+    .eq("horario", horario)
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Erro ao atualizar reserva existente:", error);
+  }
+
+  return { data, error };
+}
+
 async function criarOuAtualizarClientePublico({ nome, telefone }) {
   if (!arenaAtualId) return null;
 
@@ -783,7 +807,10 @@ return "#14532d";
   }
 
   const tipo = reserva.tipo || "Avulso";
-  const status = reserva.status === "Livre" ? "Reservado" : reserva.status;
+  const status =
+    reserva.status === "Livre" || reserva.status === "Pendente"
+      ? "Reservado"
+      : reserva.status;
 
   if (tipo !== "Fixo") {
     const novaReserva = {
@@ -792,12 +819,39 @@ return "#14532d";
       tipo,
     };
 
-    setReservas((anterior) => ({
-      ...anterior,
-      [chaveReserva(dataTexto, horario)]: novaReserva,
-    }));
+    if (reserva.status === "Pendente") {
+      const { data: reservaAtualizada, error } =
+        await atualizarReservaBancoPorHorario(dataTexto, horario, {
+          status: "Reservado",
+          tipo: "Avulso",
+        });
 
-    await salvarReservaBanco({
+      if (error) {
+        alert(
+          `Nao foi possivel confirmar a reserva: ${
+            error.message || "erro desconhecido"
+          }`
+        );
+        return;
+      }
+
+      setReservas((anterior) => ({
+        ...anterior,
+        [chaveReserva(dataTexto, horario)]: {
+          cliente: reservaAtualizada.cliente || reserva.cliente || "",
+          telefone: reservaAtualizada.telefone || reserva.telefone || "",
+          valor: reservaAtualizada.valor || reserva.valor || "",
+          status: reservaAtualizada.status || "Reservado",
+          tipo: reservaAtualizada.tipo || "Avulso",
+          grupoFixo: reservaAtualizada.grupo_fixo || reserva.grupoFixo || "",
+        },
+      }));
+
+      alert("Reserva confirmada!");
+      return;
+    }
+
+    const error = await salvarReservaBanco({
       cliente: reserva.cliente || "",
       telefone: reserva.telefone || "",
       data: dataTexto,
@@ -807,6 +861,20 @@ return "#14532d";
       tipo,
       grupo_fixo: reserva.grupoFixo || "",
     });
+
+    if (error) {
+      alert(
+        `Nao foi possivel reservar o horario: ${
+          error.message || "erro desconhecido"
+        }`
+      );
+      return;
+    }
+
+    setReservas((anterior) => ({
+      ...anterior,
+      [chaveReserva(dataTexto, horario)]: novaReserva,
+    }));
 
     alert("HorÃ¡rio reservado!");
     return;
