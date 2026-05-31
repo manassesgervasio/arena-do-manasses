@@ -16,8 +16,11 @@ export default function HorarioCard({
   onTipoChange,
   onStatusChange,
   onReservar,
+  onSolicitarReservaPublica,
   onAlugarComoAvulso,
   onLimpar,
+  modoPublico,
+  reservaIndisponivel,
 }) {
   const [mostrandoAluguelAvulso, setMostrandoAluguelAvulso] = useState(false);
   const [salvandoAluguelAvulso, setSalvandoAluguelAvulso] = useState(false);
@@ -27,6 +30,12 @@ export default function HorarioCard({
     valor: "",
     status: "Reservado",
   });
+  const [solicitacaoPublica, setSolicitacaoPublica] = useState({
+    nome: "",
+    telefone: "",
+  });
+  const [enviandoSolicitacaoPublica, setEnviandoSolicitacaoPublica] =
+    useState(false);
 
   function atualizarAluguelAvulso(campo, valor) {
     setAluguelAvulso((anterior) => ({
@@ -43,6 +52,13 @@ export default function HorarioCard({
       status: "Reservado",
     });
     setMostrandoAluguelAvulso(false);
+  }
+
+  function atualizarSolicitacaoPublica(campo, valor) {
+    setSolicitacaoPublica((anterior) => ({
+      ...anterior,
+      [campo]: valor,
+    }));
   }
 
   async function salvarAluguelAvulso() {
@@ -63,6 +79,59 @@ export default function HorarioCard({
     }
 
     limparAluguelAvulso();
+  }
+
+  async function confirmarSolicitacaoPublica(event) {
+    event.preventDefault();
+
+    const nome = solicitacaoPublica.nome.trim();
+    const telefone = solicitacaoPublica.telefone.replace(/\D/g, "");
+
+    if (nome.length < 3) {
+      alert("Informe um nome com pelo menos 3 caracteres.");
+      return;
+    }
+
+    if (telefone.length < 10) {
+      alert("Informe um telefone/WhatsApp com pelo menos 10 digitos.");
+      return;
+    }
+
+    setEnviandoSolicitacaoPublica(true);
+    const janelaWhatsApp = window.open("", "_blank");
+    if (janelaWhatsApp) {
+      janelaWhatsApp.opener = null;
+    }
+
+    const resultado = await onSolicitarReservaPublica?.({
+      nome,
+      telefone,
+    });
+
+    setEnviandoSolicitacaoPublica(false);
+
+    if (!resultado?.ok) {
+      janelaWhatsApp?.close();
+      alert(
+        resultado?.mensagem ||
+          "Nao foi possivel enviar a solicitacao. Tente novamente."
+      );
+      return;
+    }
+
+    setSolicitacaoPublica({
+      nome: "",
+      telefone: "",
+    });
+    onToggleExpandido?.();
+
+    alert(resultado.mensagem);
+
+    if (resultado.whatsappUrl && janelaWhatsApp) {
+      janelaWhatsApp.location.href = resultado.whatsappUrl;
+    } else if (resultado.whatsappUrl) {
+      window.open(resultado.whatsappUrl, "_blank", "noopener,noreferrer");
+    }
   }
 
   const statusAvulsoLista = statusLista.filter((status) => status !== "Livre");
@@ -100,6 +169,8 @@ export default function HorarioCard({
   const statusClasse = String(item.status || "Livre").toLowerCase();
   const tituloResumo =
     mensalistaContratado?.nome || item.cliente || "Disponível";
+  const podeReservarWhatsApp =
+    modoPublico && compactoLivre && !mensalistaContratado && !reservaIndisponivel;
   const cardClasse = [
     "horario-card",
     `horario-card-${statusClasse}`,
@@ -196,7 +267,7 @@ export default function HorarioCard({
             {statusSelo}
           </span>
         )}
-        {expandido && (
+        {expandido && !modoPublico && (
           <span
             style={{
               display: "flex",
@@ -212,10 +283,58 @@ export default function HorarioCard({
             {item.valor ? <span>R$ {item.valor}</span> : null}
           </span>
         )}
-        {expandido && <ReservaBadges tipo={item.tipo} />}
+        {expandido && !modoPublico && <ReservaBadges tipo={item.tipo} />}
       </button>
 
-      {expandido && (
+      {expandido && modoPublico && (
+        <div className="horario-card-public-details">
+          <div>
+            <strong>{tituloResumo}</strong>
+            {statusSelo && <span>{statusSelo}</span>}
+          </div>
+
+          {podeReservarWhatsApp && (
+            <form
+              className="public-reserva-form"
+              onSubmit={confirmarSolicitacaoPublica}
+            >
+              <input
+                placeholder="Nome"
+                value={solicitacaoPublica.nome}
+                onChange={(event) =>
+                  atualizarSolicitacaoPublica("nome", event.target.value)
+                }
+                style={inputStyle}
+              />
+              <input
+                placeholder="Telefone/WhatsApp"
+                inputMode="tel"
+                value={solicitacaoPublica.telefone}
+                onChange={(event) =>
+                  atualizarSolicitacaoPublica("telefone", event.target.value)
+                }
+                style={inputStyle}
+              />
+              <button
+                className="whatsapp-reserva-button"
+                type="submit"
+                disabled={enviandoSolicitacaoPublica}
+              >
+                {enviandoSolicitacaoPublica
+                  ? "Enviando..."
+                  : "Reservar pelo WhatsApp"}
+              </button>
+            </form>
+          )}
+          {reservaIndisponivel && compactoLivre && (
+            <span className="horario-public-unavailable">
+              Indisponível para reserva
+            </span>
+          )}
+        </div>
+      )}
+
+      {expandido && !modoPublico && (
         <div className="horario-card-form">
           {mensalistaContratado && (
             <div

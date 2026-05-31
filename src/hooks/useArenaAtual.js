@@ -15,11 +15,30 @@ export function useArenaAtual(session) {
 
     async function carregarContexto() {
       if (!session?.user?.email) {
-        setArenaAtual(null);
+        setCarregandoContexto(true);
+        setErroContexto("");
         setUsuarioAtual(null);
         setPerfilAtual(null);
+
+        const { data: arenaPublica, error: arenaPublicaError } = await supabase
+          .from("arenas")
+          .select("id,nome,slug,ativa")
+          .eq("slug", ARENA_SLUG_ATUAL)
+          .eq("ativa", true)
+          .maybeSingle();
+
+        if (!montado) return;
+
+        if (arenaPublicaError) {
+          console.error("Erro ao carregar arena publica:", arenaPublicaError);
+          setArenaAtual(null);
+          setErroContexto("");
+          setCarregandoContexto(false);
+          return;
+        }
+
+        setArenaAtual(arenaPublica || null);
         setCarregandoContexto(false);
-        setErroContexto("");
         return;
       }
 

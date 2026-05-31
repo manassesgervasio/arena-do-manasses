@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Login({ onEntrar }) {
+export default function Login({ onEntrar, onVoltar }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
@@ -63,6 +63,16 @@ export default function Login({ onEntrar }) {
           <button className="login-button" type="submit" disabled={carregando}>
             {carregando ? "Entrando..." : "Entrar"}
           </button>
+          {onVoltar && (
+            <button
+              className="login-secondary-button"
+              type="button"
+              onClick={onVoltar}
+              disabled={carregando}
+            >
+              Voltar para agenda
+            </button>
+          )}
         </form>
       </section>
     </main>

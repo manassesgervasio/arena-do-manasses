@@ -24,6 +24,8 @@ export default function Home({
   permissoesLogado,
   contextoArena,
   onSair,
+  onEntrar,
+  modoPublico = false,
   dataBase,
   mesFiltro,
   dias,
@@ -46,6 +48,7 @@ export default function Home({
   atualizarReserva,
   reservarHorario,
   alugarMensalistaComoAvulso,
+  solicitarReservaPublica,
   limparReserva,
   mudarSemana,
   alterarData,
@@ -82,7 +85,7 @@ export default function Home({
     return true;
   });
   const menuExtraItems = [
-    permissoesArena.usuarios
+    !modoPublico && permissoesArena.usuarios
       ? {
           id: "usuarios",
           label: "Usuários",
@@ -97,11 +100,17 @@ export default function Home({
       label: "Configurações",
       disabled: true,
     },
-    {
-      id: "sair",
-      label: "Sair",
-      onClick: onSair,
-    },
+    modoPublico
+      ? {
+          id: "entrar",
+          label: "Entrar",
+          onClick: onEntrar,
+        }
+      : {
+          id: "sair",
+          label: "Sair",
+          onClick: onSair,
+        },
   ].filter(Boolean);
 
   useEffect(() => {
@@ -177,8 +186,11 @@ export default function Home({
         atualizarReserva={atualizarReserva}
         reservarHorario={reservarHorario}
         alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
+        solicitarReservaPublica={solicitarReservaPublica}
         limparReserva={limparReserva}
         mostrarApenasOcupados={mostrarApenasOcupados}
+        modoPublico={modoPublico}
+        arenaNome={contextoArena?.arenaAtual?.nome || "Arena do Manasses"}
         onSemanaAnterior={() => mudarSemanaAgenda(-1)}
         onSemanaProxima={() => mudarSemanaAgenda(1)}
         podeLimparHorarioPago={canLimparHorarioPago(
@@ -368,6 +380,8 @@ export default function Home({
           setMostrarUsuariosArena(true);
         }}
         onSair={onSair}
+        onEntrar={onEntrar}
+        modoPublico={modoPublico}
       />
       <MobileNavigation
         activeTab={activeMobileTab}

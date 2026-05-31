@@ -16,9 +16,12 @@ export default function AgendaGrid({
   atualizarReserva,
   reservarHorario,
   alugarMensalistaComoAvulso,
+  solicitarReservaPublica,
   limparReserva,
   podeLimparHorarioPago,
   mostrarApenasOcupados,
+  modoPublico,
+  arenaNome,
   onSemanaAnterior,
   onSemanaProxima,
 }) {
@@ -27,6 +30,7 @@ export default function AgendaGrid({
   );
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
   const diaMobile = dias[diaMobileIndex] || dias[0];
+  const podeVoltarSemana = !modoPublico || dataEhFutura(dias[0]);
 
   function alternarHorarioAberto(dataTexto, hora) {
     setHorarioAbertoPorDia((anterior) => ({
@@ -81,6 +85,7 @@ const jogosDia = horarios.filter((horaAtual) => {
   function renderHorarioCard(data, hora) {
     const dataTexto = formatarData(data);
     const item = pegarReserva(dataTexto, hora);
+    const dataPassadaPublica = modoPublico && dataEhPassada(data);
     const temReservaReal =
       item.status !== "Livre" ||
       (item.tipo && item.tipo !== "Avulso") ||
@@ -104,6 +109,11 @@ const jogosDia = horarios.filter((horaAtual) => {
         statusLista={statusLista}
         expandido={horarioAbertoPorDia[dataTexto] === hora}
         compactoLivre={!horarioOcupado}
+        modoPublico={modoPublico}
+        arenaNome={arenaNome}
+        dataTexto={dataTexto}
+        dataFormatada={formatarDataBR(dataTexto)}
+        reservaIndisponivel={dataPassadaPublica}
         onToggleExpandido={() => alternarHorarioAberto(dataTexto, hora)}
         onClienteChange={(e) =>
           atualizarReserva(
@@ -146,6 +156,9 @@ const jogosDia = horarios.filter((horaAtual) => {
           )
         }
         onReservar={() => reservarHorario(dataTexto, hora)}
+        onSolicitarReservaPublica={(dadosCliente) =>
+          solicitarReservaPublica(dataTexto, hora, dadosCliente)
+        }
         onAlugarComoAvulso={(dadosReserva) =>
           alugarMensalistaComoAvulso(dataTexto, hora, dadosReserva)
         }
@@ -208,7 +221,8 @@ const jogosDia = horarios.filter((horaAtual) => {
           <button
             className="agenda-week-arrow"
             type="button"
-            onClick={onSemanaAnterior}
+            onClick={podeVoltarSemana ? onSemanaAnterior : undefined}
+            disabled={!podeVoltarSemana}
             aria-label="Semana anterior"
           >
             ◀
@@ -225,15 +239,21 @@ const jogosDia = horarios.filter((horaAtual) => {
           >
             {dias.map((data, index) => {
               const textoData = formatarData(data);
+              const dataPassadaPublica = modoPublico && dataEhPassada(data);
 
               return (
                 <button
                   className={`agenda-mobile-day-button${
                     index === diaMobileIndex ? " is-selected" : ""
-                  }`}
+                  }${dataPassadaPublica ? " is-disabled" : ""}`}
                   key={textoData}
                   type="button"
-                  onClick={() => setDiaMobileIndex(index)}
+                  onClick={() => {
+                    if (dataPassadaPublica) return;
+
+                    setDiaMobileIndex(index);
+                  }}
+                  disabled={dataPassadaPublica}
                   style={{
                     minHeight: "44px",
                     border:
@@ -297,6 +317,30 @@ function obterIndiceDoDiaAtual(dias) {
   );
 
   return indiceHoje >= 0 ? indiceHoje : 0;
+}
+
+function dataEhPassada(data) {
+  const hoje = new Date();
+
+  hoje.setHours(0, 0, 0, 0);
+
+  const dataComparada = new Date(data);
+
+  dataComparada.setHours(0, 0, 0, 0);
+
+  return dataComparada < hoje;
+}
+
+function dataEhFutura(data) {
+  const hoje = new Date();
+
+  hoje.setHours(0, 0, 0, 0);
+
+  const dataComparada = new Date(data);
+
+  dataComparada.setHours(0, 0, 0, 0);
+
+  return dataComparada > hoje;
 }
 
 function formatarDataLocal(data) {

@@ -11,6 +11,8 @@ export default function AppHeader({
   onAbrirPainelSaaS,
   onAbrirUsuariosArena,
   onSair,
+  onEntrar,
+  modoPublico = false,
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const {
@@ -65,6 +67,11 @@ export default function AppHeader({
                 <span>Carregando arena...</span>
               ) : erroContexto ? (
                 <span>{erroContexto}</span>
+              ) : modoPublico ? (
+                <>
+                  {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
+                  <span>Visitante</span>
+                </>
               ) : (
                 <>
                   {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
@@ -90,7 +97,11 @@ export default function AppHeader({
             <button type="button" disabled>
               Configurações
             </button>
-            {(usuarioAtual || (perfilLogado && permissoesLogado)) && (
+            {modoPublico ? (
+              <button type="button" onClick={onEntrar}>
+                Entrar
+              </button>
+            ) : (usuarioAtual || (perfilLogado && permissoesLogado)) && (
               <button type="button" className="app-account-danger" onClick={onSair}>
                 Sair
               </button>

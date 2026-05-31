@@ -410,6 +410,73 @@
   letter-spacing: 0.04em;
 }
 
+.horario-card-public-details {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  cursor: default;
+}
+
+.horario-card-public-details > div {
+  display: grid;
+  gap: 2px;
+}
+
+.horario-card-public-details strong {
+  color: #0f172a;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 950;
+}
+
+.horario-card-public-details span {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 850;
+}
+
+.whatsapp-reserva-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 13px;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.horario-public-unavailable {
+  display: inline-flex;
+  width: fit-content;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+.agenda-week-arrow:disabled,
+.agenda-mobile-day-button.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+}
+
+.login-secondary-button {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: white;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .app-header {
     min-height: 38px !important;

@@ -36,6 +36,7 @@ function obterPerfilDaSessao(session) {
 export default function App() {
   const [sessaoAuth, setSessaoAuth] = useState(null);
   const [authCarregando, setAuthCarregando] = useState(true);
+  const [mostrarLogin, setMostrarLogin] = useState(false);
   const [perfilLogado, setPerfilLogado] = useState(null);
   const contextoArena = useArenaAtual(sessaoAuth);
   const arenaAtualId = contextoArena.arenaAtual?.id;
@@ -65,6 +66,7 @@ export default function App() {
 
     setSessaoAuth(data.session);
     setPerfilLogado(obterPerfilDaSessao(data.session));
+    setMostrarLogin(false);
     setAuthCarregando(false);
   }
 
@@ -75,6 +77,7 @@ export default function App() {
 
     setSessaoAuth(session);
     setPerfilLogado(obterPerfilDaSessao(session));
+    if (session) setMostrarLogin(false);
     setAuthCarregando(false);
   });
 
@@ -91,14 +94,49 @@ export default function App() {
     setReservas({});
     setReservasArenaId(null);
 
-    if (!sessaoAuth || !arenaAtualId) return;
+    const modoVisitante = !sessaoAuth;
+    const primeiroDia = dias?.[0] ? formatarDataLocal(dias[0]) : "";
+    const ultimoDia = dias?.length
+      ? formatarDataLocal(dias[dias.length - 1])
+      : "";
 
-    const { data, error } = await supabase
+    if (modoVisitante) {
+      console.log("modo visitante");
+      console.log("arenaAtual", contextoArena.arenaAtual);
+      console.log("periodoVisivel", primeiroDia, ultimoDia);
+    }
+
+    if (!arenaAtualId) {
+      if (modoVisitante) {
+        console.log("reservasPublicas", []);
+        console.log(
+          "erroReservasPublicas",
+          "Arena atual sem id. A consulta publica de reservas nao foi executada."
+        );
+      }
+
+      return;
+    }
+
+    let query = supabase
       .from("reservas")
       .select("*")
       .eq("arena_id", arenaAtualId);
 
+    if (modoVisitante && primeiroDia && ultimoDia) {
+      query = query
+        .gte("data", primeiroDia)
+        .lte("data", ultimoDia);
+    }
+
+    const { data, error } = await query;
+
     if (!ativo) return;
+
+    if (modoVisitante) {
+      console.log("reservasPublicas", data);
+      console.log("erroReservasPublicas", error);
+    }
 
     if (error) {
       console.log("Erro ao carregar reservas:", error);
@@ -122,6 +160,10 @@ export default function App() {
       };
     });
 
+    if (modoVisitante) {
+      console.log("reservasPublicasFormatadas", reservasFormatadas);
+    }
+
     setReservas(reservasFormatadas);
     setReservasArenaId(arenaAtualId);
   }
@@ -131,7 +173,7 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId]);
+}, [sessaoAuth, arenaAtualId, dias]);
 
   useEffect(() => {
   if (!sessaoAuth || !arenaAtualId) {
@@ -195,7 +237,7 @@ export default function App() {
 }, [sessaoAuth, arenaAtualId, mesFiltro, versaoHorariosMensalistas]);
 
   useEffect(() => {
-  if (!sessaoAuth || !arenaAtualId) {
+  if (!arenaAtualId) {
     setHorariosMensalistas({});
     return;
   }
@@ -269,7 +311,7 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId, versaoHorariosMensalistas]);
+}, [arenaAtualId, versaoHorariosMensalistas]);
 
   function recarregarHorariosMensalistas() {
     setVersaoHorariosMensalistas((versao) => versao + 1);
@@ -339,6 +381,154 @@ async function salvarReservaBanco(reserva) {
   }
 
   return error;
+}
+
+async function criarOuAtualizarClientePublico({ nome, telefone }) {
+  if (!arenaAtualId) return null;
+
+  const { data: clienteExistente, error: erroBusca } = await supabase
+    .from("clientes")
+    .select("*")
+    .eq("arena_id", arenaAtualId)
+    .eq("telefone", telefone)
+    .maybeSingle();
+
+  if (erroBusca) {
+    console.warn(
+      "Cadastro publico de cliente ignorado. A tabela clientes pode nao existir ou ter outra estrutura:",
+      erroBusca
+    );
+    return null;
+  }
+
+  if (clienteExistente) return clienteExistente;
+
+  const { data: novoCliente, error: erroInsert } = await supabase
+    .from("clientes")
+    .insert({
+      nome,
+      telefone,
+      arena_id: arenaAtualId,
+    })
+    .select("*")
+    .single();
+
+  if (erroInsert) {
+    console.warn(
+      "Nao foi possivel criar cadastro publico de cliente. A reserva seguira com cliente e telefone:",
+      erroInsert
+    );
+    return null;
+  }
+
+  return novoCliente;
+}
+
+async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
+  if (!arenaAtualId) {
+    return {
+      ok: false,
+      mensagem: "Nao foi possivel carregar a arena. Tente novamente.",
+    };
+  }
+
+  const nome = dadosCliente.nome.trim();
+  const telefone = normalizarTelefone(dadosCliente.telefone);
+
+  if (nome.length < 3) {
+    return {
+      ok: false,
+      mensagem: "Informe um nome com pelo menos 3 caracteres.",
+    };
+  }
+
+  if (telefone.length < 10) {
+    return {
+      ok: false,
+      mensagem: "Informe um telefone/WhatsApp com pelo menos 10 digitos.",
+    };
+  }
+
+  const { data: reservaExistente, error: erroBuscaReserva } = await supabase
+    .from("reservas")
+    .select("*")
+    .eq("arena_id", arenaAtualId)
+    .eq("data", dataTexto)
+    .eq("horario", horario)
+    .maybeSingle();
+
+  if (erroBuscaReserva) {
+    console.error("Erro ao verificar horario publico:", erroBuscaReserva);
+    return {
+      ok: false,
+      mensagem:
+        "Nao foi possivel verificar se o horario esta livre. Tente novamente.",
+    };
+  }
+
+  if (reservaTemOcupacao(reservaExistente)) {
+    return {
+      ok: false,
+      mensagem: "Esse horario acabou de ser reservado. Escolha outro horario.",
+    };
+  }
+
+  await criarOuAtualizarClientePublico({ nome, telefone });
+  const reservaPublica = {
+    cliente: nome,
+    telefone,
+    data: dataTexto,
+    horario,
+    valor: 0,
+    status: "Pendente",
+    tipo: "Avulso",
+    grupo_fixo: "",
+    arena_id: arenaAtualId,
+  };
+
+  const { data: reservaCriada, error: erroInsert } = await supabase
+    .from("reservas")
+    .insert(reservaPublica)
+    .select("*")
+    .single();
+
+  if (erroInsert) {
+    console.error("Erro ao criar reserva publica:", erroInsert);
+    return {
+      ok: false,
+      mensagem:
+        erroInsert.code === "23505"
+          ? "Esse horario acabou de ser reservado. Escolha outro horario."
+          : `Nao foi possivel enviar a solicitacao: ${
+              erroInsert.message || "erro desconhecido"
+            }`,
+    };
+  }
+
+  setReservas((anterior) => ({
+    ...anterior,
+    [chaveReserva(dataTexto, horario)]: {
+      cliente: reservaCriada.cliente || nome,
+      telefone: reservaCriada.telefone || telefone,
+      valor: reservaCriada.valor || "",
+      status: reservaCriada.status || "Pendente",
+      tipo: reservaCriada.tipo || "Avulso",
+      grupoFixo: reservaCriada.grupo_fixo || "",
+    },
+  }));
+  setReservasArenaId(arenaAtualId);
+
+  return {
+    ok: true,
+    mensagem: "Solicitacao enviada! A arena vai confirmar pelo WhatsApp.",
+    whatsappUrl: criarLinkWhatsAppSolicitacao({
+      nome,
+      telefone,
+      dataFormatada: formatarDataBR(dataTexto),
+      horario,
+      arenaNome: contextoArena.arenaAtual?.nome,
+    }),
+  };
 }
 
 async function excluirReservaBanco(dataTexto, horario) {
@@ -757,15 +947,16 @@ return "#14532d";
     );
   }
 
-  if (!sessaoAuth) {
+  if (!sessaoAuth && mostrarLogin) {
     return (
       <Login
         onEntrar={entrarComEmailSenha}
+        onVoltar={() => setMostrarLogin(false)}
       />
     );
   }
 
-  if (contextoArena.carregandoContexto) {
+  if (sessaoAuth && contextoArena.carregandoContexto) {
     return (
       <main className="login-page">
         <section className="login-panel" aria-label="Carregando contexto">
@@ -779,9 +970,10 @@ return "#14532d";
   }
 
   if (
-    contextoArena.erroContexto ||
-    !contextoArena.usuarioAtual ||
-    !contextoArena.arenaAtual
+    sessaoAuth &&
+    (contextoArena.erroContexto ||
+      !contextoArena.usuarioAtual ||
+      !contextoArena.arenaAtual)
   ) {
     return (
       <main className="login-page">
@@ -807,6 +999,8 @@ return "#14532d";
       permissoesLogado={permissoesLogado}
       contextoArena={contextoArena}
       onSair={sair}
+      onEntrar={() => setMostrarLogin(true)}
+      modoPublico={!sessaoAuth}
       dataBase={dataBase}
       mesFiltro={mesFiltro}
       dias={dias}
@@ -829,6 +1023,7 @@ return "#14532d";
       atualizarReserva={atualizarReserva}
       reservarHorario={reservarHorario}
       alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
+      solicitarReservaPublica={solicitarReservaPublica}
       limparReserva={limparReserva}
       mudarSemana={mudarSemana}
       alterarData={alterarData}
@@ -851,5 +1046,53 @@ const horarioStyle = {
   fontSize: "14px",
 };
 
+function formatarDataLocal(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
 
+  return `${ano}-${mes}-${dia}`;
+}
 
+function normalizarTelefone(telefone) {
+  return String(telefone || "").replace(/\D/g, "");
+}
+
+function reservaTemOcupacao(reserva) {
+  if (!reserva) return false;
+
+  return (
+    reserva.status !== "Livre" ||
+    (reserva.tipo && reserva.tipo !== "Avulso") ||
+    Boolean(reserva.cliente?.trim()) ||
+    Boolean(reserva.telefone?.trim()) ||
+    Number(reserva.valor || 0) > 0
+  );
+}
+
+function criarLinkWhatsAppSolicitacao({
+  nome,
+  telefone,
+  dataFormatada,
+  horario,
+  arenaNome,
+}) {
+  const mensagem = [
+    "Olá! Acabei de solicitar uma reserva pela agenda online.",
+    "",
+    `Nome: ${nome}`,
+    `Telefone: ${telefone}`,
+    `Arena: ${arenaNome || "Arena"}`,
+    `Data: ${dataFormatada}`,
+    `Horário: ${horario}`,
+    "Status: Pendente de confirmação da arena.",
+    "",
+    "Aguardo a confirmação.",
+  ].join("\n");
+
+  return `https://wa.me/${WHATSAPP_ARENA_PUBLICO}?text=${encodeURIComponent(
+    mensagem
+  )}`;
+}
+
+const WHATSAPP_ARENA_PUBLICO = "5598999999999";
