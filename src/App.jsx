@@ -151,6 +151,10 @@ export default function App() {
       const chave = `${reserva.data}_${reserva.horario}`;
 
       reservasFormatadas[chave] = {
+        id: reserva.id || "",
+        arena_id: reserva.arena_id || "",
+        data: reserva.data || "",
+        horario: reserva.horario || "",
         cliente: reserva.cliente || "",
         telefone: reserva.telefone || "",
         valor: reserva.valor || "",
@@ -324,6 +328,10 @@ export default function App() {
   function pegarReserva(dataTexto, horario) {
     if (reservasArenaId !== arenaAtualId) {
       return {
+        id: "",
+        arena_id: "",
+        data: dataTexto,
+        horario,
         cliente: "",
         telefone: "",
         valor: "",
@@ -337,6 +345,10 @@ export default function App() {
 
     return (
       reservas[chave] || {
+        id: "",
+        arena_id: "",
+        data: dataTexto,
+        horario,
         cliente: "",
         telefone: "",
         valor: "",
@@ -499,6 +511,10 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
   setReservas((anterior) => ({
     ...anterior,
     [chaveReserva(dataTexto, horario)]: {
+      id: reservaCriada.id || "",
+      arena_id: reservaCriada.arena_id || arenaAtualId,
+      data: reservaCriada.data || dataTexto,
+      horario: reservaCriada.horario || horario,
       cliente: reservaCriada.cliente || nome,
       telefone: reservaCriada.telefone || telefone,
       valor: reservaCriada.valor || "",
@@ -511,7 +527,7 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
 
   return {
     ok: true,
-    mensagem: "Solicitacao enviada! A arena vai confirmar pelo WhatsApp.",
+    mensagem: "Reserva pendente criada com sucesso.",
     whatsappUrl: criarLinkWhatsAppSolicitacao({
       nome,
       telefone,

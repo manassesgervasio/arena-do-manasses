@@ -35,6 +35,7 @@ export default function HorarioCard({
     nome: "",
     telefone: "",
   });
+  const [whatsappPublicoUrl, setWhatsappPublicoUrl] = useState("");
   const [enviandoSolicitacaoPublica, setEnviandoSolicitacaoPublica] =
     useState(false);
 
@@ -108,6 +109,7 @@ export default function HorarioCard({
     setEnviandoSolicitacaoPublica(false);
 
     if (!resultado?.ok) {
+      setWhatsappPublicoUrl("");
       alert(
         resultado?.mensagem ||
           "Nao foi possivel enviar a solicitacao. Tente novamente."
@@ -119,13 +121,9 @@ export default function HorarioCard({
       nome: "",
       telefone: "",
     });
-    onToggleExpandido?.();
+    setWhatsappPublicoUrl(resultado.whatsappUrl || "");
 
-    alert(resultado.mensagem);
-
-    if (resultado.whatsappUrl) {
-      window.open(resultado.whatsappUrl, "_blank", "noopener,noreferrer");
-    }
+    alert(resultado.mensagem || "Reserva pendente criada com sucesso.");
   }
 
   const statusAvulsoLista = statusLista.filter((status) => status !== "Livre");
@@ -324,6 +322,16 @@ export default function HorarioCard({
             <span className="horario-public-unavailable">
               Indisponível para reserva
             </span>
+          )}
+          {whatsappPublicoUrl && (
+            <a
+              className="whatsapp-reserva-button"
+              href={whatsappPublicoUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Abrir WhatsApp da arena
+            </a>
           )}
         </div>
       )}
