@@ -77,6 +77,21 @@ export default function HorarioCard({
   const statusVisual = mensalistaContratado
     ? "Mensalista"
     : item.status || "Livre";
+  const statusSelo = mensalistaContratado
+    ? "⭐ MENSALISTA"
+    : item.tipo === "Fixo"
+    ? "📍 FIXO"
+    : item.status === "Pago"
+    ? "✅ PAGO"
+    : item.status === "Pendente"
+    ? "⏳ PENDENTE"
+    : item.status === "Reservado"
+    ? "📌 RESERVADO"
+    : item.status === "Cancelado"
+    ? "✕ CANCELADO"
+    : item.status === "Faltou"
+    ? "⚠ FALTOU"
+    : "";
   const statusIcone = mensalistaContratado
     ? "⭐"
     : item.tipo === "Fixo"
@@ -106,27 +121,12 @@ export default function HorarioCard({
       className={cardClasse}
       onClick={alternarPeloCard}
       style={{
-        background:
-          mensalistaContratado
-            ? "#ecfeff"
-            : item.status === "Reservado"
-            ? "#dbeafe"
-            : item.status === "Pago"
-            ? "#dcfce7"
-            : item.status === "Pendente"
-            ? "#fef9c3"
-            : item.status === "Cancelado"
-            ? "#fee2e2"
-            : item.status === "Faltou"
-            ? "#ffedd5"
-            : "white",
-        opacity: item.status === "Livre" && !mensalistaContratado ? 0.82 : 1,
+        background: "white",
+        opacity: 1,
         transition: "0.2s",
-        border: mensalistaContratado
-          ? "1px solid #0891b2"
-          : "1px solid rgba(148, 163, 184, 0.32)",
+        border: "1px solid rgba(148, 163, 184, 0.24)",
         borderRadius: "14px",
-        padding: !expandido ? "8px 10px" : "10px",
+        padding: !expandido ? "4px 10px" : "10px",
         boxShadow: !expandido
           ? "0 2px 6px rgba(15, 23, 42, 0.05)"
           : "0 8px 18px rgba(15, 23, 42, 0.14)",
@@ -141,7 +141,7 @@ export default function HorarioCard({
         style={{
           width: "100%",
           display: "grid",
-          gap: !expandido ? "3px" : "6px",
+          gap: !expandido ? "1px" : "6px",
           border: "none",
           background: "transparent",
           padding: 0,
@@ -157,23 +157,36 @@ export default function HorarioCard({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "8px",
+            gap: "6px",
             color: "#475569",
-            fontSize: "12px",
+            fontSize: !expandido ? "11px" : "12px",
             fontWeight: "bold",
           }}
         >
-          <span>
-            {statusIcone} {hora.split(" - ")[0]}
+          <span className="horario-card-hour">
+            {expandido ? `${statusIcone} ` : ""}
+            {hora.split(" - ")[0]}
           </span>
-          <span aria-hidden="true">{expandido ? "▲" : "▼"}</span>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
+              minWidth: 0,
+            }}
+          >
+            {!expandido && statusSelo && (
+              <span className="horario-status-pill">{statusSelo}</span>
+            )}
+            <span aria-hidden="true">{expandido ? "▲" : "▼"}</span>
+          </span>
         </span>
         <strong
           style={{
             overflow: "hidden",
             color: "#0f172a",
-            fontSize: !expandido ? "13px" : "14px",
-            lineHeight: !expandido ? "16px" : "18px",
+            fontSize: !expandido ? "12px" : "14px",
+            lineHeight: !expandido ? "14px" : "18px",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}

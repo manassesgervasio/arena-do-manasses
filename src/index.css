@@ -30,6 +30,219 @@
   }
 }
 
+/* Premium navigation refresh */
+.main-menu-trigger {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 950;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.72);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.main-menu-layer,
+.app-account-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.main-menu-backdrop,
+.app-account-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: rgba(15, 23, 42, 0.28);
+  cursor: default;
+}
+
+.mobile-navigation {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  z-index: 1001 !important;
+  display: grid !important;
+  align-content: start;
+  gap: 4px !important;
+  width: min(292px, 86vw) !important;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 18px !important;
+  overflow-y: auto;
+  border: none !important;
+  border-radius: 0 22px 22px 0 !important;
+  background: white !important;
+  box-shadow: 22px 0 60px rgba(15, 23, 42, 0.2) !important;
+  box-sizing: border-box;
+}
+
+.main-menu-header,
+.app-account-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.2em;
+}
+
+.main-menu-header button,
+.app-account-panel-header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.mobile-navigation-item {
+  width: 100%;
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  text-align: left;
+}
+
+.mobile-navigation-item.is-active {
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+.mobile-navigation-item:disabled {
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+}
+
+.app-header {
+  padding-left: 64px !important;
+}
+
+.app-brand {
+  letter-spacing: 0.28em !important;
+  font-size: 16px !important;
+}
+
+.app-title {
+  font-size: 18px !important;
+  line-height: 21px !important;
+}
+
+.app-subtitle {
+  display: none !important;
+}
+
+.app-account-menu {
+  position: fixed !important;
+  inset: 0 0 0 auto !important;
+  z-index: 1001 !important;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  width: min(320px, 88vw) !important;
+  height: 100vh;
+  padding: 18px !important;
+  border: none !important;
+  border-radius: 22px 0 0 22px !important;
+  background: white !important;
+  color: #0f172a;
+  box-shadow: -22px 0 60px rgba(15, 23, 42, 0.2) !important;
+}
+
+.app-account-info {
+  border-bottom-color: rgba(148, 163, 184, 0.18) !important;
+  color: #475569 !important;
+}
+
+.app-account-menu button {
+  color: #334155 !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  background: #f8fafc !important;
+}
+
+.app-account-menu .app-account-danger {
+  color: #b91c1c !important;
+  border-color: rgba(248, 113, 113, 0.22) !important;
+  background: #fef2f2 !important;
+}
+
+.horario-card:not(.is-expanded) {
+  height: 42px !important;
+  min-height: 42px !important;
+}
+
+.horario-card-hour {
+  font-size: 15px !important;
+  line-height: 17px !important;
+  letter-spacing: 0 !important;
+}
+
+.horario-card:not(.is-expanded) strong {
+  font-size: 10.5px !important;
+  line-height: 12px !important;
+}
+
+.horario-status-pill {
+  max-width: 104px;
+  background: rgba(15, 23, 42, 0.05);
+  color: #334155;
+}
+
+.agenda-mobile-day-selector {
+  gap: 4px !important;
+}
+
+.agenda-mobile-day-button {
+  border-color: transparent !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+  .main-menu-trigger {
+    top: 9px;
+    left: 9px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .app-header {
+    padding-left: 52px !important;
+  }
+
+  .app-brand {
+    font-size: 14px !important;
+  }
+
+  .app-title {
+    font-size: 16px !important;
+    line-height: 18px !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
@@ -132,23 +345,11 @@ code {
   }
 
   .week-controls {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 0 !important;
-    margin-top: 18px !important;
+    margin-top: 12px !important;
   }
 
-  .week-control-button,
-  .week-control-input {
-    width: 100% !important;
-    min-height: 44px !important;
-    box-sizing: border-box !important;
-    margin-top: 0 !important;
-  }
-
-  .week-control-button:last-child {
-    grid-column: auto;
+  .week-controls-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .horario-action-button {
@@ -164,7 +365,34 @@ code {
 }
 
 .mobile-navigation {
-  display: none;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin: 16px 0 10px;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.mobile-navigation-item {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-navigation-item.is-active {
+  background: #22c55e;
+  color: #052e16;
 }
 
 .financeiro-mobile-header {
@@ -214,11 +442,63 @@ code {
 }
 
 .horario-card-livre-compacto .horario-card-time {
-  min-height: 44px;
+  min-height: 28px;
 }
 
 .horario-card:not(.is-expanded) .horario-card-time {
-  min-height: 44px;
+  min-height: 28px;
+  justify-content: start;
+}
+
+.horario-card:not(.is-expanded) {
+  height: 40px;
+  min-height: 40px;
+  overflow: hidden;
+  background: white !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.horario-card:not(.is-expanded) strong {
+  color: #475569 !important;
+  font-size: 11px !important;
+  line-height: 13px !important;
+  font-weight: 900;
+}
+
+.horario-card-hour {
+  color: #0f172a;
+  font-size: 13px;
+  line-height: 15px;
+  font-weight: 950;
+}
+
+.horario-card.is-expanded .horario-card-hour {
+  font-size: 13px;
+}
+
+.horario-card.is-expanded {
+  background: white !important;
+  border: none !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+}
+
+.horario-status-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 96px;
+  min-height: 15px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.1);
+  color: #166534;
+  font-size: 9px;
+  line-height: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .reserva-badge {
@@ -251,12 +531,12 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
 }
 
 .dia-cabecalho-data {
-  color: #cbd5e1;
+  color: #64748b;
   font-size: 12px;
   line-height: 14px;
 }
@@ -266,8 +546,21 @@ code {
   line-height: 14px;
 }
 
+.dia-cabecalho-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+  color: #16a34a;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .dia-cabecalho-separador {
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 .mensalistas-section {
@@ -774,61 +1067,206 @@ code {
   font-weight: 800;
 }
 
-.logged-profile {
-  display: inline-flex;
+.app-header {
+  position: relative;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -25px -25px 8px;
+  padding: 16px 25px 12px;
+  background: #0f172a;
+}
+
+.app-brand-block {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
   gap: 10px;
-  width: fit-content;
-  max-width: 100%;
-  margin: 12px auto 0;
-  padding: 7px 8px 7px 11px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  border-radius: 999px;
-  background: rgba(34, 197, 94, 0.12);
-  color: #bbf7d0;
-  font-size: 13px;
-  font-weight: 800;
+  text-align: left;
 }
 
-.arena-context {
+.app-brand {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: fit-content;
-  max-width: 100%;
-  margin: 12px auto 0;
-  padding: 7px 11px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.58);
-  color: #cbd5e1;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.arena-context strong {
-  color: white;
-}
-
-.logged-profile button {
-  min-height: 30px;
-  padding: 5px 10px;
+  min-height: auto;
+  padding: 0;
   border: none;
-  border-radius: 999px;
-  background: #ef4444;
-  color: white;
-  font-size: 12px;
+  border-radius: 0;
+  background: transparent;
+  color: #f8fafc;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.app-title {
+  margin: 0 !important;
+  color: white !important;
+  font-size: 20px !important;
+  line-height: 23px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+}
+
+.app-subtitle {
+  margin-top: 0;
+  color: #cbd5e1;
+  font-size: 12px !important;
+  line-height: 15px;
+  text-align: left !important;
+}
+
+.app-account {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.app-account-button,
+.app-account-menu button {
+  min-height: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.1);
+  color: #e2e8f0;
+  font-size: 13px;
   font-weight: 900;
   cursor: pointer;
 }
 
-.logged-profile .logged-profile-secondary {
-  background: #22c55e;
-  color: #052e16;
+.app-account-button {
+  padding: 6px 10px;
+}
+
+.app-account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 300;
+  display: grid;
+  gap: 8px;
+  width: min(280px, calc(100vw - 32px));
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: #111827;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
+  text-align: left;
+}
+
+.app-account-info {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.app-account-menu button {
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.app-account-menu .app-account-danger {
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.week-controls {
+  display: block;
+  margin-top: 6px;
+}
+
+.week-controls-main {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  scrollbar-width: thin;
+}
+
+.week-control-button,
+.week-control-input {
+  flex: 0 0 auto;
+  min-height: 32px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  box-sizing: border-box;
+}
+
+.week-control-button {
+  width: 34px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: white;
+  color: #166534;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.week-control-input {
+  width: auto;
+  max-width: 132px;
+  padding: 6px 9px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.week-occupied-switch {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: white;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.week-occupied-switch input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #22c55e;
+}
+
+.week-days-strip {
+  display: none;
+}
+
+.week-day-chip {
+  flex: 1 0 auto;
+  min-width: 72px;
+  padding: 6px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.agenda-shell {
+  margin-top: 4px !important;
+  padding: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  border-radius: 16px !important;
+  background: white !important;
 }
 
 .painel-saas {
@@ -1844,7 +2282,72 @@ code {
 
 @media (max-width: 640px) {
   .home-page {
-    padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
+    padding: 8px !important;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .app-header {
+    align-items: center;
+    gap: 6px;
+    margin: -8px -8px 6px;
+    padding: 10px 8px 8px;
+  }
+
+  .app-brand-block {
+    gap: 7px;
+  }
+
+  .app-brand {
+    min-height: auto;
+    padding: 0;
+    font-size: 13px;
+  }
+
+  .app-title {
+    font-size: 17px !important;
+    line-height: 19px !important;
+  }
+
+  .app-subtitle {
+    max-width: 180px;
+    font-size: 10px !important;
+    line-height: 12px;
+  }
+
+  .app-account-button {
+    min-height: 28px;
+    padding: 5px 8px;
+  }
+
+  .week-controls {
+    margin-top: 4px !important;
+  }
+
+  .week-controls-main {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 5px !important;
+    padding: 1px 0 3px !important;
+  }
+
+  .week-control-button,
+  .week-control-input,
+  .week-occupied-switch {
+    min-height: 30px !important;
+    font-size: 11px !important;
+  }
+
+  .week-control-button {
+    width: 30px !important;
+  }
+
+  .week-control-input {
+    max-width: 116px;
+    padding: 5px 7px;
+  }
+
+  .week-occupied-switch {
+    padding: 0 8px;
   }
 
   .login-page {
@@ -1880,43 +2383,37 @@ code {
 
   .agenda-shell {
     max-height: none !important;
-    margin-top: 20px !important;
-    padding: 10px !important;
+    margin-top: 4px !important;
+    padding: 7px !important;
     overflow-x: hidden !important;
     overflow-y: visible !important;
-    border-radius: 12px !important;
-  }
-
-  .agenda-filter-toggle {
-    width: 100%;
-    justify-content: center;
-    margin: 0 0 10px;
-    min-height: 44px;
-    box-sizing: border-box;
+    border-radius: 14px !important;
+    background: white !important;
   }
 
   .agenda-mobile-day-selector {
     display: flex !important;
-    gap: 8px !important;
-    margin: 0 -2px 12px !important;
-    padding: 2px 2px 8px !important;
+    gap: 5px !important;
+    margin: 0 -1px 5px !important;
+    padding: 1px 1px 4px !important;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
   }
 
   .agenda-mobile-day-button {
-    flex: 0 0 74px;
-    min-height: 50px !important;
-    padding: 7px 6px !important;
-    font-size: 12px !important;
-    line-height: 15px !important;
+    flex: 0 0 51px;
+    min-height: 42px !important;
+    padding: 5px !important;
+    font-size: 11px !important;
+    line-height: 13px !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   }
 
   .agenda-mobile .dia-cabecalho {
     display: grid;
     gap: 1px;
-    padding: 7px 10px !important;
+    padding: 6px 10px !important;
     border-radius: 10px !important;
     top: 6px !important;
     font-size: 13px !important;
@@ -1932,7 +2429,7 @@ code {
     margin-top: 0 !important;
     font-size: 11px !important;
     line-height: 14px !important;
-    color: #cbd5e1;
+    color: #64748b;
   }
 
   .agenda-mobile .dia-cabecalho-resumo {
@@ -1948,27 +2445,29 @@ code {
   }
 
   .agenda-mobile-horarios {
-    gap: 12px !important;
-    margin-top: 12px !important;
+    gap: 7px !important;
+    margin-top: 6px !important;
   }
 
   .agenda-mobile .horario-card {
     transform: none !important;
-    padding: 12px !important;
+    padding: 10px !important;
     border-radius: 14px !important;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14) !important;
   }
 
   .agenda-mobile .horario-card:not(.is-expanded) {
-    padding: 8px 10px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 4px 10px !important;
     box-shadow: 0 2px 7px rgba(15, 23, 42, 0.06) !important;
   }
 
   .agenda-mobile .horario-card-time {
-    gap: 5px !important;
+    gap: 1px !important;
     margin-bottom: 0 !important;
-    font-size: 13px !important;
-    line-height: 18px !important;
+    font-size: 12px !important;
+    line-height: 14px !important;
   }
 
   .agenda-mobile .horario-card.is-expanded .horario-card-time {
@@ -2138,25 +2637,26 @@ code {
   .mobile-navigation {
     position: static;
     z-index: 9000;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
     gap: 6px;
     width: 100%;
-    margin: 18px 0 4px;
-    padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 18px;
-    background: rgba(15, 23, 42, 0.96);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    margin: 7px 0 4px;
+    padding: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 14px;
+    background: white;
+    box-shadow: none;
     box-sizing: border-box;
   }
 
   .mobile-navigation-item {
-    min-height: 44px;
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 0 9px;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     background: transparent;
-    color: #cbd5e1;
+    color: #475569;
     font-size: 11px;
     font-weight: 800;
     cursor: pointer;
@@ -2406,5 +2906,217 @@ code {
   .mobile-navigation-item.is-active {
     background: #22c55e;
     color: #052e16;
+  }
+}
+
+/* Final overrides for drawer navigation after legacy mobile rules */
+.main-menu-layer .mobile-navigation {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  z-index: 1001 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-content: start !important;
+  width: min(292px, 86vw) !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  border: none !important;
+  border-radius: 0 22px 22px 0 !important;
+  background: white !important;
+  box-shadow: 22px 0 60px rgba(15, 23, 42, 0.2) !important;
+}
+
+.main-menu-layer .mobile-navigation-item {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  color: #334155 !important;
+  text-align: left !important;
+}
+
+.main-menu-layer .mobile-navigation-item.is-active {
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+/* Fifth visual refinement */
+.main-menu-trigger {
+  top: 12px !important;
+  left: 14px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #f8fafc !important;
+  font-size: 20px !important;
+  box-shadow: none !important;
+}
+
+.app-header {
+  align-items: center !important;
+  min-height: 54px;
+  margin-bottom: 6px !important;
+  padding-top: 12px !important;
+  padding-bottom: 10px !important;
+}
+
+.app-brand-block {
+  gap: 0 !important;
+}
+
+.app-brand {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.38em !important;
+  line-height: 20px !important;
+}
+
+.app-title {
+  display: none !important;
+}
+
+.app-account-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  font-size: 16px !important;
+}
+
+.app-account-menu button:disabled {
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+}
+
+.week-controls {
+  margin-top: 4px !important;
+}
+
+.week-controls-main {
+  gap: 5px !important;
+  padding: 0 0 5px !important;
+}
+
+.week-control-button {
+  width: 32px !important;
+  min-height: 32px !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.week-month-pill {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: white;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.week-month-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.week-occupied-switch {
+  min-height: 32px !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.agenda-mobile-day-button {
+  border-color: transparent !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+}
+
+.agenda-mobile-day-button.is-selected {
+  background: #ecfdf5 !important;
+  color: #14532d !important;
+}
+
+.horario-card:not(.is-expanded) {
+  height: 42px !important;
+  min-height: 42px !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035) !important;
+}
+
+.horario-card-hour {
+  font-size: 16px !important;
+  line-height: 18px !important;
+  font-weight: 950 !important;
+}
+
+.horario-card:not(.is-expanded) strong {
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  line-height: 12px !important;
+}
+
+.horario-status-pill {
+  max-width: 104px !important;
+  min-height: 14px !important;
+  padding: 0 5px !important;
+  background: rgba(15, 23, 42, 0.045) !important;
+  color: #334155 !important;
+  font-size: 8.5px !important;
+  line-height: 14px !important;
+}
+
+@media (max-width: 640px) {
+  .main-menu-trigger {
+    top: 8px !important;
+    left: 9px !important;
+  }
+
+  .app-header {
+    min-height: 48px;
+    margin-bottom: 5px !important;
+    padding-left: 50px !important;
+  }
+
+  .app-brand {
+    font-size: 16px !important;
+    letter-spacing: 0.34em !important;
+  }
+
+  .app-account-button {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px !important;
+  }
+
+  .week-month-pill {
+    max-width: 145px;
+    padding: 0 10px;
+    font-size: 11px;
   }
 }

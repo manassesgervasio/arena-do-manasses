@@ -1,79 +1,70 @@
 export default function WeekControls({
-  dataBase,
   mesFiltro,
-  formatarData,
-  onSemanaAnterior,
-  onDataChange,
   onMesFiltroChange,
+  onSemanaAnterior,
   onSemanaProxima,
-  onCopiarFixos,
+  mostrarApenasOcupados,
+  onMostrarApenasOcupadosChange,
 }) {
+  const mesLegivel = formatarMesLegivel(mesFiltro);
+
   return (
-    <div
-      className="week-controls"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "8px",
-        marginTop: "25px",
-        flexWrap: "wrap",
-        padding: "0 10px",
-      }}
-    >
-      <button
-        className="week-control-button"
-        onClick={onSemanaAnterior}
-        style={botao}
-      >
-        ← Semana anterior
-      </button>
+    <section className="week-controls">
+      <div className="week-controls-main">
+        <button
+          className="week-control-button"
+          type="button"
+          onClick={onSemanaAnterior}
+          aria-label="Semana anterior"
+        >
+          &lt;
+        </button>
 
-      <input
-        className="week-control-input"
-        type="date"
-        value={formatarData(dataBase)}
-        onChange={onDataChange}
-        style={inputData}
-      />
-      <input
-        className="week-control-input"
-        type="month"
-        value={mesFiltro}
-        onChange={onMesFiltroChange}
-        style={{
-          padding: "10px",
-          borderRadius: "10px",
-          border: "none",
-          fontWeight: "bold",
-          marginTop: "10px",
-        }}
-      />
+        <label className="week-month-pill">
+          <span aria-hidden="true">{"\u{1F4C5}"}</span>
+          <span>{mesLegivel}</span>
+          <input
+            className="week-month-native"
+            type="month"
+            value={mesFiltro}
+            onChange={onMesFiltroChange}
+            aria-label="Selecionar mes"
+          />
+        </label>
 
-      <button
-        className="week-control-button"
-        onClick={onSemanaProxima}
-        style={botao}
-      >
-        Próxima semana →
-      </button>
-    </div>
+        <button
+          className="week-control-button"
+          type="button"
+          onClick={onSemanaProxima}
+          aria-label="Proxima semana"
+        >
+          &gt;
+        </button>
+
+        <label className="week-occupied-switch">
+          <input
+            type="checkbox"
+            checked={mostrarApenasOcupados}
+            onChange={(event) =>
+              onMostrarApenasOcupadosChange(event.target.checked)
+            }
+          />
+          <span>Ocupados</span>
+        </label>
+      </div>
+    </section>
   );
 }
 
-const botao = {
-  background: "#22c55e",
-  color: "white",
-  border: "none",
-  padding: "10px 14px",
-  borderRadius: "12px",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "14px",
-};
+function formatarMesLegivel(mesFiltro) {
+  if (!mesFiltro) return "Mes atual";
 
-const inputData = {
-  padding: "12px",
-  borderRadius: "12px",
-  border: "none",
-  fontWeight: "bold",
-};
+  const [ano, mes] = mesFiltro.split("-").map(Number);
+  const data = new Date(ano, mes - 1, 1);
+  const texto = data.toLocaleDateString("pt-BR", {
+    month: "long",
+    year: "numeric",
+  });
+
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}

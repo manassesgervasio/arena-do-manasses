@@ -18,10 +18,10 @@ export default function AgendaGrid({
   alugarMensalistaComoAvulso,
   limparReserva,
   podeLimparHorarioPago,
+  mostrarApenasOcupados,
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
-  const [mostrarApenasOcupados, setMostrarApenasOcupados] = useState(false);
   const diaMobile = dias[diaMobileIndex] || dias[0];
 
   function alternarHorarioAberto(dataTexto, hora) {
@@ -180,15 +180,6 @@ const jogosDia = horarios.filter((horaAtual) => {
         padding: "12px",
       }}
     >
-      <label className="agenda-filter-toggle">
-        <input
-          type="checkbox"
-          checked={mostrarApenasOcupados}
-          onChange={(event) => setMostrarApenasOcupados(event.target.checked)}
-        />
-        <span>Mostrar apenas horários ocupados</span>
-      </label>
-
       <div
         className="agenda-desktop"
         style={{
@@ -223,7 +214,9 @@ const jogosDia = horarios.filter((horaAtual) => {
 
             return (
               <button
-                className="agenda-mobile-day-button"
+                className={`agenda-mobile-day-button${
+                  index === diaMobileIndex ? " is-selected" : ""
+                }`}
                 key={textoData}
                 type="button"
                 onClick={() => setDiaMobileIndex(index)}
@@ -231,10 +224,10 @@ const jogosDia = horarios.filter((horaAtual) => {
                   minHeight: "44px",
                   border:
                     index === diaMobileIndex
-                      ? "2px solid #22c55e"
-                      : "1px solid #cbd5e1",
-                  borderRadius: "10px",
-                  background: index === diaMobileIndex ? "#dcfce7" : "white",
+                      ? "1px solid #bbf7d0"
+                      : "1px solid transparent",
+                  borderRadius: "12px",
+                  background: index === diaMobileIndex ? "#ecfdf5" : "#f8fafc",
                   color: "#0f172a",
                   fontWeight: "bold",
                   fontSize: "12px",

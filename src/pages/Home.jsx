@@ -60,6 +60,7 @@ export default function Home({
     useState(false);
   const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
   const [mostrarUsuariosArena, setMostrarUsuariosArena] = useState(false);
+  const [mostrarApenasOcupados, setMostrarApenasOcupados] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
   );
@@ -80,6 +81,28 @@ export default function Home({
     if (item.id === "mensalistas") return permissoesArena.mensalistas;
     return true;
   });
+  const menuExtraItems = [
+    permissoesArena.usuarios
+      ? {
+          id: "usuarios",
+          label: "Usuários",
+          onClick: () => {
+            setMostrarPainelSaaS(false);
+            setMostrarUsuariosArena(true);
+          },
+        }
+      : null,
+    {
+      id: "configuracoes",
+      label: "Configurações",
+      disabled: true,
+    },
+    {
+      id: "sair",
+      label: "Sair",
+      onClick: onSair,
+    },
+  ].filter(Boolean);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 640px)");
@@ -122,16 +145,12 @@ export default function Home({
   function renderWeekControls() {
     return (
       <WeekControls
-        dataBase={dataBase}
         mesFiltro={mesFiltro}
-        formatarData={formatarData}
         onSemanaAnterior={() => mudarSemana(-1)}
-        onDataChange={(e) =>
-          alterarData(e.target.value)
-        }
         onMesFiltroChange={(e) => setMesFiltro(e.target.value)}
         onSemanaProxima={() => mudarSemana(1)}
-        onCopiarFixos={copiarFixosProximaSemana}
+        mostrarApenasOcupados={mostrarApenasOcupados}
+        onMostrarApenasOcupadosChange={setMostrarApenasOcupados}
       />
     );
   }
@@ -153,6 +172,7 @@ export default function Home({
         reservarHorario={reservarHorario}
         alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
         limparReserva={limparReserva}
+        mostrarApenasOcupados={mostrarApenasOcupados}
         podeLimparHorarioPago={canLimparHorarioPago(
           usuarioAtual,
           perfilAtual,
@@ -198,20 +218,6 @@ export default function Home({
 
         <ResumoCards resumo={resumo} moeda={moeda} />
 
-        {!isMobile && (
-          <div className="financeiro-profissional-access">
-            <button
-              type="button"
-              onClick={() =>
-                setMostrarFinanceiroProfissional((mostrar) => !mostrar)
-              }
-            >
-              {mostrarFinanceiroProfissional
-                ? "Ocultar Financeiro Profissional"
-                : "Abrir Financeiro Profissional"}
-            </button>
-          </div>
-        )}
       </section>
     );
   }
@@ -287,14 +293,52 @@ export default function Home({
     );
   }
 
+  function renderDesktopContent() {
+    if (mostrarPainelSaaS) {
+      return permissoesArena.painelSaaS ? (
+        <PainelCentralSaaS
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarPainelSaaS(false)}
+        />
+      ) : (
+        <AccessDenied />
+      );
+    }
+
+    if (mostrarUsuariosArena) {
+      return permissoesArena.usuarios ? (
+        <UsuariosArena
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarUsuariosArena(false)}
+        />
+      ) : (
+        <AccessDenied />
+      );
+    }
+
+    if (activeMobileTab === "clientes") return renderClientes();
+    if (activeMobileTab === "financeiro") return renderFinanceiro();
+    if (activeMobileTab === "financeiro-profissional") {
+      return renderFinanceiroProfissional();
+    }
+    if (activeMobileTab === "mensalistas") return renderMensalistas();
+
+    return (
+      <>
+        {renderWeekControls()}
+        {renderAgenda()}
+      </>
+    );
+  }
+
   return (
   <>
     <div
       className="home-page"
       style={{
         minHeight: "100vh",
-        background: "#0f172a",
-        color: "white",
+        background: "#f8fafc",
+        color: "#0f172a",
         padding: "25px",
         fontFamily: "Arial",
       }}
@@ -317,49 +361,21 @@ export default function Home({
         }}
         onSair={onSair}
       />
-      {isMobile && (
-        <MobileNavigation
-          activeTab={activeMobileTab}
-          items={mobileNavigationItems}
-          onTabChange={(tab) => {
-            setMostrarPainelSaaS(false);
-            setMostrarUsuariosArena(false);
-            setActiveMobileTab(tab);
-          }}
-        />
-      )}
+      <MobileNavigation
+        activeTab={activeMobileTab}
+        items={mobileNavigationItems}
+        extraItems={menuExtraItems}
+        onTabChange={(tab) => {
+          setMostrarPainelSaaS(false);
+          setMostrarUsuariosArena(false);
+          setActiveMobileTab(tab);
+        }}
+      />
 
       {isMobile ? (
         renderMobileContent()
-      ) : mostrarPainelSaaS ? (
-        permissoesArena.painelSaaS ? (
-        <PainelCentralSaaS
-          contextoArena={contextoArena}
-          onVoltar={() => setMostrarPainelSaaS(false)}
-        />
-        ) : (
-          <AccessDenied />
-        )
-      ) : mostrarUsuariosArena ? (
-        permissoesArena.usuarios ? (
-        <UsuariosArena
-          contextoArena={contextoArena}
-          onVoltar={() => setMostrarUsuariosArena(false)}
-        />
-        ) : (
-          <AccessDenied />
-        )
       ) : (
-        <>
-          {renderWeekControls()}
-          {permissoesArena.financeiro && renderFinanceiro()}
-          {permissoesArena.financeiro &&
-            mostrarFinanceiroProfissional &&
-            renderFinanceiroProfissional()}
-          {renderAgenda()}
-          {permissoesArena.mensalistas && renderMensalistas()}
-          {permissoesArena.clientes && renderClientes()}
-        </>
+        renderDesktopContent()
       )}
 </div>
 </>

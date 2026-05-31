@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   canAccessPainelSaaS,
   canAccessUsuariosArena,
@@ -11,6 +12,7 @@ export default function AppHeader({
   onAbrirUsuariosArena,
   onSair,
 }) {
+  const [menuAberto, setMenuAberto] = useState(false);
   const {
     arenaAtual,
     usuarioAtual,
@@ -25,84 +27,78 @@ export default function AppHeader({
   );
 
   return (
-    <>
-      <h1
-       className="app-title"
-       style={{
-    textAlign: "center",
-    fontSize: "46px",
-    color: "#ffffff",
-    fontWeight: "900",
-    letterSpacing: "1px",
-    textShadow: "0 0 18px rgba(34, 197, 94, 0.75)",
-    marginBottom: "8px",
-        }}
-      >
-        Arena do Manassés ⚽
-      </h1>
-
-      <p
-        className="app-subtitle"
-        style={{
-          textAlign: "center",
-          fontSize: "18px",
-        }}
-      >
-        Agenda por datas reais
-      </p>
-
-      <div className="arena-context">
-        {carregandoContexto ? (
-          <span>Carregando arena...</span>
-        ) : erroContexto ? (
-          <span>{erroContexto}</span>
-        ) : arenaAtual && perfilAtual ? (
-          <>
-            <span>
-              Arena: <strong>{arenaAtual.nome}</strong>
-            </span>
-            <span>
-              Perfil: <strong>{perfilAtual}</strong>
-            </span>
-          </>
-        ) : null}
+    <header className="app-header">
+      <div className="app-brand-block">
+        <div className="app-brand">ARENA</div>
       </div>
 
-      {(usuarioAtual || (perfilLogado && permissoesLogado)) && (
-        <div className="logged-profile" aria-label="Perfil logado">
-          {usuarioAtual?.nome && (
-            <span>
-              Usuario: <strong>{usuarioAtual.nome}</strong>
-            </span>
-          )}
-          {perfilAtual && (
-            <span>
-              Perfil: <strong>{perfilAtual}</strong>
-            </span>
-          )}
-          {podeAcessarPainelSaaS && (
+      <div className="app-account">
+        <button
+          type="button"
+          className="app-account-button"
+          onClick={() => setMenuAberto((aberto) => !aberto)}
+          aria-expanded={menuAberto}
+          aria-label="Abrir painel da conta"
+        >
+          <span aria-hidden="true">{"\u2699"}</span>
+        </button>
+
+        {menuAberto && (
+          <div className="app-account-layer">
             <button
               type="button"
-              className="logged-profile-secondary"
-              onClick={onAbrirPainelSaaS}
-            >
-              Painel SaaS
+              className="app-account-backdrop"
+              onClick={() => setMenuAberto(false)}
+              aria-label="Fechar conta"
+            />
+
+          <aside className="app-account-menu">
+            <div className="app-account-panel-header">
+              <span>Perfil</span>
+              <button type="button" onClick={() => setMenuAberto(false)}>
+                ×
+              </button>
+            </div>
+
+            <div className="app-account-info">
+              {carregandoContexto ? (
+                <span>Carregando arena...</span>
+              ) : erroContexto ? (
+                <span>{erroContexto}</span>
+              ) : (
+                <>
+                  {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
+                  {usuarioAtual?.nome && <span>Usuário: {usuarioAtual.nome}</span>}
+                  {perfilAtual && <span>Perfil: {perfilAtual}</span>}
+                  {!usuarioAtual && perfilLogado && (
+                    <span>Perfil: {perfilLogado}</span>
+                  )}
+                </>
+              )}
+            </div>
+
+            {podeAcessarPainelSaaS && (
+              <button type="button" onClick={onAbrirPainelSaaS}>
+                Painel SaaS
+              </button>
+            )}
+            {podeAcessarUsuariosArena && (
+              <button type="button" onClick={onAbrirUsuariosArena}>
+                Usuários
+              </button>
+            )}
+            <button type="button" disabled>
+              Configurações
             </button>
-          )}
-          {podeAcessarUsuariosArena && (
-            <button
-              type="button"
-              className="logged-profile-secondary"
-              onClick={onAbrirUsuariosArena}
-            >
-              Usuarios
-            </button>
-          )}
-          <button type="button" onClick={onSair}>
-            Sair
-          </button>
-        </div>
-      )}
-    </>
+            {(usuarioAtual || (perfilLogado && permissoesLogado)) && (
+              <button type="button" className="app-account-danger" onClick={onSair}>
+                Sair
+              </button>
+            )}
+          </aside>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
