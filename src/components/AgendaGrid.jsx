@@ -21,6 +21,7 @@ export default function AgendaGrid({
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
+  const [mostrarApenasOcupados, setMostrarApenasOcupados] = useState(false);
   const diaMobile = dias[diaMobileIndex] || dias[0];
 
   function alternarHorarioAberto(dataTexto, hora) {
@@ -85,6 +86,9 @@ const jogosDia = horarios.filter((horaAtual) => {
     const mensalistaContratado = temReservaReal
       ? null
       : horariosMensalistas[`${data.getDay()}_${hora}`] || null;
+    const horarioOcupado = temReservaReal || Boolean(mensalistaContratado);
+
+    if (mostrarApenasOcupados && !horarioOcupado) return null;
 
     return (
       <HorarioCard
@@ -95,6 +99,7 @@ const jogosDia = horarios.filter((horaAtual) => {
         tipoLista={tipoLista}
         statusLista={statusLista}
         expandido={horarioAbertoPorDia[dataTexto] === hora}
+        compactoLivre={!horarioOcupado}
         onToggleExpandido={() => alternarHorarioAberto(dataTexto, hora)}
         onClienteChange={(e) =>
           atualizarReserva(
@@ -175,6 +180,15 @@ const jogosDia = horarios.filter((horaAtual) => {
         padding: "12px",
       }}
     >
+      <label className="agenda-filter-toggle">
+        <input
+          type="checkbox"
+          checked={mostrarApenasOcupados}
+          onChange={(event) => setMostrarApenasOcupados(event.target.checked)}
+        />
+        <span>Mostrar apenas horários ocupados</span>
+      </label>
+
       <div
         className="agenda-desktop"
         style={{
