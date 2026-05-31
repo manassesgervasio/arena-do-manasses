@@ -426,6 +426,78 @@
   }
 }
 
+/* Week navigation refinement */
+.week-controls-main {
+  justify-content: center !important;
+}
+
+.agenda-mobile-week-nav {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+
+.agenda-week-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: white;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 950;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+}
+
+.agenda-mobile-week-nav .agenda-mobile-day-selector {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(38px, 1fr)) !important;
+  justify-content: center;
+  gap: 3px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.agenda-mobile-week-nav .agenda-mobile-day-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.agenda-mobile-week-nav .agenda-mobile-day-button {
+  min-width: 38px;
+}
+
+@media (max-width: 420px) {
+  .agenda-mobile-week-nav {
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+    gap: 4px;
+  }
+
+  .agenda-week-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .agenda-mobile-week-nav .agenda-mobile-day-selector {
+    grid-template-columns: repeat(7, minmax(34px, 1fr)) !important;
+    gap: 2px !important;
+  }
+
+  .agenda-mobile-week-nav .agenda-mobile-day-button {
+    min-width: 34px;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;

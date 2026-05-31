@@ -146,9 +146,7 @@ export default function Home({
     return (
       <WeekControls
         mesFiltro={mesFiltro}
-        onSemanaAnterior={() => mudarSemana(-1)}
         onMesFiltroChange={(e) => setMesFiltro(e.target.value)}
-        onSemanaProxima={() => mudarSemana(1)}
         mostrarApenasOcupados={mostrarApenasOcupados}
         onMostrarApenasOcupadosChange={setMostrarApenasOcupados}
       />
@@ -173,6 +171,8 @@ export default function Home({
         alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
         limparReserva={limparReserva}
         mostrarApenasOcupados={mostrarApenasOcupados}
+        onSemanaAnterior={() => mudarSemana(-1)}
+        onSemanaProxima={() => mudarSemana(1)}
         podeLimparHorarioPago={canLimparHorarioPago(
           usuarioAtual,
           perfilAtual,

@@ -19,6 +19,8 @@ export default function AgendaGrid({
   limparReserva,
   podeLimparHorarioPago,
   mostrarApenasOcupados,
+  onSemanaAnterior,
+  onSemanaProxima,
 }) {
   const [diaMobileIndex, setDiaMobileIndex] = useState(0);
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
@@ -200,47 +202,68 @@ const jogosDia = horarios.filter((horaAtual) => {
       </div>
 
       <div className="agenda-mobile">
-        <div
-          className="agenda-mobile-day-selector"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(7, minmax(42px, 1fr))",
-            gap: "6px",
-            marginBottom: "12px",
-          }}
-        >
-          {dias.map((data, index) => {
-            const textoData = formatarData(data);
+        <div className="agenda-mobile-week-nav">
+          <button
+            className="agenda-week-arrow"
+            type="button"
+            onClick={onSemanaAnterior}
+            aria-label="Semana anterior"
+          >
+            ◀
+          </button>
 
-            return (
-              <button
-                className={`agenda-mobile-day-button${
-                  index === diaMobileIndex ? " is-selected" : ""
-                }`}
-                key={textoData}
-                type="button"
-                onClick={() => setDiaMobileIndex(index)}
-                style={{
-                  minHeight: "44px",
-                  border:
-                    index === diaMobileIndex
-                      ? "1px solid #bbf7d0"
-                      : "1px solid transparent",
-                  borderRadius: "12px",
-                  background: index === diaMobileIndex ? "#ecfdf5" : "#f8fafc",
-                  color: "#0f172a",
-                  fontWeight: "bold",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                }}
-              >
-                <div>{diasSemana[data.getDay()]}</div>
-                <div style={{ fontSize: "11px" }}>
-                  {textoData.split("-")[2]}
-                </div>
-              </button>
-            );
-          })}
+          <div
+            className="agenda-mobile-day-selector"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(7, minmax(42px, 1fr))",
+              gap: "6px",
+              marginBottom: "12px",
+            }}
+          >
+            {dias.map((data, index) => {
+              const textoData = formatarData(data);
+
+              return (
+                <button
+                  className={`agenda-mobile-day-button${
+                    index === diaMobileIndex ? " is-selected" : ""
+                  }`}
+                  key={textoData}
+                  type="button"
+                  onClick={() => setDiaMobileIndex(index)}
+                  style={{
+                    minHeight: "44px",
+                    border:
+                      index === diaMobileIndex
+                        ? "1px solid #bbf7d0"
+                        : "1px solid transparent",
+                    borderRadius: "12px",
+                    background:
+                      index === diaMobileIndex ? "#ecfdf5" : "#f8fafc",
+                    color: "#0f172a",
+                    fontWeight: "bold",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div>{diasSemana[data.getDay()]}</div>
+                  <div style={{ fontSize: "11px" }}>
+                    {textoData.split("-")[2]}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            className="agenda-week-arrow"
+            type="button"
+            onClick={onSemanaProxima}
+            aria-label="Proxima semana"
+          >
+            ▶
+          </button>
         </div>
 
         {diaMobile && (

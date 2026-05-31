@@ -1,8 +1,6 @@
 export default function WeekControls({
   mesFiltro,
   onMesFiltroChange,
-  onSemanaAnterior,
-  onSemanaProxima,
   mostrarApenasOcupados,
   onMostrarApenasOcupadosChange,
 }) {
@@ -11,15 +9,6 @@ export default function WeekControls({
   return (
     <section className="week-controls">
       <div className="week-controls-main">
-        <button
-          className="week-control-button"
-          type="button"
-          onClick={onSemanaAnterior}
-          aria-label="Semana anterior"
-        >
-          &lt;
-        </button>
-
         <label className="week-month-pill">
           <span aria-hidden="true">{"\u{1F4C5}"}</span>
           <span>{mesLegivel}</span>
@@ -31,15 +20,6 @@ export default function WeekControls({
             aria-label="Selecionar mes"
           />
         </label>
-
-        <button
-          className="week-control-button"
-          type="button"
-          onClick={onSemanaProxima}
-          aria-label="Proxima semana"
-        >
-          &gt;
-        </button>
 
         <label className="week-occupied-switch">
           <input
