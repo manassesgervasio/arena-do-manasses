@@ -1034,34 +1034,76 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       )}
 
       {arenaEdicaoWhatsapp && (
-        <form className="painel-saas-form" onSubmit={salvarWhatsappArena}>
-          <div className="painel-saas-form-header">
-            <h3>Editar WhatsApp da arena</h3>
-            <button type="button" onClick={fecharEdicaoWhatsapp}>
-              Cancelar
-            </button>
-          </div>
+        <div
+          className="painel-saas-modal-backdrop"
+          style={{
+            alignItems: "center",
+            background: "rgba(15, 23, 42, 0.42)",
+            display: "flex",
+            inset: 0,
+            justifyContent: "center",
+            padding: "18px",
+            position: "fixed",
+            zIndex: 50,
+          }}
+        >
+          <form
+            className="painel-saas-form"
+            onSubmit={salvarWhatsappArena}
+            style={{
+              background: "#ffffff",
+              boxShadow: "0 24px 60px rgba(15, 23, 42, 0.22)",
+              margin: 0,
+              maxWidth: "460px",
+              width: "100%",
+            }}
+          >
+            <div className="painel-saas-form-header">
+              <h3>Editar WhatsApp da arena</h3>
+              <button type="button" onClick={fecharEdicaoWhatsapp}>
+                Cancelar
+              </button>
+            </div>
 
-          <div className="painel-saas-form-context">
-            Arena: <strong>{arenaEdicaoWhatsapp.nome}</strong>
-          </div>
+            <div className="painel-saas-form-context">
+              Arena: <strong>{arenaEdicaoWhatsapp.nome}</strong>
+            </div>
 
-          {erroWhatsapp && <div className="painel-saas-error">{erroWhatsapp}</div>}
+            {erroWhatsapp && (
+              <div className="painel-saas-error">{erroWhatsapp}</div>
+            )}
 
-          <label>
-            <span>WhatsApp da Arena</span>
-            <input
-              type="text"
-              value={whatsappEdicao}
-              onChange={(event) => setWhatsappEdicao(event.target.value)}
-              placeholder="5598999999999"
-            />
-          </label>
+            <label>
+              <span>WhatsApp da arena</span>
+              <input
+                type="text"
+                value={whatsappEdicao}
+                onChange={(event) => setWhatsappEdicao(event.target.value)}
+                placeholder="5598999999999"
+                autoFocus
+              />
+            </label>
 
-          <button type="submit" disabled={salvandoWhatsapp}>
-            {salvandoWhatsapp ? "Salvando..." : "Salvar WhatsApp"}
-          </button>
-        </form>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                type="button"
+                onClick={fecharEdicaoWhatsapp}
+                disabled={salvandoWhatsapp}
+              >
+                Cancelar
+              </button>
+              <button type="submit" disabled={salvandoWhatsapp}>
+                {salvandoWhatsapp ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       <div className="painel-saas-summary">
