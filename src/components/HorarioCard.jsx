@@ -99,10 +99,6 @@ export default function HorarioCard({
     }
 
     setEnviandoSolicitacaoPublica(true);
-    const janelaWhatsApp = window.open("", "_blank");
-    if (janelaWhatsApp) {
-      janelaWhatsApp.opener = null;
-    }
 
     const resultado = await onSolicitarReservaPublica?.({
       nome,
@@ -112,7 +108,6 @@ export default function HorarioCard({
     setEnviandoSolicitacaoPublica(false);
 
     if (!resultado?.ok) {
-      janelaWhatsApp?.close();
       alert(
         resultado?.mensagem ||
           "Nao foi possivel enviar a solicitacao. Tente novamente."
@@ -128,9 +123,7 @@ export default function HorarioCard({
 
     alert(resultado.mensagem);
 
-    if (resultado.whatsappUrl && janelaWhatsApp) {
-      janelaWhatsApp.location.href = resultado.whatsappUrl;
-    } else if (resultado.whatsappUrl) {
+    if (resultado.whatsappUrl) {
       window.open(resultado.whatsappUrl, "_blank", "noopener,noreferrer");
     }
   }

@@ -8,7 +8,6 @@ import Login from "./components/Login";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
-import { FALLBACK_WHATSAPP_ARENA } from "./config/arenaConfig";
 
 const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
@@ -457,6 +456,15 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     };
   }
 
+  const telefoneArenaNormalizado = obterWhatsappArena(contextoArena.arenaAtual);
+
+  if (!telefoneArenaNormalizado) {
+    return {
+      ok: false,
+      mensagem: "WhatsApp da arena não configurado. Fale com o administrador.",
+    };
+  }
+
   const reservaPublica = {
     cliente: nome,
     telefone,
@@ -509,7 +517,7 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
       telefone,
       dataFormatada: formatarDataBR(dataTexto),
       horario,
-      whatsappArena: obterWhatsappArena(contextoArena.arenaAtual),
+      whatsappArena: telefoneArenaNormalizado,
     }),
   };
 }
@@ -1115,24 +1123,33 @@ function criarLinkWhatsAppSolicitacao({
     "",
     "Por favor, confirme a disponibilidade.",
   ].join("\n");
-
-  return `https://wa.me/${whatsappArena}?text=${encodeURIComponent(
+  const url = `https://wa.me/${whatsappArena}?text=${encodeURIComponent(
     mensagem
   )}`;
+
+  console.log("URL WhatsApp arena:", url);
+
+  return url;
 }
 
 function obterWhatsappArena(arenaAtual) {
-  const whatsapp = formatarTelefoneWhatsApp(
-    arenaAtual?.whatsapp || arenaAtual?.telefone
-  );
+  const telefoneBruto = arenaAtual?.whatsapp || arenaAtual?.telefone || "";
+  const whatsapp = formatarTelefoneWhatsApp(telefoneBruto);
 
-  return whatsapp || FALLBACK_WHATSAPP_ARENA;
+  console.log("WhatsApp arena bruto:", telefoneBruto);
+  console.log("WhatsApp arena normalizado:", whatsapp);
+
+  if (!whatsapp) {
+    console.warn("WhatsApp da arena inválido ou vazio:", telefoneBruto);
+  }
+
+  return whatsapp;
 }
 
 function formatarTelefoneWhatsApp(telefone) {
   const digitos = String(telefone || "").replace(/\D/g, "");
 
-  if (!digitos) return "";
+  if (digitos.length < 10) return "";
   if (digitos.startsWith("55")) return digitos;
 
   return `55${digitos}`;
