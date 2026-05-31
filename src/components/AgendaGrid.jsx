@@ -22,7 +22,9 @@ export default function AgendaGrid({
   onSemanaAnterior,
   onSemanaProxima,
 }) {
-  const [diaMobileIndex, setDiaMobileIndex] = useState(0);
+  const [diaMobileIndex, setDiaMobileIndex] = useState(() =>
+    obterIndiceDoDiaAtual(dias)
+  );
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
   const diaMobile = dias[diaMobileIndex] || dias[0];
 
@@ -285,4 +287,22 @@ const jogosDia = horarios.filter((horaAtual) => {
       </div>
     </div>
   );
+}
+
+function obterIndiceDoDiaAtual(dias) {
+  const hoje = new Date();
+  const hojeTexto = formatarDataLocal(hoje);
+  const indiceHoje = dias.findIndex(
+    (data) => formatarDataLocal(data) === hojeTexto
+  );
+
+  return indiceHoje >= 0 ? indiceHoje : 0;
+}
+
+function formatarDataLocal(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
+
+  return `${ano}-${mes}-${dia}`;
 }
