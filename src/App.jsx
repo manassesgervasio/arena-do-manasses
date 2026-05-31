@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
-import { WHATSAPP_ARENA } from "./config/arenaConfig";
+import { FALLBACK_WHATSAPP_ARENA } from "./config/arenaConfig";
 
 const PERFIL_PADRAO = "Funcionario";
 const PERFIS_PERMISSOES = {
@@ -509,6 +509,7 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
       telefone,
       dataFormatada: formatarDataBR(dataTexto),
       horario,
+      whatsappArena: obterWhatsappArena(contextoArena.arenaAtual),
     }),
   };
 }
@@ -1101,6 +1102,7 @@ function criarLinkWhatsAppSolicitacao({
   telefone,
   dataFormatada,
   horario,
+  whatsappArena,
 }) {
   const mensagem = [
     "Olá! Nova solicitação de reserva pela agenda online.",
@@ -1114,7 +1116,24 @@ function criarLinkWhatsAppSolicitacao({
     "Por favor, confirme a disponibilidade.",
   ].join("\n");
 
-  return `https://wa.me/${WHATSAPP_ARENA}?text=${encodeURIComponent(
+  return `https://wa.me/${whatsappArena}?text=${encodeURIComponent(
     mensagem
   )}`;
+}
+
+function obterWhatsappArena(arenaAtual) {
+  const whatsapp = formatarTelefoneWhatsApp(
+    arenaAtual?.whatsapp || arenaAtual?.telefone
+  );
+
+  return whatsapp || FALLBACK_WHATSAPP_ARENA;
+}
+
+function formatarTelefoneWhatsApp(telefone) {
+  const digitos = String(telefone || "").replace(/\D/g, "");
+
+  if (!digitos) return "";
+  if (digitos.startsWith("55")) return digitos;
+
+  return `55${digitos}`;
 }

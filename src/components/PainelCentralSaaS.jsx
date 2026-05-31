@@ -750,7 +750,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
           </label>
 
           <label>
-            <span>Telefone</span>
+            <span>WhatsApp da arena</span>
             <input
               type="text"
               value={formulario.telefone}
@@ -1040,6 +1040,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
               <tr>
                 <th>Nome da arena</th>
                 <th>Slug</th>
+                <th>WhatsApp</th>
                 <th>Cidade/Estado</th>
                 <th>Plano</th>
                 <th>Status</th>
@@ -1060,6 +1061,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                     <strong>{arena.nome}</strong>
                   </td>
                   <td>{arena.slug}</td>
+                  <td>{arena.telefone || "-"}</td>
                   <td>
                     {[arena.cidade, arena.estado].filter(Boolean).join("/") || "-"}
                   </td>

@@ -22,7 +22,7 @@ export function useArenaAtual(session) {
 
         const { data: arenaPublica, error: arenaPublicaError } = await supabase
           .from("arenas")
-          .select("id,nome,slug,ativa")
+          .select("id,nome,slug,telefone,ativa")
           .eq("slug", ARENA_SLUG_ATUAL)
           .eq("ativa", true)
           .maybeSingle();
@@ -74,7 +74,7 @@ export function useArenaAtual(session) {
       if (usuario.tipo_usuario === "super_admin") {
         const { data: arenaPadrao, error: arenaPadraoError } = await supabase
           .from("arenas")
-          .select("id,nome,slug,ativa")
+          .select("id,nome,slug,telefone,ativa")
           .eq("slug", ARENA_SLUG_ATUAL)
           .eq("ativa", true)
           .maybeSingle();
@@ -129,7 +129,7 @@ export function useArenaAtual(session) {
       const arenaIds = vinculos.map((vinculo) => vinculo.arena_id);
       const { data: arenas, error: arenasError } = await supabase
         .from("arenas")
-        .select("id,nome,slug,ativa")
+        .select("id,nome,slug,telefone,ativa")
         .in("id", arenaIds)
         .eq("ativa", true);
 
