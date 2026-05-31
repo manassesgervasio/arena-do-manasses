@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { gerarDiasDaSemana } from "../utils";
 
 export function useAgendaSemana() {
   const [dataBase, setDataBase] = useState(() => {
@@ -9,7 +8,7 @@ export function useAgendaSemana() {
 
     return hoje;
   });
-  const dias = useMemo(() => gerarDiasDaSemana(dataBase), [dataBase]);
+  const dias = useMemo(() => gerarDiasVisiveis(dataBase), [dataBase]);
 
   function mudarSemana(qtd) {
     const nova = new Date(dataBase);
@@ -29,4 +28,15 @@ export function useAgendaSemana() {
     mudarSemana,
     alterarData,
   };
+}
+
+function gerarDiasVisiveis(dataBase) {
+  return Array.from({ length: 7 }, (_, indice) => {
+    const data = new Date(dataBase);
+
+    data.setDate(dataBase.getDate() + indice);
+    data.setHours(0, 0, 0, 0);
+
+    return data;
+  });
 }

@@ -153,6 +153,14 @@ export default function Home({
     );
   }
 
+  function mudarSemanaAgenda(direcao) {
+    const primeiraDataVisivel = new Date(dataBase);
+
+    primeiraDataVisivel.setDate(primeiraDataVisivel.getDate() + direcao * 7);
+    setMesFiltro(formatarMesFiltro(primeiraDataVisivel));
+    mudarSemana(direcao);
+  }
+
   function renderAgenda() {
     return (
       <AgendaGrid
@@ -171,8 +179,8 @@ export default function Home({
         alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
         limparReserva={limparReserva}
         mostrarApenasOcupados={mostrarApenasOcupados}
-        onSemanaAnterior={() => mudarSemana(-1)}
-        onSemanaProxima={() => mudarSemana(1)}
+        onSemanaAnterior={() => mudarSemanaAgenda(-1)}
+        onSemanaProxima={() => mudarSemanaAgenda(1)}
         podeLimparHorarioPago={canLimparHorarioPago(
           usuarioAtual,
           perfilAtual,
@@ -381,6 +389,13 @@ export default function Home({
 </div>
 </>
 );
+}
+
+function formatarMesFiltro(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+
+  return `${ano}-${mes}`;
 }
 
 function AccessDenied() {
