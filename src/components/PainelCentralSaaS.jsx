@@ -95,6 +95,10 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   );
   const [salvandoResponsavel, setSalvandoResponsavel] = useState(false);
   const [erroResponsavel, setErroResponsavel] = useState("");
+  const [arenaEdicaoWhatsapp, setArenaEdicaoWhatsapp] = useState(null);
+  const [whatsappEdicao, setWhatsappEdicao] = useState("");
+  const [salvandoWhatsapp, setSalvandoWhatsapp] = useState(false);
+  const [erroWhatsapp, setErroWhatsapp] = useState("");
 
   async function carregarArenas() {
     setCarregando(true);
@@ -195,6 +199,19 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setArenaResponsavel(null);
     setFormularioResponsavel(criarFormularioResponsavelInicial());
     setErroResponsavel("");
+  }
+
+  function abrirEdicaoWhatsapp(arena) {
+    setArenaEdicaoWhatsapp(arena);
+    setWhatsappEdicao(arena.telefone || "");
+    setErroWhatsapp("");
+    setMensagem("");
+  }
+
+  function fecharEdicaoWhatsapp() {
+    setArenaEdicaoWhatsapp(null);
+    setWhatsappEdicao("");
+    setErroWhatsapp("");
   }
 
   function atualizarFormularioResponsavel(campo, valor) {
@@ -605,6 +622,43 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     setSalvandoResponsavel(false);
   }
 
+  async function salvarWhatsappArena(event) {
+    event.preventDefault();
+
+    if (!podeCadastrarArena) {
+      setErroWhatsapp("Apenas super_admin pode editar o WhatsApp da arena.");
+      return;
+    }
+
+    if (!arenaEdicaoWhatsapp?.id) {
+      setErroWhatsapp("Selecione uma arena para editar.");
+      return;
+    }
+
+    setSalvandoWhatsapp(true);
+    setErroWhatsapp("");
+
+    const { error } = await supabase
+      .from("arenas")
+      .update({
+        telefone: whatsappEdicao.trim() || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", arenaEdicaoWhatsapp.id);
+
+    if (error) {
+      console.error("Erro ao atualizar WhatsApp da arena:", error);
+      setErroWhatsapp(`Nao foi possivel atualizar o WhatsApp. ${error.message}`);
+      setSalvandoWhatsapp(false);
+      return;
+    }
+
+    setMensagem("WhatsApp da arena atualizado com sucesso.");
+    fecharEdicaoWhatsapp();
+    await carregarArenas();
+    setSalvandoWhatsapp(false);
+  }
+
   const resumo = useMemo(() => {
     return arenas.reduce(
       (total, arena) => {
@@ -979,6 +1033,37 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
         </form>
       )}
 
+      {arenaEdicaoWhatsapp && (
+        <form className="painel-saas-form" onSubmit={salvarWhatsappArena}>
+          <div className="painel-saas-form-header">
+            <h3>Editar WhatsApp da arena</h3>
+            <button type="button" onClick={fecharEdicaoWhatsapp}>
+              Cancelar
+            </button>
+          </div>
+
+          <div className="painel-saas-form-context">
+            Arena: <strong>{arenaEdicaoWhatsapp.nome}</strong>
+          </div>
+
+          {erroWhatsapp && <div className="painel-saas-error">{erroWhatsapp}</div>}
+
+          <label>
+            <span>WhatsApp da Arena</span>
+            <input
+              type="text"
+              value={whatsappEdicao}
+              onChange={(event) => setWhatsappEdicao(event.target.value)}
+              placeholder="5598999999999"
+            />
+          </label>
+
+          <button type="submit" disabled={salvandoWhatsapp}>
+            {salvandoWhatsapp ? "Salvando..." : "Salvar WhatsApp"}
+          </button>
+        </form>
+      )}
+
       <div className="painel-saas-summary">
         <PainelResumoCard titulo="Total de arenas" valor={resumo.total} />
         <PainelResumoCard titulo="Arenas ativas" valor={resumo.ativas} />
@@ -1095,13 +1180,22 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   <td>{formatarData(arena.data_vencimento)}</td>
                   <td>
                     {podeCadastrarArena && (
-                      <button
-                        type="button"
-                        className="painel-saas-action"
-                        onClick={() => abrirFormularioResponsavel(arena)}
-                      >
-                        Adicionar responsavel
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          className="painel-saas-action"
+                          onClick={() => abrirEdicaoWhatsapp(arena)}
+                        >
+                          Editar WhatsApp
+                        </button>
+                        <button
+                          type="button"
+                          className="painel-saas-action"
+                          onClick={() => abrirFormularioResponsavel(arena)}
+                        >
+                          Adicionar responsavel
+                        </button>
+                      </>
                     )}
                   </td>
                 </tr>
