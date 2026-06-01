@@ -15,6 +15,7 @@ to anon
 with check (
   status = 'Pendente'
   and tipo = 'Avulso'
+  and origem = 'Publica'
   and arena_id in (
     select arenas.id
     from public.arenas

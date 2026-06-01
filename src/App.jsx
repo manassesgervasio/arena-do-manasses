@@ -158,6 +158,7 @@ export default function App() {
         arena_id: reserva.arena_id || "",
         data: reserva.data || "",
         horario: reserva.horario || "",
+        origem: reserva.origem || "",
         cliente: reserva.cliente || "",
         telefone: reserva.telefone || "",
         valor: reserva.valor || "",
@@ -194,7 +195,7 @@ export default function App() {
   async function carregarNotificacoesPendentes() {
     const { data, error } = await supabase
       .from("reservas")
-      .select("id,arena_id,data,horario,cliente,telefone,valor,status,tipo,grupo_fixo")
+      .select("*")
       .eq("arena_id", arenaAtualId)
       .in("status", ["Pendente", "Reservado"])
       .order("data", { ascending: true })
@@ -373,6 +374,7 @@ export default function App() {
         arena_id: "",
         data: dataTexto,
         horario,
+        origem: "",
         cliente: "",
         telefone: "",
         valor: "",
@@ -390,6 +392,7 @@ export default function App() {
         arena_id: "",
         data: dataTexto,
         horario,
+        origem: "",
         cliente: "",
         telefone: "",
         valor: "",
@@ -409,6 +412,7 @@ function normalizarReservaParaBanco(reserva) {
     valor: Number(reserva.valor || 0),
     status: reserva.status || "Livre",
     tipo: reserva.tipo || "Avulso",
+    origem: reserva.origem || obterOrigemReserva(reserva.tipo),
     grupo_fixo: reserva.grupo_fixo || reserva.grupoFixo || "",
     arena_id: arenaAtualId,
   };
@@ -495,6 +499,7 @@ function aplicarReservaAtualizadaNoEstado(reservaAtualizada) {
       arena_id: reservaAtualizada.arena_id || arenaAtualId,
       data: reservaAtualizada.data || "",
       horario: reservaAtualizada.horario || "",
+      origem: reservaAtualizada.origem || "",
       cliente: reservaAtualizada.cliente || "",
       telefone: reservaAtualizada.telefone || "",
       valor: reservaAtualizada.valor || "",
@@ -648,6 +653,7 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     valor: 0,
     status: "Pendente",
     tipo: "Avulso",
+    origem: "Publica",
     grupo_fixo: "",
     arena_id: arenaAtualId,
   };
@@ -678,6 +684,7 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
       arena_id: reservaCriada.arena_id || arenaAtualId,
       data: reservaCriada.data || dataTexto,
       horario: reservaCriada.horario || horario,
+      origem: reservaCriada.origem || "Publica",
       cliente: reservaCriada.cliente || nome,
       telefone: reservaCriada.telefone || telefone,
       valor: reservaCriada.valor || "",
@@ -1298,8 +1305,7 @@ function reservaTemOcupacao(reserva) {
 function ehSolicitacaoAgendamento(reserva) {
   return (
     reserva?.status === "Pendente" &&
-    Boolean(String(reserva.telefone || "").trim()) &&
-    Number(reserva.valor || 0) === 0
+    reserva?.origem === "Publica"
   );
 }
 
@@ -1310,8 +1316,15 @@ function ehPendenciaPagamento(reserva) {
   return (
     statusPendentePagamento &&
     Number(reserva.valor || 0) > 0 &&
-    !ehSolicitacaoAgendamento(reserva)
+    reserva?.origem !== "Publica"
   );
+}
+
+function obterOrigemReserva(tipo) {
+  if (tipo === "Fixo") return "Fixo";
+  if (tipo === "Mensalista") return "Mensalista";
+
+  return "Manual";
 }
 
 function criarLinkWhatsAppSolicitacao({
