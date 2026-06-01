@@ -52,6 +52,7 @@ export default function App() {
   const [totalMensalistasPago, setTotalMensalistasPago] = useState(0);
   const [horariosMensalistas, setHorariosMensalistas] = useState({});
   const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
+  const [notificacoesPendentes, setNotificacoesPendentes] = useState([]);
 
   const [buscaCliente, setBuscaCliente] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("Todos");
@@ -179,6 +180,41 @@ export default function App() {
     ativo = false;
   };
 }, [sessaoAuth, arenaAtualId, dias]);
+
+  useEffect(() => {
+  if (!sessaoAuth || !arenaAtualId) {
+    setNotificacoesPendentes([]);
+    return;
+  }
+
+  let ativo = true;
+
+  async function carregarNotificacoesPendentes() {
+    const { data, error } = await supabase
+      .from("reservas")
+      .select("id,arena_id,data,horario,cliente,telefone,valor,status,tipo,grupo_fixo")
+      .eq("arena_id", arenaAtualId)
+      .eq("status", "Pendente")
+      .order("data", { ascending: true })
+      .order("horario", { ascending: true });
+
+    if (!ativo) return;
+
+    if (error) {
+      console.error("Erro ao carregar notificações pendentes:", error);
+      setNotificacoesPendentes([]);
+      return;
+    }
+
+    setNotificacoesPendentes(data || []);
+  }
+
+  carregarNotificacoesPendentes();
+
+  return () => {
+    ativo = false;
+  };
+}, [sessaoAuth, arenaAtualId]);
 
   useEffect(() => {
   if (!sessaoAuth || !arenaAtualId) {
@@ -418,6 +454,89 @@ async function atualizarReservaBancoPorHorario(dataTexto, horario, campos) {
   }
 
   return { data, error };
+}
+
+async function atualizarReservaBancoPorId(id, campos) {
+  if (!arenaAtualId) {
+    return {
+      data: null,
+      error: { message: "Contexto da arena nao carregado." },
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("reservas")
+    .update(campos)
+    .eq("id", id)
+    .eq("arena_id", arenaAtualId)
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Erro ao atualizar reserva por notificação:", error);
+  }
+
+  return { data, error };
+}
+
+function aplicarReservaAtualizadaNoEstado(reservaAtualizada) {
+  if (!reservaAtualizada?.data || !reservaAtualizada?.horario) return;
+
+  const chave = chaveReserva(reservaAtualizada.data, reservaAtualizada.horario);
+
+  setReservas((anterior) => ({
+    ...anterior,
+    [chave]: {
+      id: reservaAtualizada.id || "",
+      arena_id: reservaAtualizada.arena_id || arenaAtualId,
+      data: reservaAtualizada.data || "",
+      horario: reservaAtualizada.horario || "",
+      cliente: reservaAtualizada.cliente || "",
+      telefone: reservaAtualizada.telefone || "",
+      valor: reservaAtualizada.valor || "",
+      status: reservaAtualizada.status || "Livre",
+      tipo: reservaAtualizada.tipo || "Avulso",
+      grupoFixo: reservaAtualizada.grupo_fixo || "",
+    },
+  }));
+  setReservasArenaId(arenaAtualId);
+}
+
+async function alterarStatusNotificacao(reserva, status) {
+  if (!reserva?.id) {
+    alert("Não foi possível localizar a reserva pendente.");
+    return;
+  }
+
+  const { data: reservaAtualizada, error } = await atualizarReservaBancoPorId(
+    reserva.id,
+    {
+      status,
+      tipo: "Avulso",
+    }
+  );
+
+  if (error) {
+    alert(
+      `Não foi possível atualizar a solicitação: ${
+        error.message || "erro desconhecido"
+      }`
+    );
+    return;
+  }
+
+  aplicarReservaAtualizadaNoEstado(reservaAtualizada);
+  setNotificacoesPendentes((anteriores) =>
+    anteriores.filter((item) => item.id !== reserva.id)
+  );
+}
+
+async function confirmarNotificacao(reserva) {
+  await alterarStatusNotificacao(reserva, "Reservado");
+}
+
+async function recusarNotificacao(reserva) {
+  await alterarStatusNotificacao(reserva, "Cancelado");
 }
 
 async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
@@ -833,17 +952,10 @@ return "#14532d";
         return;
       }
 
-      setReservas((anterior) => ({
-        ...anterior,
-        [chaveReserva(dataTexto, horario)]: {
-          cliente: reservaAtualizada.cliente || reserva.cliente || "",
-          telefone: reservaAtualizada.telefone || reserva.telefone || "",
-          valor: reservaAtualizada.valor || reserva.valor || "",
-          status: reservaAtualizada.status || "Reservado",
-          tipo: reservaAtualizada.tipo || "Avulso",
-          grupoFixo: reservaAtualizada.grupo_fixo || reserva.grupoFixo || "",
-        },
-      }));
+      aplicarReservaAtualizadaNoEstado(reservaAtualizada);
+      setNotificacoesPendentes((anteriores) =>
+        anteriores.filter((item) => item.id !== reservaAtualizada.id)
+      );
 
       alert("Reserva confirmada!");
       return;
@@ -1091,6 +1203,9 @@ return "#14532d";
       alugarMensalistaComoAvulso={alugarMensalistaComoAvulso}
       solicitarReservaPublica={solicitarReservaPublica}
       limparReserva={limparReserva}
+      notificacoesPendentes={notificacoesPendentes}
+      onConfirmarNotificacao={confirmarNotificacao}
+      onRecusarNotificacao={recusarNotificacao}
       mudarSemana={mudarSemana}
       alterarData={alterarData}
       copiarFixosProximaSemana={copiarFixosProximaSemana}

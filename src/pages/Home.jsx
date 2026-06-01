@@ -50,6 +50,9 @@ export default function Home({
   alugarMensalistaComoAvulso,
   solicitarReservaPublica,
   limparReserva,
+  notificacoesPendentes,
+  onConfirmarNotificacao,
+  onRecusarNotificacao,
   mudarSemana,
   alterarData,
   copiarFixosProximaSemana,
@@ -382,6 +385,10 @@ export default function Home({
         onSair={onSair}
         onEntrar={onEntrar}
         modoPublico={modoPublico}
+        notificacoesPendentes={notificacoesPendentes}
+        onConfirmarNotificacao={onConfirmarNotificacao}
+        onRecusarNotificacao={onRecusarNotificacao}
+        formatarDataBR={formatarDataBR}
       />
       <MobileNavigation
         activeTab={activeMobileTab}

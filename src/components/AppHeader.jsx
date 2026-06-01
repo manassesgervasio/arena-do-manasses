@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CentralNotificacoes from "./CentralNotificacoes";
 import {
   canAccessPainelSaaS,
   canAccessUsuariosArena,
@@ -13,6 +14,10 @@ export default function AppHeader({
   onSair,
   onEntrar,
   modoPublico = false,
+  notificacoesPendentes = [],
+  onConfirmarNotificacao,
+  onRecusarNotificacao,
+  formatarDataBR,
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const {
@@ -35,6 +40,15 @@ export default function AppHeader({
       </div>
 
       <div className="app-account">
+        {!modoPublico && (
+          <CentralNotificacoes
+            notificacoes={notificacoesPendentes}
+            onConfirmar={onConfirmarNotificacao}
+            onRecusar={onRecusarNotificacao}
+            formatarDataBR={formatarDataBR}
+          />
+        )}
+
         <button
           type="button"
           className="app-account-button"
