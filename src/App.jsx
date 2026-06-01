@@ -198,6 +198,7 @@ export default function App() {
       .select("*")
       .eq("arena_id", arenaAtualId)
       .in("status", ["Pendente", "Reservado"])
+      .lte("data", obterDataHojeTexto())
       .order("data", { ascending: true })
       .order("horario", { ascending: true });
 
@@ -1316,8 +1317,17 @@ function ehPendenciaPagamento(reserva) {
   return (
     statusPendentePagamento &&
     Number(reserva.valor || 0) > 0 &&
-    reserva?.origem !== "Publica"
+    reserva?.origem !== "Publica" &&
+    String(reserva.data || "") <= obterDataHojeTexto()
   );
+}
+
+function obterDataHojeTexto() {
+  const hoje = new Date();
+
+  hoje.setHours(0, 0, 0, 0);
+
+  return formatarDataLocal(hoje);
 }
 
 function obterOrigemReserva(tipo) {
