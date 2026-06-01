@@ -51,8 +51,11 @@ export default function Home({
   solicitarReservaPublica,
   limparReserva,
   notificacoesPendentes,
+  pendenciasPagamento,
   onConfirmarNotificacao,
   onRecusarNotificacao,
+  onMarcarPagamentoPago,
+  onIrParaReserva,
   mudarSemana,
   alterarData,
   copiarFixosProximaSemana,
@@ -386,9 +389,19 @@ export default function Home({
         onEntrar={onEntrar}
         modoPublico={modoPublico}
         notificacoesPendentes={notificacoesPendentes}
+        pendenciasPagamento={pendenciasPagamento}
         onConfirmarNotificacao={onConfirmarNotificacao}
         onRecusarNotificacao={onRecusarNotificacao}
+        onMarcarPagamentoPago={onMarcarPagamentoPago}
+        onIrParaReserva={(reserva) => {
+          setMostrarPainelSaaS(false);
+          setMostrarUsuariosArena(false);
+          setMostrarFinanceiroProfissional(false);
+          setActiveMobileTab("agenda");
+          onIrParaReserva?.(reserva);
+        }}
         formatarDataBR={formatarDataBR}
+        moeda={moeda}
       />
       <MobileNavigation
         activeTab={activeMobileTab}

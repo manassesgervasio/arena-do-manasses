@@ -53,6 +53,7 @@ export default function App() {
   const [horariosMensalistas, setHorariosMensalistas] = useState({});
   const [versaoHorariosMensalistas, setVersaoHorariosMensalistas] = useState(0);
   const [notificacoesPendentes, setNotificacoesPendentes] = useState([]);
+  const [pendenciasPagamento, setPendenciasPagamento] = useState([]);
 
   const [buscaCliente, setBuscaCliente] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("Todos");
@@ -184,6 +185,7 @@ export default function App() {
   useEffect(() => {
   if (!sessaoAuth || !arenaAtualId) {
     setNotificacoesPendentes([]);
+    setPendenciasPagamento([]);
     return;
   }
 
@@ -194,19 +196,21 @@ export default function App() {
       .from("reservas")
       .select("id,arena_id,data,horario,cliente,telefone,valor,status,tipo,grupo_fixo")
       .eq("arena_id", arenaAtualId)
-      .eq("status", "Pendente")
+      .in("status", ["Pendente", "Reservado"])
       .order("data", { ascending: true })
       .order("horario", { ascending: true });
 
     if (!ativo) return;
 
     if (error) {
-      console.error("Erro ao carregar notificações pendentes:", error);
+      console.error("Erro ao carregar pendências da arena:", error);
       setNotificacoesPendentes([]);
+      setPendenciasPagamento([]);
       return;
     }
 
-    setNotificacoesPendentes(data || []);
+    setNotificacoesPendentes((data || []).filter(ehSolicitacaoAgendamento));
+    setPendenciasPagamento((data || []).filter(ehPendenciaPagamento));
   }
 
   carregarNotificacoesPendentes();
@@ -502,6 +506,15 @@ function aplicarReservaAtualizadaNoEstado(reservaAtualizada) {
   setReservasArenaId(arenaAtualId);
 }
 
+function removerReservaDasCentrais(id) {
+  setNotificacoesPendentes((anteriores) =>
+    anteriores.filter((item) => item.id !== id)
+  );
+  setPendenciasPagamento((anteriores) =>
+    anteriores.filter((item) => item.id !== id)
+  );
+}
+
 async function alterarStatusNotificacao(reserva, status) {
   if (!reserva?.id) {
     alert("Não foi possível localizar a reserva pendente.");
@@ -526,9 +539,7 @@ async function alterarStatusNotificacao(reserva, status) {
   }
 
   aplicarReservaAtualizadaNoEstado(reservaAtualizada);
-  setNotificacoesPendentes((anteriores) =>
-    anteriores.filter((item) => item.id !== reserva.id)
-  );
+  removerReservaDasCentrais(reserva.id);
 }
 
 async function confirmarNotificacao(reserva) {
@@ -537,6 +548,38 @@ async function confirmarNotificacao(reserva) {
 
 async function recusarNotificacao(reserva) {
   await alterarStatusNotificacao(reserva, "Cancelado");
+}
+
+async function marcarPagamentoComoPago(reserva) {
+  if (!reserva?.id) {
+    alert("Não foi possível localizar a reserva.");
+    return;
+  }
+
+  const { data: reservaAtualizada, error } = await atualizarReservaBancoPorId(
+    reserva.id,
+    {
+      status: "Pago",
+    }
+  );
+
+  if (error) {
+    alert(
+      `Não foi possível marcar como pago: ${
+        error.message || "erro desconhecido"
+      }`
+    );
+    return;
+  }
+
+  aplicarReservaAtualizadaNoEstado(reservaAtualizada);
+  removerReservaDasCentrais(reserva.id);
+}
+
+function irParaReserva(reserva) {
+  if (!reserva?.data) return;
+
+  alterarData(reserva.data);
 }
 
 async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
@@ -953,9 +996,7 @@ return "#14532d";
       }
 
       aplicarReservaAtualizadaNoEstado(reservaAtualizada);
-      setNotificacoesPendentes((anteriores) =>
-        anteriores.filter((item) => item.id !== reservaAtualizada.id)
-      );
+      removerReservaDasCentrais(reservaAtualizada.id);
 
       alert("Reserva confirmada!");
       return;
@@ -1204,8 +1245,11 @@ return "#14532d";
       solicitarReservaPublica={solicitarReservaPublica}
       limparReserva={limparReserva}
       notificacoesPendentes={notificacoesPendentes}
+      pendenciasPagamento={pendenciasPagamento}
       onConfirmarNotificacao={confirmarNotificacao}
       onRecusarNotificacao={recusarNotificacao}
+      onMarcarPagamentoPago={marcarPagamentoComoPago}
+      onIrParaReserva={irParaReserva}
       mudarSemana={mudarSemana}
       alterarData={alterarData}
       copiarFixosProximaSemana={copiarFixosProximaSemana}
@@ -1248,6 +1292,25 @@ function reservaTemOcupacao(reserva) {
     Boolean(reserva.cliente?.trim()) ||
     Boolean(reserva.telefone?.trim()) ||
     Number(reserva.valor || 0) > 0
+  );
+}
+
+function ehSolicitacaoAgendamento(reserva) {
+  return (
+    reserva?.status === "Pendente" &&
+    Boolean(String(reserva.telefone || "").trim()) &&
+    Number(reserva.valor || 0) === 0
+  );
+}
+
+function ehPendenciaPagamento(reserva) {
+  const statusPendentePagamento =
+    reserva?.status === "Reservado" || reserva?.status === "Pendente";
+
+  return (
+    statusPendentePagamento &&
+    Number(reserva.valor || 0) > 0 &&
+    !ehSolicitacaoAgendamento(reserva)
   );
 }
 

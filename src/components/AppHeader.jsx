@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CentralNotificacoes from "./CentralNotificacoes";
+import CentralPagamentos from "./CentralPagamentos";
 import {
   canAccessPainelSaaS,
   canAccessUsuariosArena,
@@ -15,9 +16,13 @@ export default function AppHeader({
   onEntrar,
   modoPublico = false,
   notificacoesPendentes = [],
+  pendenciasPagamento = [],
   onConfirmarNotificacao,
   onRecusarNotificacao,
+  onMarcarPagamentoPago,
+  onIrParaReserva,
   formatarDataBR,
+  moeda,
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const {
@@ -46,6 +51,15 @@ export default function AppHeader({
             onConfirmar={onConfirmarNotificacao}
             onRecusar={onRecusarNotificacao}
             formatarDataBR={formatarDataBR}
+          />
+        )}
+        {!modoPublico && (
+          <CentralPagamentos
+            pendencias={pendenciasPagamento}
+            onMarcarPago={onMarcarPagamentoPago}
+            onIrParaReserva={onIrParaReserva}
+            formatarDataBR={formatarDataBR}
+            moeda={moeda}
           />
         )}
 
