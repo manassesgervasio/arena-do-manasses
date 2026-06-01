@@ -556,6 +556,29 @@ async function recusarNotificacao(reserva) {
   await alterarStatusNotificacao(reserva, "Cancelado");
 }
 
+async function criarOuAtualizarClientePublico({ nome, telefone }) {
+  if (!arenaAtualId) return null;
+
+  const { data, error } = await supabase.rpc(
+    "criar_ou_atualizar_cliente_publico",
+    {
+      p_arena_id: arenaAtualId,
+      p_nome: nome,
+      p_telefone: telefone,
+    }
+  );
+
+  if (error) {
+    console.warn(
+      "Não foi possível criar/atualizar cliente público. A reserva continuará normalmente:",
+      error
+    );
+    return null;
+  }
+
+  return data || null;
+}
+
 async function marcarPagamentoComoPago(reserva) {
   if (!reserva?.id) {
     alert("Não foi possível localizar a reserva.");
@@ -658,6 +681,11 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     grupo_fixo: "",
     arena_id: arenaAtualId,
   };
+
+  await criarOuAtualizarClientePublico({
+    nome,
+    telefone,
+  });
 
   const { data: reservaCriada, error: erroInsert } = await supabase
     .from("reservas")
