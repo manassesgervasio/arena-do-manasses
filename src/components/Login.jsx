@@ -28,7 +28,7 @@ export default function Login({ onEntrar, onVoltar }) {
     <main className="login-page">
       <Card as="section" className="login-panel" aria-label="Login">
         <div className="login-brand">
-          <h1>Arena do Manasses</h1>
+          <h1>A R E N A</h1>
           <p>Acesso ao sistema</p>
         </div>
 

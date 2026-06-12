@@ -31,7 +31,7 @@ export default function LoginPage({ onEntrar }) {
     <main className="login-page">
       <Card as="section" className="login-panel" aria-label="Login">
         <div className="login-brand">
-          <h1>Arena do Manassés</h1>
+          <h1>A R E N A</h1>
           <p>Acesso ao sistema</p>
         </div>
 

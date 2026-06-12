@@ -1194,7 +1194,7 @@ return "#14532d";
       <main className="login-page">
         <section className="login-panel" aria-label="Carregando sessÃ£o">
           <div className="login-brand">
-            <h1>Arena do ManassÃ©s</h1>
+            <h1>A R E N A</h1>
             <p>Carregando sessÃ£o...</p>
           </div>
         </section>
@@ -1216,7 +1216,7 @@ return "#14532d";
       <main className="login-page">
         <section className="login-panel" aria-label="Carregando contexto">
           <div className="login-brand">
-            <h1>Arena do Manasses</h1>
+            <h1>A R E N A</h1>
             <p>Carregando contexto da arena...</p>
           </div>
         </section>
@@ -1234,7 +1234,7 @@ return "#14532d";
       <main className="login-page">
         <section className="login-panel" aria-label="Erro de contexto">
           <div className="login-brand">
-            <h1>Arena do Manasses</h1>
+            <h1>A R E N A</h1>
             <p>
               {contextoArena.erroContexto ||
                 "Nao foi possivel carregar o contexto da arena."}
