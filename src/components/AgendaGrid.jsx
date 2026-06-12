@@ -79,6 +79,7 @@ const jogosDia = horarios.filter((horaAtual) => {
         totalDia={totalDia}
         jogosDia={jogosDia}
         moeda={moeda}
+        ocultarResumo={modoPublico}
       />
     );
   }

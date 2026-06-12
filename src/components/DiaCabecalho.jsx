@@ -3,6 +3,7 @@ export default function DiaCabecalho({
   dataFormatada,
   totalDia,
   jogosDia,
+  ocultarResumo = false,
 }) {
   const dataCurta = dataFormatada.split("/").slice(0, 2).join("/");
 
@@ -13,14 +14,18 @@ export default function DiaCabecalho({
           <span className="dia-cabecalho-semana">{diaSemana}</span>
           <span className="dia-cabecalho-data">{dataCurta}</span>
         </span>
-        <span className="dia-cabecalho-separador dia-cabecalho-separador-principal">
-          {"\u2022"}
-        </span>
-        <span className="dia-cabecalho-grupo dia-cabecalho-grupo-resumo">
-          <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")}</span>
-          <span className="dia-cabecalho-separador">{"\u2022"}</span>
-          <span>{jogosDia} jogos</span>
-        </span>
+        {!ocultarResumo && (
+          <>
+            <span className="dia-cabecalho-separador dia-cabecalho-separador-principal">
+              {"\u2022"}
+            </span>
+            <span className="dia-cabecalho-grupo dia-cabecalho-grupo-resumo">
+              <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")}</span>
+              <span className="dia-cabecalho-separador">{"\u2022"}</span>
+              <span>{jogosDia} jogos</span>
+            </span>
+          </>
+        )}
       </div>
     </div>
   );
