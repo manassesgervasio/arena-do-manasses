@@ -49,6 +49,133 @@
   .app-account-layer {
     position: fixed !important;
     inset: 0 !important;
+    z-index: 20000 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-layer::before,
+  .notifications-layer::after,
+  .app-account-layer::before,
+  .app-account-layer::after,
+  .notifications-backdrop::before,
+  .notifications-backdrop::after,
+  .app-account-backdrop::before,
+  .app-account-backdrop::after,
+  .notifications-panel::before,
+  .notifications-panel::after,
+  .payments-panel::before,
+  .payments-panel::after,
+  .app-account-menu::before,
+  .app-account-menu::after {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  .notifications-layer > .notifications-backdrop,
+  .notifications-layer > .notifications-backdrop.ds-button,
+  .app-account-layer > .app-account-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    display: block !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    filter: none !important;
+    transform: none !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-panel,
+  .payments-panel,
+  .app-account-menu {
+    position: fixed !important;
+    top: max(72px, calc(env(safe-area-inset-top) + 64px)) !important;
+    right: 12px !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    left: 12px !important;
+    z-index: 20001 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: 24px !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24) !important;
+    color: var(--ds-text) !important;
+    filter: none !important;
+    transform: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-panel *,
+  .payments-panel *,
+  .app-account-menu * {
+    max-width: 100%;
+    filter: none !important;
+  }
+
+  .notifications-header,
+  .app-account-panel-header {
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .notification-item,
+  .notifications-empty,
+  .app-account-info {
+    background-image: none !important;
+    filter: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .notifications-layer,
+  .app-account-layer {
+    position: fixed !important;
+    inset: 0 !important;
     z-index: 12000 !important;
     width: 100vw !important;
     min-height: 100dvh !important;
@@ -1818,5 +1945,132 @@ textarea:disabled {
   .usuarios-arena-form,
   .usuarios-arena-table-wrap {
     color: #111827 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .notifications-layer,
+  .app-account-layer {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-layer::before,
+  .notifications-layer::after,
+  .app-account-layer::before,
+  .app-account-layer::after,
+  .notifications-backdrop::before,
+  .notifications-backdrop::after,
+  .app-account-backdrop::before,
+  .app-account-backdrop::after,
+  .notifications-panel::before,
+  .notifications-panel::after,
+  .payments-panel::before,
+  .payments-panel::after,
+  .app-account-menu::before,
+  .app-account-menu::after {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  .notifications-layer > .notifications-backdrop,
+  .notifications-layer > .notifications-backdrop.ds-button,
+  .app-account-layer > .app-account-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    display: block !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    filter: none !important;
+    transform: none !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-panel,
+  .payments-panel,
+  .app-account-menu {
+    position: fixed !important;
+    top: max(72px, calc(env(safe-area-inset-top) + 64px)) !important;
+    right: 12px !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    left: 12px !important;
+    z-index: 20001 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: 24px !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24) !important;
+    color: var(--ds-text) !important;
+    filter: none !important;
+    transform: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-panel *,
+  .payments-panel *,
+  .app-account-menu * {
+    max-width: 100%;
+    filter: none !important;
+  }
+
+  .notifications-header,
+  .app-account-panel-header {
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .notification-item,
+  .notifications-empty,
+  .app-account-info {
+    background-image: none !important;
+    filter: none !important;
   }
 }
