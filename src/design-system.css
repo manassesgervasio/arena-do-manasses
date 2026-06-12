@@ -169,6 +169,10 @@
     background-image: none !important;
     filter: none !important;
   }
+
+  .app-header .app-account-button {
+    display: none !important;
+  }
 }
 
 @media (max-width: 767px) {
@@ -2072,5 +2076,9 @@ textarea:disabled {
   .app-account-info {
     background-image: none !important;
     filter: none !important;
+  }
+
+  .app-header .app-account-button {
+    display: none !important;
   }
 }

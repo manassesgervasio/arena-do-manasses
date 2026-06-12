@@ -91,6 +91,16 @@ export default function Home({
     return true;
   });
   const menuExtraItems = [
+    !modoPublico && permissoesArena.painelSaaS
+      ? {
+          id: "painel-saas",
+          label: "Painel SaaS",
+          onClick: () => {
+            setMostrarUsuariosArena(false);
+            setMostrarPainelSaaS(true);
+          },
+        }
+      : null,
     !modoPublico && permissoesArena.usuarios
       ? {
           id: "usuarios",
