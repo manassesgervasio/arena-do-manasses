@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import { canManageFechamento } from "../utils/permissoes";
+import { Button, Card, Input, LoadingState, Select, Textarea } from "./ui";
 
 const formularioInicial = {
   descricao: "",
@@ -735,7 +736,7 @@ export default function FinanceiroProfissional({
 
         <label className="financeiro-profissional-filter">
           <span>Mes e ano</span>
-          <input
+          <Input
             type="month"
             value={mesAno}
             onChange={(event) => setMesAno(event.target.value)}
@@ -759,13 +760,17 @@ export default function FinanceiroProfissional({
       </div>
 
       <div className="financeiro-profissional-layout">
-        <form className="financeiro-profissional-card" onSubmit={salvarLancamento}>
+        <Card
+          as="form"
+          className="financeiro-profissional-card"
+          onSubmit={salvarLancamento}
+        >
           <div className="financeiro-profissional-card-header">
             <h3>Lancamentos manuais</h3>
             {lancamentoEditandoId && (
-              <button type="button" onClick={limparFormulario}>
+              <Button type="button" onClick={limparFormulario}>
                 Cancelar edicao
-              </button>
+              </Button>
             )}
           </div>
 
@@ -778,7 +783,7 @@ export default function FinanceiroProfissional({
           <div className="financeiro-profissional-form">
             <label>
               <span>Descricao</span>
-              <input
+              <Input
                 type="text"
                 value={formulario.descricao}
                 onChange={(event) => atualizarCampo("descricao", event.target.value)}
@@ -788,7 +793,7 @@ export default function FinanceiroProfissional({
 
             <label>
               <span>Valor</span>
-              <input
+              <Input
                 type="number"
                 min="0"
                 step="0.01"
@@ -800,18 +805,18 @@ export default function FinanceiroProfissional({
 
             <label>
               <span>Tipo</span>
-              <select
+              <Select
                 value={formulario.tipo}
                 onChange={(event) => atualizarCampo("tipo", event.target.value)}
               >
                 <option value="entrada">Entrada</option>
                 <option value="despesa">Despesa</option>
-              </select>
+              </Select>
             </label>
 
             <label>
               <span>Categoria</span>
-              <select
+              <Select
                 value={formulario.categoriaId}
                 onChange={(event) => atualizarCampo("categoriaId", event.target.value)}
                 disabled={cadastrosCarregando || Boolean(cadastrosErro)}
@@ -822,12 +827,12 @@ export default function FinanceiroProfissional({
                     {categoria.nome}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
 
             <label>
               <span>Forma de pagamento</span>
-              <select
+              <Select
                 value={formulario.formaPagamentoId}
                 onChange={(event) =>
                   atualizarCampo("formaPagamentoId", event.target.value)
@@ -840,12 +845,12 @@ export default function FinanceiroProfissional({
                     {formaPagamento.nome}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
 
             <label>
               <span>Data</span>
-              <input
+              <Input
                 type="date"
                 value={formulario.data}
                 onChange={(event) => atualizarCampo("data", event.target.value)}
@@ -854,7 +859,7 @@ export default function FinanceiroProfissional({
 
             <label className="financeiro-profissional-observacao">
               <span>Observacao</span>
-              <textarea
+              <Textarea
                 value={formulario.observacao}
                 onChange={(event) => atualizarCampo("observacao", event.target.value)}
                 placeholder="Detalhes internos do lancamento"
@@ -863,9 +868,9 @@ export default function FinanceiroProfissional({
           </div>
 
           {cadastrosCarregando && (
-            <div className="financeiro-profissional-loading">
+            <LoadingState className="financeiro-profissional-loading">
               Carregando categorias e formas de pagamento...
-            </div>
+            </LoadingState>
           )}
 
           {cadastrosErro && (
@@ -877,16 +882,16 @@ export default function FinanceiroProfissional({
           )}
 
           {resumoPeriodoCarregando && (
-            <div className="financeiro-profissional-loading">
+            <LoadingState className="financeiro-profissional-loading">
               Carregando resumo financeiro do periodo...
-            </div>
+            </LoadingState>
           )}
 
           {resumoPeriodoErro && (
             <div className="financeiro-profissional-error">{resumoPeriodoErro}</div>
           )}
 
-          <button
+          <Button
             className="financeiro-profissional-primary"
             type="submit"
             disabled={salvandoLancamento || cadastrosCarregando || mesEstaFechado}
@@ -896,10 +901,10 @@ export default function FinanceiroProfissional({
               : lancamentoEditandoId
                 ? "Salvar alteracoes"
                 : "Adicionar lancamento"}
-          </button>
-        </form>
+          </Button>
+        </Card>
 
-        <div className="financeiro-profissional-card financeiro-profissional-close">
+        <Card className="financeiro-profissional-card financeiro-profissional-close">
           <h3>Fechamento mensal</h3>
           <div className="financeiro-profissional-close-status">
             <span
@@ -936,16 +941,16 @@ export default function FinanceiroProfissional({
           </div>
 
           {podeGerenciarFechamento && (mesEstaFechado ? (
-            <button
+            <Button
               className="financeiro-profissional-secondary"
               type="button"
               onClick={reabrirMes}
               disabled={fechamentoCarregando || fechamentoSalvando}
             >
               {fechamentoSalvando ? "Reabrindo..." : "Reabrir mês"}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               className="financeiro-profissional-primary"
               type="button"
               onClick={fecharMes}
@@ -954,7 +959,7 @@ export default function FinanceiroProfissional({
               }
             >
               {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
-            </button>
+            </Button>
           ))}
 
           {mesEstaFechado && (
@@ -972,19 +977,19 @@ export default function FinanceiroProfissional({
           {fechamentoErro && (
             <div className="financeiro-profissional-error">{fechamentoErro}</div>
           )}
-        </div>
+        </Card>
       </div>
 
-      <div className="financeiro-profissional-card">
+      <Card className="financeiro-profissional-card">
         <div className="financeiro-profissional-card-header">
           <h3>Tabela de lancamentos</h3>
           <span>{totais.lancamentosDoMes.length} no mes</span>
         </div>
 
         {lancamentosCarregando && (
-          <div className="financeiro-profissional-loading">
+          <LoadingState className="financeiro-profissional-loading">
             Carregando lancamentos manuais...
-          </div>
+          </LoadingState>
         )}
 
         {lancamentosErro && (
@@ -1039,21 +1044,21 @@ export default function FinanceiroProfissional({
                     </td>
                     <td>
                       <div className="financeiro-profissional-actions">
-                        <button
+                        <Button
                           type="button"
                           disabled={mesEstaFechado}
                           onClick={() => editarLancamento(lancamento)}
                         >
                           Editar
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
                           className="financeiro-profissional-danger"
                           disabled={mesEstaFechado}
                           onClick={() => excluirLancamento(lancamento.id)}
                         >
                           Excluir
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -1069,16 +1074,19 @@ export default function FinanceiroProfissional({
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </section>
   );
 }
 
 function ResumoCard({ titulo, valor, tipo = "entrada" }) {
   return (
-    <article className={`financeiro-profissional-summary-card is-${tipo}`}>
+    <Card
+      as="article"
+      className={`financeiro-profissional-summary-card is-${tipo}`}
+    >
       <span>{titulo}</span>
       <strong>{valor}</strong>
-    </article>
+    </Card>
   );
 }

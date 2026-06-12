@@ -361,13 +361,6 @@ export default function Home({
   <>
     <div
       className="home-page"
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        color: "#0f172a",
-        padding: "25px",
-        fontFamily: "Arial",
-      }}
     >
       <AppHeader
         perfilLogado={perfilLogado}

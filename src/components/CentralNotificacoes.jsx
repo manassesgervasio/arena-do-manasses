@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button, Drawer, EmptyState } from "./ui";
 
 export default function CentralNotificacoes({
   notificacoes = [],
@@ -11,40 +12,40 @@ export default function CentralNotificacoes({
 
   return (
     <div className="notifications-wrap">
-      <button
+      <Button
         type="button"
         className="notifications-button"
         onClick={() => setAberta((valor) => !valor)}
         aria-expanded={aberta}
-        aria-label="Abrir notificações"
+        aria-label="Abrir notificacoes"
       >
-        <span aria-hidden="true">🔔</span>
+        <span aria-hidden="true">!</span>
         {quantidade > 0 && (
           <span className="notifications-badge">{quantidade}</span>
         )}
-      </button>
+      </Button>
 
       {aberta && (
         <div className="notifications-layer">
-          <button
+          <Button
             type="button"
             className="notifications-backdrop"
             onClick={() => setAberta(false)}
-            aria-label="Fechar notificações"
+            aria-label="Fechar notificacoes"
           />
 
-          <aside className="notifications-panel">
+          <Drawer className="notifications-panel">
             <div className="notifications-header">
-              <strong>Notificações</strong>
-              <button type="button" onClick={() => setAberta(false)}>
-                ×
-              </button>
+              <strong>Notificacoes</strong>
+              <Button type="button" onClick={() => setAberta(false)}>
+                Fechar
+              </Button>
             </div>
 
             {quantidade === 0 ? (
-              <div className="notifications-empty">
-                Nenhuma solicitação pendente.
-              </div>
+              <EmptyState className="notifications-empty">
+                Nenhuma solicitacao pendente.
+              </EmptyState>
             ) : (
               <div className="notifications-list">
                 {notificacoes.map((reserva) => (
@@ -55,20 +56,22 @@ export default function CentralNotificacoes({
                     <small>Solicitou reserva</small>
 
                     <div className="notification-actions">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => onConfirmar?.(reserva)}
+                        variant="primary"
                       >
                         Confirmar
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => onRecusar?.(reserva)}
                       >
                         Recusar
-                      </button>
+                      </Button>
                       {reserva.telefone && (
-                        <a
+                        <Button
+                          as="a"
                           href={criarLinkWhatsAppCliente({
                             nome: reserva.cliente,
                             telefone: reserva.telefone,
@@ -79,14 +82,14 @@ export default function CentralNotificacoes({
                           rel="noreferrer"
                         >
                           WhatsApp
-                        </a>
+                        </Button>
                       )}
                     </div>
                   </article>
                 ))}
               </div>
             )}
-          </aside>
+          </Drawer>
         </div>
       )}
     </div>
@@ -95,12 +98,12 @@ export default function CentralNotificacoes({
 
 function criarLinkWhatsAppCliente({ nome, telefone, data, horario }) {
   const mensagem = [
-    `Olá, ${nome || "tudo bem"}.`,
+    `Ola, ${nome || "tudo bem"}.`,
     "",
-    "Estamos analisando sua solicitação de reserva.",
+    "Estamos analisando sua solicitacao de reserva.",
     "",
     `Data: ${data || ""}`,
-    `Horário: ${horario || ""}`,
+    `Horario: ${horario || ""}`,
     "",
     "Entraremos em contato em instantes.",
   ].join("\n");

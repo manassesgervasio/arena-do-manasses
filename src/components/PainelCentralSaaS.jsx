@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import { criarUsuarioAuth } from "../utils/criarUsuarioAuth";
+import { Button, EmptyState, Input, LoadingState, Select, Textarea } from "./ui";
 
 const statusOpcoes = ["todos", "teste", "ativo", "suspenso", "cancelado"];
 const planoOpcoes = ["todos", "teste", "basico", "profissional", "premium"];
@@ -736,16 +737,16 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
           <p>Administração das arenas cadastradas</p>
         </div>
 
-        <button type="button" onClick={onVoltar}>
+        <Button type="button" onClick={onVoltar}>
           Voltar para Arena
-        </button>
+        </Button>
       </div>
 
       {podeCadastrarArena && (
         <div className="painel-saas-toolbar">
-          <button type="button" onClick={abrirFormulario}>
+          <Button type="button" onClick={abrirFormulario}>
             Cadastrar nova arena
-          </button>
+          </Button>
         </div>
       )}
 
@@ -772,9 +773,9 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
         <form className="painel-saas-form" onSubmit={salvarArena}>
           <div className="painel-saas-form-header">
             <h3>Cadastrar nova arena</h3>
-            <button type="button" onClick={fecharFormulario}>
+            <Button type="button" onClick={fecharFormulario}>
               Cancelar
-            </button>
+            </Button>
           </div>
 
           {erroCadastro && <div className="painel-saas-error">{erroCadastro}</div>}
@@ -785,7 +786,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Nome da arena</span>
-            <input
+            <Input
               type="text"
               value={formulario.nome}
               onChange={(event) => atualizarFormulario("nome", event.target.value)}
@@ -795,7 +796,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Slug</span>
-            <input
+            <Input
               type="text"
               value={formulario.slug}
               onChange={(event) => atualizarFormulario("slug", event.target.value)}
@@ -805,7 +806,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>WhatsApp da arena</span>
-            <input
+            <Input
               type="text"
               value={formulario.telefone}
               onChange={(event) => atualizarFormulario("telefone", event.target.value)}
@@ -814,7 +815,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Cidade</span>
-            <input
+            <Input
               type="text"
               value={formulario.cidade}
               onChange={(event) => atualizarFormulario("cidade", event.target.value)}
@@ -823,7 +824,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Estado</span>
-            <input
+            <Input
               type="text"
               value={formulario.estado}
               onChange={(event) => atualizarFormulario("estado", event.target.value)}
@@ -832,7 +833,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Plano</span>
-            <select
+            <Select
               value={formulario.plano}
               onChange={(event) => atualizarFormulario("plano", event.target.value)}
             >
@@ -841,12 +842,12 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   {rotulo(plano)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label>
             <span>Status da assinatura</span>
-            <select
+            <Select
               value={formulario.statusAssinatura}
               onChange={(event) =>
                 atualizarFormulario("statusAssinatura", event.target.value)
@@ -857,12 +858,12 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   {rotulo(status)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label>
             <span>Data de início</span>
-            <input
+            <Input
               type="date"
               value={formulario.dataInicio}
               onChange={(event) =>
@@ -873,7 +874,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Data de vencimento</span>
-            <input
+            <Input
               type="date"
               value={formulario.dataVencimento}
               onChange={(event) =>
@@ -884,7 +885,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label className="painel-saas-form-observacao">
             <span>Observação administrativa</span>
-            <textarea
+            <Textarea
               value={formulario.observacaoAdmin}
               onChange={(event) =>
                 atualizarFormulario("observacaoAdmin", event.target.value)
@@ -898,7 +899,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Nome do responsavel</span>
-            <input
+            <Input
               type="text"
               value={formulario.responsavelNome}
               onChange={(event) =>
@@ -910,7 +911,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>E-mail do responsavel</span>
-            <input
+            <Input
               type="email"
               value={formulario.responsavelEmail}
               onChange={(event) =>
@@ -925,7 +926,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Telefone do responsavel</span>
-            <input
+            <Input
               type="text"
               value={formulario.responsavelTelefone}
               onChange={(event) =>
@@ -936,7 +937,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Perfil do responsavel</span>
-            <select
+            <Select
               value={formulario.responsavelPerfil}
               onChange={(event) =>
                 atualizarFormulario("responsavelPerfil", event.target.value)
@@ -949,12 +950,12 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   {rotulo(perfil)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
-          <button type="submit" disabled={salvandoArena}>
+          <Button type="submit" disabled={salvandoArena}>
             {salvandoArena ? "Salvando..." : "Criar arena funcional"}
-          </button>
+          </Button>
         </form>
       )}
 
@@ -962,9 +963,9 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
         <form className="painel-saas-form" onSubmit={salvarResponsavel}>
           <div className="painel-saas-form-header">
             <h3>Cadastrar responsável</h3>
-            <button type="button" onClick={fecharFormularioResponsavel}>
+            <Button type="button" onClick={fecharFormularioResponsavel}>
               Cancelar
-            </button>
+            </Button>
           </div>
 
           <div className="painel-saas-form-context">
@@ -977,7 +978,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Nome do responsável</span>
-            <input
+            <Input
               type="text"
               value={formularioResponsavel.nome}
               onChange={(event) =>
@@ -989,7 +990,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>E-mail</span>
-            <input
+            <Input
               type="email"
               value={formularioResponsavel.email}
               onChange={(event) =>
@@ -1001,7 +1002,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Telefone</span>
-            <input
+            <Input
               type="text"
               value={formularioResponsavel.telefone}
               onChange={(event) =>
@@ -1012,7 +1013,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
           <label>
             <span>Perfil</span>
-            <select
+            <Select
               value={formularioResponsavel.perfil}
               onChange={(event) =>
                 atualizarFormularioResponsavel("perfil", event.target.value)
@@ -1024,45 +1025,26 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   {rotulo(perfil)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
-          <button type="submit" disabled={salvandoResponsavel}>
+          <Button type="submit" disabled={salvandoResponsavel}>
             {salvandoResponsavel ? "Salvando..." : "Salvar responsável"}
-          </button>
+          </Button>
         </form>
       )}
 
       {arenaEdicaoWhatsapp && (
-        <div
-          className="painel-saas-modal-backdrop"
-          style={{
-            alignItems: "center",
-            background: "rgba(15, 23, 42, 0.42)",
-            display: "flex",
-            inset: 0,
-            justifyContent: "center",
-            padding: "18px",
-            position: "fixed",
-            zIndex: 50,
-          }}
-        >
+        <div className="painel-saas-modal-backdrop">
           <form
-            className="painel-saas-form"
+            className="painel-saas-form painel-saas-whatsapp-modal"
             onSubmit={salvarWhatsappArena}
-            style={{
-              background: "#ffffff",
-              boxShadow: "0 24px 60px rgba(15, 23, 42, 0.22)",
-              margin: 0,
-              maxWidth: "460px",
-              width: "100%",
-            }}
           >
             <div className="painel-saas-form-header">
               <h3>Editar WhatsApp da arena</h3>
-              <button type="button" onClick={fecharEdicaoWhatsapp}>
+              <Button type="button" onClick={fecharEdicaoWhatsapp}>
                 Cancelar
-              </button>
+              </Button>
             </div>
 
             <div className="painel-saas-form-context">
@@ -1075,7 +1057,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
             <label>
               <span>WhatsApp da arena</span>
-              <input
+              <Input
                 type="text"
                 value={whatsappEdicao}
                 onChange={(event) => setWhatsappEdicao(event.target.value)}
@@ -1084,23 +1066,17 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
               />
             </label>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                justifyContent: "flex-end",
-              }}
-            >
-              <button
+            <div className="painel-saas-modal-actions">
+              <Button
                 type="button"
                 onClick={fecharEdicaoWhatsapp}
                 disabled={salvandoWhatsapp}
               >
                 Cancelar
-              </button>
-              <button type="submit" disabled={salvandoWhatsapp}>
+              </Button>
+              <Button type="submit" disabled={salvandoWhatsapp}>
                 {salvandoWhatsapp ? "Salvando..." : "Salvar"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -1117,7 +1093,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
       <div className="painel-saas-filters">
         <label>
           <span>Buscar por nome da arena</span>
-          <input
+          <Input
             type="search"
             value={busca}
             onChange={(event) => setBusca(event.target.value)}
@@ -1127,7 +1103,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
         <label>
           <span>Status da assinatura</span>
-          <select
+          <Select
             value={statusFiltro}
             onChange={(event) => setStatusFiltro(event.target.value)}
           >
@@ -1136,12 +1112,12 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                 {status === "todos" ? "Todos" : rotulo(status)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         <label>
           <span>Plano</span>
-          <select
+          <Select
             value={planoFiltro}
             onChange={(event) => setPlanoFiltro(event.target.value)}
           >
@@ -1150,12 +1126,14 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                 {plano === "todos" ? "Todos" : rotulo(plano)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
 
       {carregando && (
-        <div className="painel-saas-loading">Carregando arenas...</div>
+        <LoadingState className="painel-saas-loading">
+          Carregando arenas...
+        </LoadingState>
       )}
 
       {erro && <div className="painel-saas-error">{erro}</div>}
@@ -1223,20 +1201,20 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
                   <td>
                     {podeCadastrarArena && (
                       <>
-                        <button
+                        <Button
                           type="button"
                           className="painel-saas-action"
                           onClick={() => abrirEdicaoWhatsapp(arena)}
                         >
                           Editar WhatsApp
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
                           className="painel-saas-action"
                           onClick={() => abrirFormularioResponsavel(arena)}
                         >
                           Adicionar responsavel
-                        </button>
+                        </Button>
                       </>
                     )}
                   </td>
@@ -1247,7 +1225,9 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
           </table>
 
           {arenasFiltradas.length === 0 && (
-            <div className="painel-saas-empty">Nenhuma arena encontrada.</div>
+            <EmptyState className="painel-saas-empty">
+              Nenhuma arena encontrada.
+            </EmptyState>
           )}
         </div>
       )}

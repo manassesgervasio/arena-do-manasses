@@ -29,7 +29,8 @@ export default function AgendaGrid({
     obterIndiceDoDiaAtual(dias)
   );
   const [horarioAbertoPorDia, setHorarioAbertoPorDia] = useState({});
-  const diaMobile = dias[diaMobileIndex] || dias[0];
+  const diaSelecionado = dias[diaMobileIndex] || dias[0];
+  const diaMobile = diaSelecionado;
   const podeVoltarSemana = !modoPublico || dataEhFutura(dias[0]);
 
   function alternarHorarioAberto(dataTexto, hora) {
@@ -181,39 +182,75 @@ const jogosDia = horarios.filter((horaAtual) => {
     );
   }
 
-  return (
-    <div
-      className="agenda-shell"
-      style={{
-        marginTop: "30px",
-        overflowX: "auto",
-        overflowY: "auto",
-        scrollBehavior: "smooth",
-        paddingBottom: "10px",
-        maxHeight: "70vh",
-        background: "white",
-        color: "#0f172a",
-        borderRadius: "14px",
-        padding: "12px",
-      }}
-    >
-      <div
-        className="agenda-desktop"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, minmax(130px, 1fr))",
-          gap: "10px",
-          minWidth: "100%",
-        }}
-      >
-        {dias.map((data) => renderDiaCabecalho(data))}
+  function renderSeletorDiaDesktop() {
+    return (
+      <div className="agenda-desktop-day-nav">
+        <button
+          className="agenda-week-arrow"
+          type="button"
+          onClick={podeVoltarSemana ? onSemanaAnterior : undefined}
+          disabled={!podeVoltarSemana}
+          aria-label="Semana anterior"
+        >
+          â—€
+        </button>
 
-        {horarios.map((hora) => (
-<div key={hora} style={{ display: "contents" }}>
-  
-  {dias.map((data) => renderHorarioCard(data, hora))}
+        <div className="agenda-desktop-day-selector">
+          {dias.map((data, index) => {
+            const textoData = formatarData(data);
+            const dataCurta = formatarDataBR(textoData)
+              .split("/")
+              .slice(0, 2)
+              .join("/");
+            const dataPassadaPublica = modoPublico && dataEhPassada(data);
+
+            return (
+              <button
+                className={`agenda-desktop-day-button${
+                  index === diaMobileIndex ? " is-selected" : ""
+                }${dataPassadaPublica ? " is-disabled" : ""}`}
+                key={textoData}
+                type="button"
+                onClick={() => {
+                  if (dataPassadaPublica) return;
+
+                  setDiaMobileIndex(index);
+                }}
+                disabled={dataPassadaPublica}
+              >
+                <span>{diasSemana[data.getDay()]}</span>
+                <strong>{dataCurta}</strong>
+              </button>
+            );
+          })}
         </div>
-))}
+
+        <button
+          className="agenda-week-arrow"
+          type="button"
+          onClick={onSemanaProxima}
+          aria-label="Proxima semana"
+        >
+          â–¶
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="agenda-shell">
+      <div className="agenda-desktop agenda-desktop-dia">
+        {renderSeletorDiaDesktop()}
+
+        {diaSelecionado && (
+          <>
+            {renderDiaCabecalho(diaSelecionado)}
+
+            <div className="agenda-desktop-horarios">
+              {horarios.map((hora) => renderHorarioCard(diaSelecionado, hora))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="agenda-mobile">
@@ -228,15 +265,7 @@ const jogosDia = horarios.filter((horaAtual) => {
             ◀
           </button>
 
-          <div
-            className="agenda-mobile-day-selector"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, minmax(42px, 1fr))",
-              gap: "6px",
-              marginBottom: "12px",
-            }}
-          >
+          <div className="agenda-mobile-day-selector">
             {dias.map((data, index) => {
               const textoData = formatarData(data);
               const dataPassadaPublica = modoPublico && dataEhPassada(data);
@@ -254,23 +283,9 @@ const jogosDia = horarios.filter((horaAtual) => {
                     setDiaMobileIndex(index);
                   }}
                   disabled={dataPassadaPublica}
-                  style={{
-                    minHeight: "44px",
-                    border:
-                      index === diaMobileIndex
-                        ? "1px solid #bbf7d0"
-                        : "1px solid transparent",
-                    borderRadius: "12px",
-                    background:
-                      index === diaMobileIndex ? "#ecfdf5" : "#f8fafc",
-                    color: "#0f172a",
-                    fontWeight: "bold",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                  }}
                 >
                   <div>{diasSemana[data.getDay()]}</div>
-                  <div style={{ fontSize: "11px" }}>
+                  <div className="agenda-mobile-day-number">
                     {textoData.split("-")[2]}
                   </div>
                 </button>
@@ -292,14 +307,7 @@ const jogosDia = horarios.filter((horaAtual) => {
           <>
             {renderDiaCabecalho(diaMobile)}
 
-            <div
-              className="agenda-mobile-horarios"
-              style={{
-                display: "grid",
-                gap: "10px",
-                marginTop: "10px",
-              }}
-            >
+            <div className="agenda-mobile-horarios">
               {horarios.map((hora) => renderHorarioCard(diaMobile, hora))}
             </div>
           </>

@@ -1,5 +1,6 @@
 import ClienteCard from "./ClienteCard";
 import ClienteModal from "./ClienteModal";
+import { Card, EmptyState, Input, Select } from "./ui";
 
 export default function ClientesSection({
   clientes,
@@ -15,141 +16,63 @@ export default function ClientesSection({
   onClienteModalClose,
 }) {
   return (
-    <div
-      className="clientes-section"
-      style={{
-        marginTop: "40px",
-      }}
-    >
-      <div
-        className="clientes-stats-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-          marginBottom: "20px",
-        }}
-      >
-        <Card
-          titulo="Clientes"
-          valor={clientes.length}
-        />
-
-        <Card
+    <div className="clientes-section">
+      <div className="clientes-stats-grid">
+        <StatCard titulo="Clientes" valor={clientes.length} />
+        <StatCard
           titulo="Inadimplentes"
-          valor={
-            clientes.filter((c) => c.pendente > 0).length
-          }
+          valor={clientes.filter((c) => c.pendente > 0).length}
         />
-        <Card
+        <StatCard
           titulo="Total pendente"
           valor={moeda(
-            clientes.reduce(
-              (total, cliente) =>
-                total + cliente.pendente,
-              0
-            )
+            clientes.reduce((total, cliente) => total + cliente.pendente, 0)
           )}
         />
-
-        <Card
+        <StatCard
           titulo="Clientes ativos"
-          valor={
-            clientes.filter((c) => c.jogos > 0).length
-          }
+          valor={clientes.filter((c) => c.jogos > 0).length}
         />
       </div>
-      <h2
-        className="clientes-heading"
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        🏆 Ranking de Clientes
-      </h2>
 
-      <input
+      <h2 className="clientes-heading">Ranking de Clientes</h2>
+
+      <Input
         className="clientes-search"
         type="text"
         placeholder="Buscar cliente..."
         value={buscaCliente}
         onChange={onBuscaClienteChange}
-        style={{
-          width: "100%",
-          padding: "12px",
-          borderRadius: "12px",
-          border: "none",
-          marginBottom: "20px",
-          fontSize: "14px",
-          fontWeight: "bold",
-        }}
       />
-      <select
+
+      <Select
         className="clientes-filter-select"
         value={filtroCliente}
         onChange={onFiltroClienteChange}
-        style={{
-          width: "100%",
-          padding: "12px",
-          borderRadius: "12px",
-          border: "none",
-          marginBottom: "20px",
-          fontSize: "14px",
-          fontWeight: "bold",
-        }}
       >
         <option>Todos</option>
         <option>Ativos</option>
         <option>Inadimplentes</option>
-      </select>
+      </Select>
 
-      <div
-        className="clientes-list-scroll"
-        style={{
-          maxHeight: "55vh",
-          overflowY: "auto",
-          paddingRight: "8px",
-          paddingBottom: "10px",
-        }}
-      >
-        <div
-          className="clientes-list-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "10px",
-          }}
-        >
+      <div className="clientes-list-scroll">
+        <div className="clientes-list-grid">
           {clientesFiltrados.length === 0 && (
-            <div
-              style={{
-                background: "#1e293b",
-                padding: "20px",
-                borderRadius: "16px",
-                textAlign: "center",
-                color: "#cbd5e1",
-                fontWeight: "bold",
-              }}
-            >
-              🔍 Nenhum cliente encontrado
-            </div>
+            <EmptyState>Nenhum cliente encontrado</EmptyState>
           )}
+
           {clientesFiltrados.map((cliente, index) => (
             <ClienteCard
               key={cliente.nome}
               cliente={cliente}
               index={index}
               formatarDataBR={formatarDataBR}
-              onClick={() =>
-                onClienteSelect(cliente)
-              }
+              onClick={() => onClienteSelect(cliente)}
             />
           ))}
         </div>
       </div>
+
       <ClienteModal
         cliente={clienteSelecionado}
         moeda={moeda}
@@ -159,35 +82,11 @@ export default function ClientesSection({
   );
 }
 
-function Card({ titulo, valor }) {
+function StatCard({ titulo, valor }) {
   return (
-    <div
-      className="clientes-stat-card"
-      style={{
-        background: "linear-gradient(135deg, #1e293b, #0f172a)",
-        padding: "22px",
-        borderRadius: "22px",
-        textAlign: "center",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-      }}
-    >
-      <p style={{ color: "#cbd5e1", fontSize: "18px", margin: 0 }}>
-        {titulo}
-      </p>
-
-      <h2
-        className="clientes-stat-value"
-        style={{
-          fontSize: "32px",
-          color: "white",
-          margin: "10px 0 0",
-          wordBreak: "break-word",
-          lineHeight: "36px",
-        }}
-      >
-        {valor}
-      </h2>
-    </div>
+    <Card className="clientes-stat-card">
+      <p>{titulo}</p>
+      <h2 className="clientes-stat-value">{valor}</h2>
+    </Card>
   );
 }

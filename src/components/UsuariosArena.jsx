@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import { criarUsuarioAuth } from "../utils/criarUsuarioAuth";
+import { Button, EmptyState, Input, LoadingState, Select } from "./ui";
 
 const perfilOpcoes = ["atendente", "gerente", "financeiro", "admin_arena"];
 
@@ -363,9 +364,9 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
             <h2>Usuarios da Arena</h2>
             <p>Gerencie os acessos da arena atual</p>
           </div>
-          <button type="button" onClick={onVoltar}>
+          <Button type="button" onClick={onVoltar}>
             Voltar
-          </button>
+          </Button>
         </div>
         <div className="usuarios-arena-error">
           Voce nao tem permissao para gerenciar usuarios desta arena.
@@ -385,15 +386,15 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
           </span>
         </div>
 
-        <button type="button" onClick={onVoltar}>
+        <Button type="button" onClick={onVoltar}>
           Voltar
-        </button>
+        </Button>
       </div>
 
       <div className="usuarios-arena-toolbar">
-        <button type="button" onClick={abrirFormulario}>
+        <Button type="button" onClick={abrirFormulario}>
           Adicionar usuario
-        </button>
+        </Button>
       </div>
 
       {mensagem && <div className="usuarios-arena-confirmation">{mensagem}</div>}
@@ -409,14 +410,14 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
         <form className="usuarios-arena-form" onSubmit={salvarUsuario}>
           <div className="usuarios-arena-form-header">
             <h3>Adicionar usuario</h3>
-            <button type="button" onClick={fecharFormulario}>
+            <Button type="button" onClick={fecharFormulario}>
               Cancelar
-            </button>
+            </Button>
           </div>
 
           <label>
             <span>Nome</span>
-            <input
+            <Input
               type="text"
               value={formulario.nome}
               onChange={(event) => atualizarFormulario("nome", event.target.value)}
@@ -426,7 +427,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
           <label>
             <span>E-mail</span>
-            <input
+            <Input
               type="email"
               value={formulario.email}
               onChange={(event) => atualizarFormulario("email", event.target.value)}
@@ -436,7 +437,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
           <label>
             <span>Telefone</span>
-            <input
+            <Input
               type="text"
               value={formulario.telefone}
               onChange={(event) => atualizarFormulario("telefone", event.target.value)}
@@ -445,7 +446,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
           <label>
             <span>Perfil</span>
-            <select
+            <Select
               value={formulario.perfil}
               onChange={(event) => atualizarFormulario("perfil", event.target.value)}
               required
@@ -455,17 +456,19 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
                   {rotulo(perfil)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
-          <button type="submit" disabled={salvando}>
+          <Button type="submit" disabled={salvando}>
             {salvando ? "Salvando..." : "Salvar usuario"}
-          </button>
+          </Button>
         </form>
       )}
 
       {carregando ? (
-        <div className="usuarios-arena-loading">Carregando usuarios...</div>
+        <LoadingState className="usuarios-arena-loading">
+          Carregando usuarios...
+        </LoadingState>
       ) : (
         <div className="usuarios-arena-table-wrap">
           <table className="usuarios-arena-table">
@@ -496,14 +499,14 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
                   <td>{vinculo.ativo ? "Sim" : "Nao"}</td>
                   <td>{formatarData(vinculo.created_at)}</td>
                   <td>
-                    <button
+                    <Button
                       type="button"
                       className="usuarios-arena-action"
                       disabled={alterandoId === vinculo.id}
                       onClick={() => alterarStatusVinculo(vinculo, !vinculo.ativo)}
                     >
                       {vinculo.ativo ? "Desativar" : "Reativar"}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -511,7 +514,9 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
           </table>
 
           {usuariosVinculados.length === 0 && (
-            <div className="usuarios-arena-empty">Nenhum usuario vinculado.</div>
+            <EmptyState className="usuarios-arena-empty">
+              Nenhum usuario vinculado.
+            </EmptyState>
           )}
         </div>
       )}

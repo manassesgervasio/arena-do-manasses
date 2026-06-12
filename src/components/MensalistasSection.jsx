@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import { diasSemana, horarios } from "../constants";
+import { Button, Card, EmptyState, Input, LoadingState, Select } from "./ui";
 
 const statusLista = ["Ativo", "Pausado", "Cancelado"];
 const situacaoLista = ["Pago", "Pendente", "Vencido"];
@@ -598,7 +599,7 @@ export default function MensalistasSection({
           <p>Mensalidades de {competenciaAtual}, sem agenda e sem resumo financeiro</p>
         </div>
 
-        <button
+        <Button
           type="button"
           className="mensalistas-primary-button"
           onClick={() => {
@@ -610,7 +611,7 @@ export default function MensalistasSection({
           }}
         >
           {mostrarFormulario ? "Fechar" : "Novo mensalista"}
-        </button>
+        </Button>
       </div>
 
       {erro && <p className="mensalistas-error">{erro}</p>}
@@ -640,20 +641,20 @@ export default function MensalistasSection({
 
       {mostrarFormulario && (
         <form className="mensalistas-form" onSubmit={salvarMensalista}>
-          <input
+          <Input
             type="text"
             placeholder="Nome"
             value={novoMensalista.nome}
             onChange={(event) => atualizarCampo("nome", event.target.value)}
             required
           />
-          <input
+          <Input
             type="tel"
             placeholder="Telefone"
             value={novoMensalista.telefone}
             onChange={(event) => atualizarCampo("telefone", event.target.value)}
           />
-          <input
+          <Input
             type="number"
             min="0"
             placeholder="Valor mensal"
@@ -663,7 +664,7 @@ export default function MensalistasSection({
             }
             required
           />
-          <input
+          <Input
             type="number"
             min="1"
             max="31"
@@ -674,15 +675,15 @@ export default function MensalistasSection({
             }
             required
           />
-          <select
+          <Select
             value={novoMensalista.status}
             onChange={(event) => atualizarCampo("status", event.target.value)}
           >
             {statusLista.map((status) => (
               <option key={status}>{status}</option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             value={novoMensalista.diaSemana}
             onChange={(event) => atualizarCampo("diaSemana", event.target.value)}
           >
@@ -691,8 +692,8 @@ export default function MensalistasSection({
                 {dia}
               </option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             value={novoMensalista.horario}
             onChange={(event) => atualizarCampo("horario", event.target.value)}
           >
@@ -701,21 +702,21 @@ export default function MensalistasSection({
                 {horario}
               </option>
             ))}
-          </select>
-          <button type="submit" disabled={salvando}>
+          </Select>
+          <Button type="submit" disabled={salvando}>
             {salvando
               ? "Salvando..."
               : mensalistaEditandoId
               ? "Salvar alterações"
               : "Adicionar"}
-          </button>
+          </Button>
         </form>
       )}
 
       <div className="mensalistas-filters" aria-label="Filtros de mensalistas">
         <label>
           <span>Status</span>
-          <select
+          <Select
             value={filtroStatus}
             onChange={(event) => setFiltroStatus(event.target.value)}
           >
@@ -723,12 +724,12 @@ export default function MensalistasSection({
             {statusLista.map((status) => (
               <option key={status}>{status}</option>
             ))}
-          </select>
+          </Select>
         </label>
 
         <label>
           <span>Situação financeira</span>
-          <select
+          <Select
             value={filtroSituacao}
             onChange={(event) => setFiltroSituacao(event.target.value)}
           >
@@ -736,20 +737,24 @@ export default function MensalistasSection({
             {situacaoLista.map((situacao) => (
               <option key={situacao}>{situacao}</option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
 
       {carregando ? (
-        <div className="mensalistas-empty">Carregando mensalistas...</div>
+        <LoadingState className="mensalistas-empty">
+          Carregando mensalistas...
+        </LoadingState>
       ) : (
         <div className="mensalistas-grid">
           {mensalistasFiltrados.length === 0 && (
-            <div className="mensalistas-empty">Nenhum mensalista encontrado.</div>
+            <EmptyState className="mensalistas-empty">
+              Nenhum mensalista encontrado.
+            </EmptyState>
           )}
 
           {mensalistasFiltrados.map((mensalista) => (
-            <article className="mensalista-card" key={mensalista.id}>
+            <Card as="article" className="mensalista-card" key={mensalista.id}>
               {(() => {
                 const situacao = obterSituacaoMensal(mensalista);
                 const estaPago = situacao === "Pago";
@@ -803,7 +808,7 @@ export default function MensalistasSection({
                         {situacao}
                       </span>
 
-                      <button
+                      <Button
                         type="button"
                         className="mensalista-payment-button"
                         disabled={estaPago || pagamentoSalvandoId === mensalista.id}
@@ -814,7 +819,7 @@ export default function MensalistasSection({
                           : estaPago
                           ? "Mensalidade paga"
                           : "Marcar como pago"}
-                      </button>
+                      </Button>
                     </div>
 
                     <section className="mensalista-history">
@@ -839,16 +844,16 @@ export default function MensalistasSection({
                       )}
                     </section>
 
-                    <button
+                    <Button
                       type="button"
                       className="mensalista-edit-button"
                       onClick={() => iniciarEdicao(mensalista)}
                     >
                       Editar mensalista
-                    </button>
+                    </Button>
 
                     {podeExcluirMensalista && (
-                      <button
+                      <Button
                         type="button"
                         className="mensalista-delete-button"
                         disabled={mensalistaExcluindoId === mensalista.id}
@@ -857,10 +862,10 @@ export default function MensalistasSection({
                         {mensalistaExcluindoId === mensalista.id
                           ? "Excluindo..."
                           : "Excluir mensalista"}
-                      </button>
+                      </Button>
                     )}
 
-                    <button
+                    <Button
                       type="button"
                       className="mensalista-delete-payment-button"
                       disabled={
@@ -874,11 +879,11 @@ export default function MensalistasSection({
                         : temPagamentoMensal
                         ? "Excluir pagamento mensal"
                         : "Sem pagamento mensal"}
-                    </button>
+                    </Button>
                   </>
                 );
               })()}
-            </article>
+            </Card>
           ))}
         </div>
       )}
@@ -897,9 +902,9 @@ function Info({ label, value }) {
 
 function ResumoMensalistaCard({ titulo, valor }) {
   return (
-    <div className="mensalistas-summary-card">
+    <Card className="mensalistas-summary-card">
       <span>{titulo}</span>
       <strong>{valor}</strong>
-    </div>
+    </Card>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button, Card, Input } from "./ui";
 
 export default function Login({ onEntrar, onVoltar }) {
   const [email, setEmail] = useState("");
@@ -25,7 +26,7 @@ export default function Login({ onEntrar, onVoltar }) {
 
   return (
     <main className="login-page">
-      <section className="login-panel" aria-label="Login">
+      <Card as="section" className="login-panel" aria-label="Login">
         <div className="login-brand">
           <h1>Arena do Manasses</h1>
           <p>Acesso ao sistema</p>
@@ -34,7 +35,7 @@ export default function Login({ onEntrar, onVoltar }) {
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-field">
             <span>E-mail</span>
-            <input
+            <Input
               type="email"
               name="email"
               autoComplete="email"
@@ -47,7 +48,7 @@ export default function Login({ onEntrar, onVoltar }) {
 
           <label className="login-field">
             <span>Senha</span>
-            <input
+            <Input
               type="password"
               name="password"
               autoComplete="current-password"
@@ -60,21 +61,26 @@ export default function Login({ onEntrar, onVoltar }) {
 
           {erro && <p className="login-error">{erro}</p>}
 
-          <button className="login-button" type="submit" disabled={carregando}>
+          <Button
+            className="login-button"
+            type="submit"
+            disabled={carregando}
+            variant="primary"
+          >
             {carregando ? "Entrando..." : "Entrar"}
-          </button>
+          </Button>
           {onVoltar && (
-            <button
+            <Button
               className="login-secondary-button"
               type="button"
               onClick={onVoltar}
               disabled={carregando}
             >
               Voltar para agenda
-            </button>
+            </Button>
           )}
         </form>
-      </section>
+      </Card>
     </main>
   );
 }

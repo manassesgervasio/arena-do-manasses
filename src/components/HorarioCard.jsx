@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReservaBadges from "./ReservaBadges";
+import { Button, Input, Select } from "./ui";
 
 export default function HorarioCard({
   item,
@@ -70,9 +71,7 @@ export default function HorarioCard({
     }
 
     setSalvandoAluguelAvulso(true);
-
     const mensagemErro = await onAlugarComoAvulso?.(aluguelAvulso);
-
     setSalvandoAluguelAvulso(false);
 
     if (mensagemErro) {
@@ -100,12 +99,7 @@ export default function HorarioCard({
     }
 
     setEnviandoSolicitacaoPublica(true);
-
-    const resultado = await onSolicitarReservaPublica?.({
-      nome,
-      telefone,
-    });
-
+    const resultado = await onSolicitarReservaPublica?.({ nome, telefone });
     setEnviandoSolicitacaoPublica(false);
 
     if (!resultado?.ok) {
@@ -117,50 +111,46 @@ export default function HorarioCard({
       return;
     }
 
-    setSolicitacaoPublica({
-      nome: "",
-      telefone: "",
-    });
+    setSolicitacaoPublica({ nome: "", telefone: "" });
     setWhatsappPublicoUrl(resultado.whatsappUrl || "");
-
     alert(resultado.mensagem || "Reserva pendente criada com sucesso.");
   }
 
   const statusAvulsoLista = statusLista.filter((status) => status !== "Livre");
   const statusIcones = {
-    Livre: "⚪",
-    Reservado: "📌",
-    Pago: "✅",
-    Pendente: "⏳",
-    Cancelado: "❌",
-    Faltou: "⚠️",
+    Livre: "",
+    Reservado: "",
+    Pago: "",
+    Pendente: "",
+    Cancelado: "",
+    Faltou: "",
   };
   const statusVisual = mensalistaContratado
     ? "Mensalista"
     : item.status || "Livre";
   const statusSelo = mensalistaContratado
-    ? "⭐ MENSALISTA"
+    ? "MENSALISTA"
     : item.tipo === "Fixo"
-    ? "📍 FIXO"
+    ? "FIXO"
     : item.status === "Pago"
-    ? "✅ PAGO"
+    ? "PAGO"
     : item.status === "Pendente"
-    ? "⏳ PENDENTE"
+    ? "PENDENTE"
     : item.status === "Reservado"
-    ? "📌 RESERVADO"
+    ? "RESERVADO"
     : item.status === "Cancelado"
-    ? "✕ CANCELADO"
+    ? "CANCELADO"
     : item.status === "Faltou"
-    ? "⚠ FALTOU"
+    ? "FALTOU"
     : "";
   const statusIcone = mensalistaContratado
-    ? "⭐"
+    ? ""
     : item.tipo === "Fixo"
-    ? "📍"
-    : statusIcones[item.status] || "⚪";
+    ? ""
+    : statusIcones[item.status] || "";
   const statusClasse = String(item.status || "Livre").toLowerCase();
   const tituloResumo =
-    mensalistaContratado?.nome || item.cliente || "Disponível";
+    mensalistaContratado?.nome || item.cliente || "Disponivel";
   const podeReservarWhatsApp =
     modoPublico && compactoLivre && !mensalistaContratado && !reservaIndisponivel;
   const cardClasse = [
@@ -176,107 +166,45 @@ export default function HorarioCard({
 
   function alternarPeloCard(event) {
     if (event.target.closest("button, input, select, textarea, a")) return;
-
     onToggleExpandido?.();
   }
 
   return (
-    <div
-      className={cardClasse}
-      onClick={alternarPeloCard}
-      style={{
-        background: "white",
-        opacity: 1,
-        transition: "0.2s",
-        border: "1px solid rgba(148, 163, 184, 0.24)",
-        borderRadius: "14px",
-        padding: !expandido ? "4px 10px" : "10px",
-        boxShadow: !expandido
-          ? "0 2px 6px rgba(15, 23, 42, 0.05)"
-          : "0 8px 18px rgba(15, 23, 42, 0.14)",
-      }}
-    >
-      <button
+    <div className={cardClasse} onClick={alternarPeloCard}>
+      <Button
         className="horario-compact-button horario-card-time"
         type="button"
         onClick={onToggleExpandido}
         aria-expanded={expandido}
         aria-label={`${expandido ? "Fechar" : "Abrir"} horario ${hora}`}
-        style={{
-          width: "100%",
-          display: "grid",
-          gap: !expandido ? "1px" : "6px",
-          border: "none",
-          background: "transparent",
-          padding: 0,
-          textAlign: "left",
-          cursor: "pointer",
-          font: "inherit",
-          color: "inherit",
-          marginBottom: expandido ? "10px" : 0,
-        }}
       >
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "6px",
-            color: "#475569",
-            fontSize: !expandido ? "11px" : "12px",
-            fontWeight: "bold",
-          }}
-        >
+        <span className="horario-card-meta">
           <span className="horario-card-hour">
-            {expandido ? `${statusIcone} ` : ""}
+            {expandido && statusIcone ? `${statusIcone} ` : ""}
             {hora.split(" - ")[0]}
           </span>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "5px",
-              minWidth: 0,
-            }}
-          >
-            <span aria-hidden="true">{expandido ? "▲" : "▼"}</span>
+          <span className="horario-card-toggle-icon" aria-hidden="true">
+            {expandido ? "▲" : "▼"}
           </span>
         </span>
-        <strong
-          style={{
-            overflow: "hidden",
-            color: "#0f172a",
-            fontSize: !expandido ? "12px" : "14px",
-            lineHeight: !expandido ? "14px" : "18px",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {tituloResumo}
-        </strong>
+
+        <strong className="horario-card-title">{tituloResumo}</strong>
+
         {!expandido && statusSelo && (
           <span className="horario-status-pill horario-status-pill-row">
             {statusSelo}
           </span>
         )}
+
         {expandido && !modoPublico && (
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "8px",
-              color: "#64748b",
-              fontSize: "12px",
-              fontWeight: 800,
-            }}
-          >
+          <span className="horario-card-expanded-summary">
             <span>{statusVisual}</span>
             {item.valor ? <span>R$ {item.valor}</span> : null}
           </span>
         )}
+
         {expandido && !modoPublico && <ReservaBadges tipo={item.tipo} />}
-      </button>
+      </Button>
 
       {expandido && modoPublico && (
         <div className="horario-card-public-details">
@@ -290,48 +218,53 @@ export default function HorarioCard({
               className="public-reserva-form"
               onSubmit={confirmarSolicitacaoPublica}
             >
-              <input
+              <Input
+                className="horario-card-input"
                 placeholder="Nome"
                 value={solicitacaoPublica.nome}
                 onChange={(event) =>
                   atualizarSolicitacaoPublica("nome", event.target.value)
                 }
-                style={inputStyle}
               />
-              <input
+              <Input
+                className="horario-card-input"
                 placeholder="Telefone/WhatsApp"
                 inputMode="tel"
                 value={solicitacaoPublica.telefone}
                 onChange={(event) =>
                   atualizarSolicitacaoPublica("telefone", event.target.value)
                 }
-                style={inputStyle}
               />
-              <button
+              <Button
                 className="whatsapp-reserva-button"
                 type="submit"
                 disabled={enviandoSolicitacaoPublica}
+                variant="primary"
               >
                 {enviandoSolicitacaoPublica
                   ? "Enviando..."
                   : "Agendar e enviar WhatsApp"}
-              </button>
+              </Button>
             </form>
           )}
+
           {reservaIndisponivel && compactoLivre && (
             <span className="horario-public-unavailable">
-              Indisponível para reserva
+              Indisponivel para reserva
             </span>
           )}
+
           {whatsappPublicoUrl && (
-            <a
+            <Button
+              as="a"
               className="whatsapp-reserva-button"
               href={whatsappPublicoUrl}
               target="_blank"
               rel="noreferrer"
+              variant="primary"
             >
               Abrir WhatsApp da arena
-            </a>
+            </Button>
           )}
         </div>
       )}
@@ -339,248 +272,169 @@ export default function HorarioCard({
       {expandido && !modoPublico && (
         <div className="horario-card-form">
           {mensalistaContratado && (
-            <div
-              style={{
-                background: "#cffafe",
-                border: "1px solid #67e8f9",
-                borderRadius: "10px",
-                color: "#155e75",
-                fontSize: "11px",
-                fontWeight: "bold",
-                marginBottom: "8px",
-                padding: "7px",
-              }}
-            >
+            <div className="horario-mensalista-notice">
               <div>Mensalista contratado</div>
-              <div
-                style={{ color: "#0f172a", fontSize: "13px", marginTop: "2px" }}
-              >
+              <div className="horario-mensalista-name">
                 {mensalistaContratado.nome}
               </div>
             </div>
           )}
 
-          {mensalistaContratado && (
+          {mensalistaContratado ? (
             <>
               {!mostrandoAluguelAvulso ? (
-                <button
+                <Button
                   className="horario-action-button horario-action-full"
                   type="button"
                   onClick={() => setMostrandoAluguelAvulso(true)}
-                  style={{
-                    width: "100%",
-                    background: "#0891b2",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "8px 10px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    minHeight: "40px",
-                  }}
+                  variant="primary"
                 >
                   Alugar como avulso
-                </button>
+                </Button>
               ) : (
                 <>
-                  <input
+                  <Input
+                    className="horario-card-input"
                     placeholder="cliente/Time"
                     value={aluguelAvulso.cliente}
                     onChange={(event) =>
                       atualizarAluguelAvulso("cliente", event.target.value)
                     }
-                    style={inputStyle}
                   />
-                  <input
+                  <Input
+                    className="horario-card-input"
                     placeholder="Telefone"
                     value={aluguelAvulso.telefone}
                     maxLength={11}
                     onChange={(event) =>
                       atualizarAluguelAvulso("telefone", event.target.value)
                     }
-                    style={{
-                      ...inputStyle,
-                      fontSize: "12px",
-                    }}
                   />
-                  <input
+                  <Input
+                    className="horario-card-input"
                     placeholder="Valor"
                     type="number"
                     value={aluguelAvulso.valor}
                     onChange={(event) =>
                       atualizarAluguelAvulso("valor", event.target.value)
                     }
-                    style={inputStyle}
                   />
-                  <select
+                  <Select
+                    className="horario-card-input"
                     value={aluguelAvulso.status}
                     onChange={(event) =>
                       atualizarAluguelAvulso("status", event.target.value)
                     }
-                    style={inputStyle}
                   >
                     {statusAvulsoLista.map((status) => (
                       <option key={status}>{status}</option>
                     ))}
-                  </select>
-                  <button
-                    className="horario-action-button"
-                    type="button"
-                    onClick={salvarAluguelAvulso}
-                    disabled={salvandoAluguelAvulso}
-                    style={{
-                      marginRight: "6px",
-                      background: "#22c55e",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: "8px 10px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      minHeight: "40px",
-                    }}
-                  >
-                    {salvandoAluguelAvulso ? "Salvando..." : "Salvar avulso"}
-                  </button>
-                  <button
-                    className="horario-action-button"
-                    type="button"
-                    onClick={limparAluguelAvulso}
-                    disabled={salvandoAluguelAvulso}
-                    style={{
-                      border: "1px solid #cbd5e1",
-                      borderRadius: "8px",
-                      padding: "8px 10px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      minHeight: "40px",
-                    }}
-                  >
-                    Cancelar
-                  </button>
+                  </Select>
+                  <div className="horario-card-actions">
+                    <Button
+                      className="horario-action-button"
+                      type="button"
+                      onClick={salvarAluguelAvulso}
+                      disabled={salvandoAluguelAvulso}
+                      variant="primary"
+                    >
+                      {salvandoAluguelAvulso ? "Salvando..." : "Salvar avulso"}
+                    </Button>
+                    <Button
+                      className="horario-action-button"
+                      type="button"
+                      onClick={limparAluguelAvulso}
+                      disabled={salvandoAluguelAvulso}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
                 </>
               )}
             </>
-          )}
-
-          {!mensalistaContratado && (
+          ) : (
             <>
-              <input
+              <Input
+                className="horario-card-input"
                 placeholder="cliente/Time"
                 value={item.cliente}
                 onChange={onClienteChange}
                 disabled={item.status === "Pago"}
-                style={inputStyle}
               />
-
-              <input
+              <Input
+                className="horario-card-input"
                 placeholder="Telefone"
                 value={item.telefone}
                 maxLength={11}
                 onChange={onTelefoneChange}
                 disabled={item.status === "Pago"}
-                style={{
-                  ...inputStyle,
-                  fontSize: "12px",
-                }}
               />
-
-              <input
+              <Input
+                className="horario-card-input"
                 placeholder="Valor"
                 type="number"
                 value={item.valor}
                 onChange={onValorChange}
                 disabled={item.status === "Pago"}
-                style={inputStyle}
               />
-
-              <select
+              <Select
+                className="horario-card-input"
                 value={item.tipo || "Avulso"}
                 onChange={onTipoChange}
                 disabled={item.status === "Pago"}
-                style={inputStyle}
               >
                 {tipoLista.map((tipo) => (
                   <option key={tipo}>{tipo}</option>
                 ))}
-              </select>
-              <select
+              </Select>
+              <Select
+                className="horario-card-input"
                 value={item.status}
                 onChange={onStatusChange}
                 disabled={item.status === "Pago"}
-                style={inputStyle}
               >
                 {statusLista.map((status) => (
                   <option key={status}>{status}</option>
                 ))}
-              </select>
-              <button
-                className="horario-action-button"
-                type="button"
-                onClick={onReservar}
-                style={{
-                  marginRight: "6px",
-                  background: "#22c55e",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "8px 10px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  minHeight: "40px",
-                }}
-              >
-                {item.status === "Pendente" ? "Confirmar" : "Reservar"}
-              </button>
+              </Select>
 
-              {item.telefone && (
-                <a
+              <div className="horario-card-actions">
+                <Button
                   className="horario-action-button"
-                  href={criarLinkConfirmacaoCliente({
-                    nome: item.cliente,
-                    telefone: item.telefone,
-                    dataFormatada,
-                    hora,
-                    status: item.status,
-                  })}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: "6px",
-                    marginTop: "6px",
-                    background: "#0f766e",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "8px 10px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    minHeight: "40px",
-                    textDecoration: "none",
-                  }}
+                  type="button"
+                  onClick={onReservar}
+                  variant="primary"
                 >
-                  Enviar confirmação pelo WhatsApp
-                </a>
-              )}
+                  {item.status === "Pendente" ? "Confirmar" : "Reservar"}
+                </Button>
 
-              <button
-                className="horario-action-button"
-                type="button"
-                onClick={onLimpar}
-                style={{
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "8px",
-                  padding: "8px 10px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  minHeight: "40px",
-                }}
-              >
-                Limpar
-              </button>
+                {item.telefone && (
+                  <Button
+                    as="a"
+                    className="horario-action-button"
+                    href={criarLinkConfirmacaoCliente({
+                      nome: item.cliente,
+                      telefone: item.telefone,
+                      dataFormatada,
+                      hora,
+                      status: item.status,
+                    })}
+                    target="_blank"
+                    rel="noreferrer"
+                    variant="primary"
+                  >
+                    Enviar confirmacao pelo WhatsApp
+                  </Button>
+                )}
+
+                <Button
+                  className="horario-action-button"
+                  type="button"
+                  onClick={onLimpar}
+                >
+                  Limpar
+                </Button>
+              </div>
             </>
           )}
         </div>
@@ -588,16 +442,6 @@ export default function HorarioCard({
     </div>
   );
 }
-
-const inputStyle = {
-  width: "100%",
-  marginBottom: "5px",
-  padding: "6px",
-  borderRadius: "7px",
-  border: "1px solid #94a3b8",
-  fontSize: "12px",
-  minHeight: "34px",
-};
 
 function criarLinkConfirmacaoCliente({
   nome,
@@ -610,21 +454,21 @@ function criarLinkConfirmacaoCliente({
   const mensagem =
     status === "Reservado"
       ? [
-          `Olá, ${nome || "tudo bem"}! Sua reserva foi confirmada.`,
+          `Ola, ${nome || "tudo bem"}! Sua reserva foi confirmada.`,
           "",
           `Data: ${dataFormatada || ""}`,
-          `Horário: ${hora || ""}`,
+          `Horario: ${hora || ""}`,
           "",
-          "Até lá!",
+          "Ate la!",
         ].join("\n")
       : [
-          `Olá, ${nome || "tudo bem"}! Sua solicitação de reserva foi recebida.`,
+          `Ola, ${nome || "tudo bem"}! Sua solicitacao de reserva foi recebida.`,
           "",
           `Data: ${dataFormatada || ""}`,
-          `Horário: ${hora || ""}`,
+          `Horario: ${hora || ""}`,
           `Status: ${status || "Pendente"}`,
           "",
-          "A arena vai confirmar/confirmou seu horário por aqui.",
+          "A arena vai confirmar/confirmou seu horario por aqui.",
         ].join("\n");
 
   return `https://wa.me/${telefoneWhatsApp}?text=${encodeURIComponent(

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Badge, Button, Card, Input } from "../components/ui";
 
 const permissoesIniciais = [
   "Agenda",
@@ -28,7 +29,7 @@ export default function LoginPage({ onEntrar }) {
 
   return (
     <main className="login-page">
-      <section className="login-panel" aria-label="Login">
+      <Card as="section" className="login-panel" aria-label="Login">
         <div className="login-brand">
           <h1>Arena do Manassés</h1>
           <p>Acesso ao sistema</p>
@@ -37,7 +38,7 @@ export default function LoginPage({ onEntrar }) {
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-field">
             <span>E-mail</span>
-            <input
+            <Input
               type="email"
               name="email"
               autoComplete="email"
@@ -50,7 +51,7 @@ export default function LoginPage({ onEntrar }) {
 
           <label className="login-field">
             <span>Senha</span>
-            <input
+            <Input
               type="password"
               name="password"
               autoComplete="current-password"
@@ -63,17 +64,24 @@ export default function LoginPage({ onEntrar }) {
 
           {erro && <p className="login-error">{erro}</p>}
 
-          <button className="login-button" type="submit" disabled={carregando}>
+          <Button
+            className="login-button"
+            type="submit"
+            variant="primary"
+            disabled={carregando}
+          >
             {carregando ? "Entrando..." : "Entrar"}
-          </button>
+          </Button>
         </form>
 
         <div className="login-permissions" aria-label="Permissões">
           {permissoesIniciais.map((permissao) => (
-            <span key={permissao}>{permissao}</span>
+            <Badge key={permissao} tone="info">
+              {permissao}
+            </Badge>
           ))}
         </div>
-      </section>
+      </Card>
     </main>
   );
 }

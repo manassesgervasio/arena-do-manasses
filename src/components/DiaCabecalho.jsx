@@ -9,12 +9,18 @@ export default function DiaCabecalho({
   return (
     <div className="dia-cabecalho" style={cabecalho}>
       <div className="dia-cabecalho-linha">
-        <span className="dia-cabecalho-semana">{diaSemana}</span>
-        <span className="dia-cabecalho-data">{dataCurta}</span>
-        <span className="dia-cabecalho-separador">{"\u2022"}</span>
-        <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")}</span>
-        <span className="dia-cabecalho-separador">{"\u2022"}</span>
-        <span>{jogosDia} jogos</span>
+        <span className="dia-cabecalho-grupo dia-cabecalho-grupo-data">
+          <span className="dia-cabecalho-semana">{diaSemana}</span>
+          <span className="dia-cabecalho-data">{dataCurta}</span>
+        </span>
+        <span className="dia-cabecalho-separador dia-cabecalho-separador-principal">
+          {"\u2022"}
+        </span>
+        <span className="dia-cabecalho-grupo dia-cabecalho-grupo-resumo">
+          <span>R$ {Number(totalDia || 0).toLocaleString("pt-BR")}</span>
+          <span className="dia-cabecalho-separador">{"\u2022"}</span>
+          <span>{jogosDia} jogos</span>
+        </span>
       </div>
     </div>
   );
