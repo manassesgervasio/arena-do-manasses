@@ -1411,4 +1411,115 @@ textarea:disabled {
     background: rgba(255, 255, 255, 0.68) !important;
     color: var(--ds-text-muted) !important;
   }
+
+  .usuarios-arena h1,
+  .usuarios-arena h2,
+  .usuarios-arena h3,
+  .mensalistas-section h1,
+  .mensalistas-section h2,
+  .mensalistas-section h3,
+  .financeiro-profissional h1,
+  .financeiro-profissional h2,
+  .financeiro-profissional h3,
+  .financeiro-mobile-header h2 {
+    color: #1e123d !important;
+    font-weight: 950 !important;
+    text-shadow: none !important;
+  }
+
+  .usuarios-arena-header p,
+  .usuarios-arena-header span,
+  .mensalistas-header p,
+  .financeiro-profissional-header p,
+  .financeiro-mobile-header p,
+  .financeiro-profissional-card-header span,
+  .financeiro-profissional-close-status p,
+  .financeiro-profissional-close-summary p,
+  .mensalista-card-header p,
+  .mensalista-history p,
+  .usuarios-arena-table td,
+  .financeiro-profissional-table td {
+    color: #4b5563 !important;
+  }
+
+  .usuarios-arena-header strong,
+  .usuarios-arena-table td strong,
+  .financeiro-profissional-table td strong,
+  .mensalista-card-header h3,
+  .mensalista-history-item strong {
+    color: #111827 !important;
+    font-weight: 950 !important;
+  }
+
+  .mensalistas-summary-card span,
+  .financeiro-profissional-summary-card span,
+  .mensalista-info span,
+  .financeiro-profissional-close-summary span,
+  .financeiro-profissional-filter span,
+  .financeiro-profissional-form label span,
+  .mensalistas-filters label span,
+  .usuarios-arena-form label span {
+    color: #374151 !important;
+    font-weight: 900 !important;
+  }
+
+  .mensalistas-summary-card strong,
+  .financeiro-profissional-summary-card strong,
+  .mensalista-info strong,
+  .financeiro-profissional-close-summary strong,
+  .clientes-stat-value {
+    color: #111827 !important;
+    font-weight: 950 !important;
+  }
+
+  .financeiro-profissional-summary-card.is-saida strong,
+  .financeiro-profissional-value-out {
+    color: #b91c1c !important;
+  }
+
+  .financeiro-profissional-summary-card.is-saldo strong,
+  .financeiro-profissional-value-in {
+    color: #047857 !important;
+  }
+
+  .financeiro-profissional-filter,
+  .financeiro-profissional-form label,
+  .mensalistas-filters label,
+  .usuarios-arena-form label {
+    color: #374151 !important;
+  }
+
+  .financeiro-profissional input,
+  .financeiro-profissional select,
+  .financeiro-profissional textarea,
+  .mensalistas-section input,
+  .mensalistas-section select,
+  .usuarios-arena input,
+  .usuarios-arena select {
+    color: #111827 !important;
+    background: #ffffff !important;
+  }
+
+  .financeiro-profissional input::placeholder,
+  .financeiro-profissional textarea::placeholder,
+  .mensalistas-section input::placeholder,
+  .usuarios-arena input::placeholder {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+  }
+
+  .financeiro-profissional-table th,
+  .usuarios-arena-table th {
+    color: #312e81 !important;
+    font-weight: 950 !important;
+  }
+
+  .financeiro-profissional-card,
+  .financeiro-profissional-summary-card,
+  .mensalistas-summary-card,
+  .mensalista-card,
+  .usuarios-arena-form,
+  .usuarios-arena-table-wrap {
+    color: #111827 !important;
+  }
 }
