@@ -458,6 +458,39 @@
     background: #ffffff !important;
     color: var(--ds-primary-700) !important;
   }
+
+  .agenda-mobile .horario-card-public-details {
+    gap: var(--ds-space-2) !important;
+    padding-top: var(--ds-space-1);
+  }
+
+  .agenda-mobile .horario-public-occupied {
+    display: grid;
+    gap: var(--ds-space-1);
+    padding: var(--ds-space-2);
+    border: 1px solid rgba(167, 139, 250, 0.22);
+    border-radius: var(--ds-radius-sm);
+    background: rgba(250, 247, 255, 0.86);
+  }
+
+  .agenda-mobile .horario-public-occupied strong {
+    color: #1e123d !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    font-weight: 950 !important;
+  }
+
+  .agenda-mobile .horario-public-occupied span {
+    width: fit-content;
+    min-height: 22px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--ds-secondary);
+    color: var(--ds-primary-700) !important;
+    font-size: 10px !important;
+    line-height: 15px !important;
+    font-weight: 950 !important;
+  }
 }
 
 @media (max-width: 767px) {

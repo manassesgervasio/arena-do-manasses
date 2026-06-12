@@ -153,6 +153,8 @@ export default function HorarioCard({
     mensalistaContratado?.nome || item.cliente || "Disponivel";
   const podeReservarWhatsApp =
     modoPublico && compactoLivre && !mensalistaContratado && !reservaIndisponivel;
+  const horarioPublicoOcupado =
+    modoPublico && !podeReservarWhatsApp && !reservaIndisponivel;
   const cardClasse = [
     "horario-card",
     `horario-card-${statusClasse}`,
@@ -208,10 +210,19 @@ export default function HorarioCard({
 
       {expandido && modoPublico && (
         <div className="horario-card-public-details">
-          <div>
-            <strong>{tituloResumo}</strong>
-            {statusSelo && <span>{statusSelo}</span>}
-          </div>
+          {podeReservarWhatsApp && (
+            <div>
+              <strong>{tituloResumo}</strong>
+              {statusSelo && <span>{statusSelo}</span>}
+            </div>
+          )}
+
+          {horarioPublicoOcupado && (
+            <div className="horario-public-occupied">
+              <strong>Este horário já está reservado</strong>
+              <span>{statusSelo || "OCUPADO"}</span>
+            </div>
+          )}
 
           {podeReservarWhatsApp && (
             <form
