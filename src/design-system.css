@@ -44,6 +44,125 @@
   --ds-badge: 11px;
 }
 
+@media (max-width: 767px) {
+  .usuarios-arena-table-wrap {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow-x: visible !important;
+  }
+
+  .usuarios-arena-table {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    border-collapse: separate;
+  }
+
+  .usuarios-arena-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .usuarios-arena-table tbody {
+    display: grid;
+    gap: var(--ds-space-2);
+  }
+
+  .usuarios-arena-table tr {
+    display: grid;
+    gap: var(--ds-space-1);
+    padding: var(--ds-space-3);
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: var(--ds-radius-lg);
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: var(--ds-shadow-sm);
+  }
+
+  .usuarios-arena-table th,
+  .usuarios-arena-table td {
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .usuarios-arena-table td {
+    display: grid;
+    grid-template-columns: minmax(92px, 0.42fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--ds-space-1);
+    padding: 0 !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .usuarios-arena-table td::before {
+    color: #5b21b6;
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .usuarios-arena-table td:nth-child(1)::before {
+    content: "Nome";
+  }
+
+  .usuarios-arena-table td:nth-child(2)::before {
+    content: "E-mail";
+  }
+
+  .usuarios-arena-table td:nth-child(3)::before {
+    content: "Telefone";
+  }
+
+  .usuarios-arena-table td:nth-child(4)::before {
+    content: "Perfil";
+  }
+
+  .usuarios-arena-table td:nth-child(5)::before {
+    content: "Ativo";
+  }
+
+  .usuarios-arena-table td:nth-child(6)::before {
+    content: "Criado em";
+  }
+
+  .usuarios-arena-table td:nth-child(7)::before {
+    content: "Ações";
+  }
+
+  .usuarios-arena-table td strong {
+    color: #0f172a !important;
+    font-size: 14px;
+    line-height: 19px;
+    font-weight: 950 !important;
+  }
+
+  .usuarios-arena-badge {
+    width: fit-content;
+    max-width: 100%;
+    min-height: 24px;
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    background: var(--ds-secondary) !important;
+    color: var(--ds-primary-700) !important;
+  }
+
+  .usuarios-arena-table .usuarios-arena-action {
+    width: 100%;
+    min-height: 38px !important;
+    border-color: rgba(124, 58, 237, 0.18) !important;
+    background: #ffffff !important;
+    color: var(--ds-primary-700) !important;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
