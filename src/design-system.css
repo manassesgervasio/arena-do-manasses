@@ -45,6 +45,184 @@
 }
 
 @media (max-width: 767px) {
+  .notifications-layer,
+  .app-account-layer {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 12000 !important;
+    width: 100vw !important;
+    min-height: 100dvh !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-backdrop,
+  .app-account-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(6px);
+    pointer-events: auto !important;
+  }
+
+  .notifications-backdrop::before,
+  .notifications-backdrop::after,
+  .app-account-backdrop::before,
+  .app-account-backdrop::after,
+  .notifications-panel::before,
+  .notifications-panel::after,
+  .app-account-menu::before,
+  .app-account-menu::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .notifications-panel,
+  .payments-panel,
+  .app-account-menu {
+    position: fixed !important;
+    top: max(72px, calc(env(safe-area-inset-top) + 64px)) !important;
+    right: 12px !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    left: 12px !important;
+    z-index: 12001 !important;
+    display: grid !important;
+    align-content: start !important;
+    gap: var(--ds-space-2) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: var(--ds-space-3) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(167, 139, 250, 0.28) !important;
+    border-radius: 24px !important;
+    background: #ffffff !important;
+    color: var(--ds-text) !important;
+    box-shadow: 0 28px 80px rgba(36, 16, 111, 0.32) !important;
+    pointer-events: auto !important;
+  }
+
+  .notifications-header,
+  .app-account-panel-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: var(--ds-space-2) !important;
+    margin: calc(var(--ds-space-3) * -1) calc(var(--ds-space-3) * -1) var(--ds-space-1) !important;
+    padding: var(--ds-space-3) !important;
+    border-bottom: 1px solid var(--ds-border);
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--ds-text) !important;
+    backdrop-filter: blur(10px);
+  }
+
+  .notifications-header strong,
+  .app-account-panel-header span {
+    min-width: 0;
+    color: #1e123d !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 950 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .notifications-header .ds-button,
+  .app-account-panel-header button {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 42px !important;
+    min-height: 38px !important;
+    padding: 0 12px !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 999px !important;
+    background: var(--ds-secondary) !important;
+    color: var(--ds-primary-700) !important;
+    box-shadow: none !important;
+  }
+
+  .notifications-list {
+    width: 100%;
+    max-width: 100%;
+    gap: var(--ds-space-2) !important;
+  }
+
+  .notification-item {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: var(--ds-space-3) !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    color: var(--ds-text) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+    overflow-wrap: anywhere;
+  }
+
+  .notification-item strong {
+    color: #111827 !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 950 !important;
+  }
+
+  .notification-item span,
+  .notification-item small {
+    color: #4b5563 !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    font-weight: 800 !important;
+  }
+
+  .notification-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--ds-space-1) !important;
+    width: 100%;
+  }
+
+  .notification-actions .ds-button,
+  .notification-actions button,
+  .notification-actions a,
+  .app-account-menu button {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 42px !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+
+  .app-account-info {
+    padding: var(--ds-space-2) !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: rgba(250, 247, 255, 0.86) !important;
+    color: #374151 !important;
+  }
+
+  .app-account-info span {
+    color: #374151 !important;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 767px) {
   .usuarios-arena-table-wrap {
     padding: 0 !important;
     border: none !important;
