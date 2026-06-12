@@ -176,6 +176,291 @@
 }
 
 @media (max-width: 767px) {
+  .painel-saas {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    gap: var(--ds-space-3) !important;
+    margin-top: var(--ds-space-3) !important;
+    box-sizing: border-box;
+  }
+
+  .painel-saas * {
+    box-sizing: border-box;
+  }
+
+  .painel-saas-header {
+    align-items: stretch !important;
+    gap: var(--ds-space-2) !important;
+  }
+
+  .painel-saas-header h2 {
+    color: #1e123d !important;
+    font-size: 26px !important;
+    line-height: 31px !important;
+    font-weight: 950 !important;
+    text-shadow: none !important;
+  }
+
+  .painel-saas-header p {
+    color: #4b5563 !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    font-weight: 800 !important;
+  }
+
+  .painel-saas-header .ds-button,
+  .painel-saas-header button {
+    width: 100% !important;
+    min-height: 44px !important;
+    border: 1px solid rgba(167, 139, 250, 0.28) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: var(--ds-primary-700) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+  }
+
+  .painel-saas-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: var(--ds-space-2) !important;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .painel-saas-summary-card {
+    min-width: 0;
+    min-height: 92px !important;
+    padding: var(--ds-space-3) !important;
+    border: 1px solid rgba(167, 139, 250, 0.2) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: #111827 !important;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16) !important;
+  }
+
+  .painel-saas-summary-card span {
+    color: #dbeafe !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 900 !important;
+  }
+
+  .painel-saas-summary-card strong {
+    color: #ffffff !important;
+    font-size: 24px !important;
+    line-height: 29px !important;
+    font-weight: 950 !important;
+  }
+
+  .painel-saas-filters {
+    grid-template-columns: 1fr !important;
+    gap: var(--ds-space-2) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: var(--ds-space-3) !important;
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+  }
+
+  .painel-saas-filters label,
+  .painel-saas-form label {
+    color: #374151 !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    font-weight: 900 !important;
+  }
+
+  .painel-saas-filters input,
+  .painel-saas-filters select,
+  .painel-saas-form input,
+  .painel-saas-form select,
+  .painel-saas-form textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    border: 1px solid rgba(167, 139, 250, 0.26) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .painel-saas-table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .painel-saas-table {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border-collapse: separate;
+  }
+
+  .painel-saas-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .painel-saas-table tbody {
+    display: grid;
+    gap: var(--ds-space-2);
+    width: 100%;
+  }
+
+  .painel-saas-table tr {
+    display: grid;
+    gap: var(--ds-space-1);
+    width: 100%;
+    max-width: 100%;
+    padding: var(--ds-space-3);
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: var(--ds-radius-lg);
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: var(--ds-shadow-sm);
+  }
+
+  .painel-saas-table th,
+  .painel-saas-table td {
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .painel-saas-table td {
+    display: grid;
+    grid-template-columns: minmax(104px, 0.42fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--ds-space-1);
+    width: 100%;
+    max-width: 100%;
+    padding: 0 !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    line-height: 18px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .painel-saas-table td::before {
+    color: #5b21b6;
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .painel-saas-table td:nth-child(1)::before {
+    content: "Arena";
+  }
+
+  .painel-saas-table td:nth-child(2)::before {
+    content: "Slug";
+  }
+
+  .painel-saas-table td:nth-child(3)::before {
+    content: "WhatsApp";
+  }
+
+  .painel-saas-table td:nth-child(4)::before {
+    content: "Cidade/UF";
+  }
+
+  .painel-saas-table td:nth-child(5)::before {
+    content: "Plano";
+  }
+
+  .painel-saas-table td:nth-child(6)::before {
+    content: "Status";
+  }
+
+  .painel-saas-table td:nth-child(7)::before {
+    content: "Ativa";
+  }
+
+  .painel-saas-table td:nth-child(8)::before {
+    content: "Responsáveis";
+  }
+
+  .painel-saas-table td:nth-child(9)::before {
+    content: "Início";
+  }
+
+  .painel-saas-table td:nth-child(10)::before {
+    content: "Vencimento";
+  }
+
+  .painel-saas-table td:nth-child(11)::before {
+    content: "Ações";
+  }
+
+  .painel-saas-table td strong {
+    color: #0f172a !important;
+    font-size: 14px;
+    line-height: 19px;
+    font-weight: 950 !important;
+  }
+
+  .painel-saas-responsaveis {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .painel-saas-responsaveis span,
+  .painel-saas-responsaveis small {
+    color: #4b5563 !important;
+  }
+
+  .painel-saas-badge,
+  .painel-saas-status {
+    width: fit-content;
+    max-width: 100%;
+    min-height: 24px;
+    overflow: visible;
+  }
+
+  .painel-saas-badge {
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    background: var(--ds-info-soft) !important;
+    color: #1d4ed8 !important;
+  }
+
+  .painel-saas-status-teste {
+    background: var(--ds-warning-soft) !important;
+    color: #c2410c !important;
+  }
+
+  .painel-saas-status-ativo {
+    background: var(--ds-success-soft) !important;
+    color: #166534 !important;
+  }
+
+  .painel-saas-status-suspenso,
+  .painel-saas-status-cancelado {
+    background: var(--ds-danger-soft) !important;
+    color: #b91c1c !important;
+  }
+
+  .painel-saas-action {
+    width: 100% !important;
+    min-height: 38px !important;
+    margin-top: var(--ds-space-1);
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: var(--ds-primary-700) !important;
+  }
+}
+
+@media (max-width: 767px) {
   .notifications-layer,
   .app-account-layer {
     position: fixed !important;
