@@ -44,7 +44,7 @@ export default function MobileNavigation({
 
           <nav className="mobile-navigation" aria-label="Navegacao principal">
             <div className="main-menu-header">
-              <span>ARENA</span>
+              <span>A R E N A</span>
               <button type="button" onClick={() => setMenuAberto(false)}>
                 ×
               </button>
