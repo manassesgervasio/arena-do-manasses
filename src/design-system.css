@@ -1057,3 +1057,358 @@ textarea:disabled {
     min-width: 640px;
   }
 }
+
+@media (max-width: 767px) {
+  body,
+  .ds-app-shell,
+  .home-page {
+    color: var(--ds-text) !important;
+    font-family: var(--ds-font) !important;
+    background:
+      radial-gradient(circle at 96% 0%, rgba(168, 85, 247, 0.16), transparent 54vw),
+      radial-gradient(circle at 0% 14%, rgba(124, 58, 237, 0.1), transparent 48vw),
+      linear-gradient(180deg, #fbf8ff 0%, #f8f3ff 42%, #ffffff 100%) !important;
+  }
+
+  .home-page {
+    min-height: 100svh;
+  }
+
+  .app-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: var(--ds-primary-gradient) !important;
+    box-shadow: 0 16px 34px rgba(91, 33, 182, 0.2) !important;
+  }
+
+  .main-menu-trigger,
+  .app-account-button,
+  .notifications-button {
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(36, 16, 111, 0.18) !important;
+  }
+
+  .main-menu-layer .mobile-navigation,
+  .app-account-menu,
+  .notifications-panel,
+  .cliente-modal-panel,
+  .painel-saas-whatsapp-modal {
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 0 var(--ds-radius-lg) var(--ds-radius-lg) 0 !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 247, 255, 0.98) 100%) !important;
+    color: var(--ds-text) !important;
+    box-shadow: var(--ds-shadow-lg) !important;
+  }
+
+  .app-account-menu,
+  .notifications-panel,
+  .cliente-modal-panel,
+  .painel-saas-whatsapp-modal {
+    border-radius: var(--ds-radius-lg) !important;
+  }
+
+  .main-menu-layer .mobile-navigation-item,
+  .app-account-menu button,
+  .mobile-navigation-item {
+    min-height: 42px !important;
+    border-radius: var(--ds-radius-sm) !important;
+    color: var(--ds-text-muted) !important;
+    font-weight: 900 !important;
+  }
+
+  .main-menu-layer .mobile-navigation-item.is-active,
+  .mobile-navigation-item.is-active {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.22) !important;
+  }
+
+  .week-controls-main {
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .week-controls-main::-webkit-scrollbar {
+    display: none;
+  }
+
+  .week-month-pill,
+  .week-occupied-switch {
+    flex: 0 0 auto;
+    min-height: 38px !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.82) !important;
+    color: var(--ds-primary-700) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+    backdrop-filter: blur(12px);
+  }
+
+  .week-occupied-switch input {
+    accent-color: var(--ds-primary);
+  }
+
+  .agenda-shell {
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 247, 255, 0.94) 100%) !important;
+    box-shadow: var(--ds-shadow-md) !important;
+  }
+
+  .agenda-mobile {
+    color: var(--ds-text);
+  }
+
+  .agenda-mobile-day-selector {
+    gap: var(--ds-space-1) !important;
+    padding: 2px 2px var(--ds-space-1) !important;
+    scrollbar-width: none;
+  }
+
+  .agenda-mobile-day-selector::-webkit-scrollbar {
+    display: none;
+  }
+
+  .agenda-mobile-day-button {
+    flex-basis: 58px !important;
+    min-height: 48px !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: var(--ds-text-muted) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+  }
+
+  .agenda-mobile-day-button.is-selected {
+    border-color: rgba(124, 58, 237, 0.2) !important;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 58%, #6d28d9 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.26) !important;
+  }
+
+  .agenda-mobile .dia-cabecalho {
+    position: sticky;
+    z-index: 20;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 247, 255, 0.96) 62%, rgba(237, 233, 254, 0.94) 100%) !important;
+    color: var(--ds-text) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+  }
+
+  .agenda-mobile .dia-cabecalho-grupo-resumo,
+  .agenda-mobile .dia-cabecalho-resumo {
+    color: var(--ds-success) !important;
+  }
+
+  .agenda-mobile-horarios {
+    gap: var(--ds-space-1) !important;
+  }
+
+  .agenda-mobile .horario-card,
+  .agenda-mobile .horario-card:not(.is-expanded) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+  }
+
+  .agenda-mobile .horario-card:not(.is-expanded) {
+    min-height: 52px !important;
+    padding: 8px 12px 8px 16px !important;
+  }
+
+  .agenda-mobile .horario-card:not(.is-expanded):not(.horario-card-livre-compacto),
+  .agenda-mobile .horario-card-fixo:not(.is-expanded),
+  .agenda-mobile .horario-card-mensalista:not(.is-expanded) {
+    min-height: 64px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .agenda-mobile .horario-card::before {
+    width: 4px;
+    inset: 8px auto 8px 8px;
+    border-radius: 999px;
+  }
+
+  .agenda-mobile .horario-card-time,
+  .agenda-mobile .horario-card:not(.is-expanded) .horario-card-time {
+    display: grid !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 2px !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .agenda-mobile .horario-card-hour {
+    color: var(--ds-text) !important;
+    font-size: 15px !important;
+    line-height: 18px !important;
+  }
+
+  .agenda-mobile .horario-card-time strong {
+    min-height: 17px;
+    max-height: none !important;
+    color: var(--ds-text) !important;
+    font-size: 13px !important;
+    line-height: 17px !important;
+    overflow: visible !important;
+    text-overflow: ellipsis;
+  }
+
+  .agenda-mobile .horario-card-livre-compacto:not(.is-expanded) strong {
+    color: var(--ds-text-muted) !important;
+    font-size: 12px !important;
+  }
+
+  .agenda-mobile .horario-status-pill,
+  .agenda-mobile .horario-status-pill-row,
+  .horario-status-pill,
+  .horario-status-pill-row {
+    width: max-content !important;
+    max-width: 100% !important;
+    min-height: 22px !important;
+    padding: 3px 9px !important;
+    border-radius: 999px !important;
+    font-size: 10px !important;
+    line-height: 15px !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+  }
+
+  .agenda-mobile .horario-card-fixo .horario-status-pill-row,
+  .agenda-mobile .horario-card-mensalista .horario-status-pill-row,
+  .agenda-mobile .horario-card-reservado .horario-status-pill-row {
+    background: var(--ds-secondary) !important;
+    color: var(--ds-primary-700) !important;
+  }
+
+  .agenda-mobile .horario-card-pago .horario-status-pill-row {
+    background: var(--ds-success-soft) !important;
+    color: #166534 !important;
+  }
+
+  .agenda-mobile .horario-card-pendente .horario-status-pill-row {
+    background: var(--ds-warning-soft) !important;
+    color: #c2410c !important;
+  }
+
+  .agenda-mobile .horario-card input,
+  .agenda-mobile .horario-card select,
+  .agenda-mobile .horario-card textarea,
+  .ds-input,
+  .ds-select,
+  .ds-textarea,
+  .clientes-search,
+  .clientes-filter-select {
+    min-height: 44px !important;
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: var(--ds-text) !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset !important;
+  }
+
+  .ds-button,
+  .agenda-mobile .horario-action-button,
+  .whatsapp-reserva-button,
+  .cliente-whatsapp-link {
+    min-height: 44px !important;
+    border-radius: 999px !important;
+    font-weight: 950 !important;
+  }
+
+  .agenda-mobile .horario-action-button {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .agenda-mobile .horario-action-button + .horario-action-button {
+    margin-left: 0 !important;
+  }
+
+  .clientes-section,
+  .financeiro-mobile-section,
+  .financeiro-profissional,
+  .mensalistas-section,
+  .painel-saas,
+  .usuarios-arena {
+    color: var(--ds-text) !important;
+  }
+
+  .clientes-heading,
+  .financeiro-mobile-header h2,
+  .financeiro-profissional-title,
+  .mensalistas-title,
+  .painel-saas-title,
+  .usuarios-arena-title {
+    color: var(--ds-text) !important;
+  }
+
+  .financeiro-mobile-header p,
+  .clientes-section p,
+  .financeiro-profissional p,
+  .mensalistas-section p,
+  .painel-saas p,
+  .usuarios-arena p {
+    color: var(--ds-text-muted) !important;
+  }
+
+  .clientes-stat-card,
+  .cliente-card,
+  .financeiro-profissional-card,
+  .financeiro-profissional-summary > *,
+  .mensalistas-summary-card,
+  .mensalista-card,
+  .painel-saas-form,
+  .usuarios-arena-form,
+  .login-panel,
+  .resumo-card {
+    border: 1px solid var(--ds-border) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: var(--ds-text) !important;
+    box-shadow: var(--ds-shadow-sm) !important;
+    overflow: visible !important;
+  }
+
+  .cliente-card-title,
+  .mensalista-card-title,
+  .financeiro-profissional-card h2,
+  .painel-saas-form h2,
+  .usuarios-arena-form h2,
+  .login-brand h1 {
+    color: var(--ds-text) !important;
+  }
+
+  .cliente-last-reserva,
+  .mensalista-card p,
+  .financeiro-profissional-card p {
+    color: var(--ds-text-muted) !important;
+  }
+
+  .ds-empty,
+  .ds-loading,
+  .mensalistas-empty,
+  .financeiro-profissional-empty,
+  .financeiro-profissional-loading,
+  .usuarios-arena-empty,
+  .usuarios-arena-loading,
+  .painel-saas-empty,
+  .painel-saas-loading,
+  .notifications-empty {
+    min-height: 86px !important;
+    border: 1px dashed var(--ds-border) !important;
+    border-radius: var(--ds-radius-lg) !important;
+    background: rgba(255, 255, 255, 0.68) !important;
+    color: var(--ds-text-muted) !important;
+  }
+}
