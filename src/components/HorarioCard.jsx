@@ -210,13 +210,6 @@ export default function HorarioCard({
 
       {expandido && modoPublico && (
         <div className="horario-card-public-details">
-          {podeReservarWhatsApp && (
-            <div>
-              <strong>{tituloResumo}</strong>
-              {statusSelo && <span>{statusSelo}</span>}
-            </div>
-          )}
-
           {horarioPublicoOcupado && (
             <div className="horario-public-occupied">
               <strong>Este horário já está reservado</strong>
