@@ -32,11 +32,30 @@ export default function ResumoCards({ resumo, moeda }) {
 }
 
 function ResumoCard({ titulo, valor }) {
+  const valorTexto = String(valor ?? "");
+  const valorMonetario = valorTexto.trim().startsWith("R$");
+  const valorSemMoeda = valorMonetario
+    ? valorTexto.replace(/^R\$\s*/, "")
+    : valorTexto;
+
   return (
     <Card className="resumo-card">
       <p>{titulo}</p>
 
-      <h2>{valor}</h2>
+      <h2
+        className={`resumo-card-value${
+          valorMonetario ? " is-money" : " is-count"
+        }`}
+      >
+        {valorMonetario ? (
+          <>
+            <span className="resumo-card-currency">R$</span>
+            <span className="resumo-card-amount">{valorSemMoeda}</span>
+          </>
+        ) : (
+          <span className="resumo-card-amount">{valorTexto}</span>
+        )}
+      </h2>
     </Card>
   );
 }

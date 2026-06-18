@@ -4603,3 +4603,59 @@ code {
     color: #ea580c !important;
   }
 }
+
+@media (min-width: 641px) {
+  .agenda-desktop-day-nav {
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    align-items: center;
+  }
+
+  .agenda-desktop-day-nav .agenda-week-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 48px !important;
+    min-width: 48px;
+    height: 48px !important;
+    min-height: 48px;
+    padding: 0;
+    border: 1px solid rgba(167, 139, 250, 0.28) !important;
+    border-radius: 999px;
+    background: #ffffff !important;
+    color: #7c3aed !important;
+    font-size: 0;
+    line-height: 1;
+    box-shadow: 0 10px 24px rgba(76, 29, 149, 0.1);
+    transition:
+      background 0.16s ease,
+      border-color 0.16s ease,
+      box-shadow 0.16s ease,
+      transform 0.16s ease;
+  }
+
+  .agenda-desktop-day-nav .agenda-week-arrow::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .agenda-desktop-day-nav .agenda-week-arrow:first-child::before {
+    content: "\2039";
+  }
+
+  .agenda-desktop-day-nav .agenda-week-arrow:last-child::before {
+    content: "\203A";
+  }
+
+  .agenda-desktop-day-nav .agenda-week-arrow:hover:not(:disabled) {
+    border-color: rgba(124, 58, 237, 0.34) !important;
+    background: #f3e8ff !important;
+    box-shadow: 0 14px 30px rgba(76, 29, 149, 0.14);
+  }
+}

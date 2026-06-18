@@ -175,6 +175,118 @@
   }
 }
 
+@media (min-width: 641px) {
+  .financeiro-mobile-section .resumo-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    align-items: stretch;
+    gap: 16px !important;
+    margin-top: 24px !important;
+  }
+
+  .resumo-cards-grid > .resumo-card.resumo-card {
+    display: flex !important;
+    flex-direction: column;
+    min-height: 148px !important;
+    padding: 22px 20px !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .resumo-card p {
+    width: 100%;
+    margin: 0 !important;
+    color: var(--ds-text-muted) !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .resumo-card h2.resumo-card-value {
+    display: flex !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    color: var(--ds-text) !important;
+    font-size: 42px !important;
+    line-height: 48px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: normal !important;
+  }
+
+  .resumo-card-value.is-money {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .resumo-card-currency {
+    flex: 0 0 auto;
+    color: var(--ds-text-muted);
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 800;
+  }
+
+  .resumo-card-amount {
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .resumo-card-value.is-count .resumo-card-amount {
+    overflow: visible;
+  }
+}
+
+@media (min-width: 1600px) {
+  .financeiro-mobile-section .resumo-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 18px !important;
+  }
+
+  .resumo-cards-grid > .resumo-card.resumo-card {
+    min-height: 156px !important;
+    padding: 24px 22px !important;
+  }
+
+  .resumo-card h2.resumo-card-value {
+    font-size: 46px !important;
+    line-height: 52px !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  .financeiro-mobile-section .resumo-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+    gap: 20px !important;
+  }
+
+  .resumo-cards-grid > .resumo-card.resumo-card {
+    min-height: 164px !important;
+  }
+
+  .resumo-card h2.resumo-card-value {
+    font-size: 50px !important;
+    line-height: 56px !important;
+  }
+}
+
 /* Final login identity override. */
 .login-page {
   color: var(--ds-text) !important;
