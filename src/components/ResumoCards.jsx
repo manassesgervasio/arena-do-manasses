@@ -39,12 +39,18 @@ function ResumoCard({ titulo, valor }) {
     : valorTexto;
 
   return (
-    <Card className="resumo-card">
+    <Card
+      className={`resumo-card${
+        valorMonetario ? " resumo-card-money" : " resumo-card-count"
+      }`}
+    >
       <p>{titulo}</p>
 
       <h2
-        className={`resumo-card-value${
-          valorMonetario ? " is-money" : " is-count"
+        className={`resumo-card-value ${
+          valorMonetario
+            ? "resumo-card-money-value is-money"
+            : "resumo-card-count-value is-count"
         }`}
       >
         {valorMonetario ? (

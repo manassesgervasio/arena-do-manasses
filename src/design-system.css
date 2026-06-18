@@ -178,7 +178,7 @@
 @media (min-width: 641px) {
   .financeiro-mobile-section .resumo-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
     align-items: stretch;
     gap: 16px !important;
     margin-top: 24px !important;
@@ -206,30 +206,29 @@
     letter-spacing: 0;
     text-transform: uppercase;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
   }
 
   .resumo-card h2.resumo-card-value {
     display: flex !important;
-    width: 100%;
+    width: auto;
     min-width: 0;
+    max-width: none !important;
     margin: 0 !important;
     align-items: baseline;
     justify-content: center;
     gap: 8px;
     color: var(--ds-text) !important;
-    font-size: 42px !important;
-    line-height: 48px !important;
+    font-size: clamp(28px, 3vw, 48px) !important;
+    line-height: 1.08 !important;
     font-weight: 800 !important;
     letter-spacing: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
     word-break: normal !important;
   }
 
-  .resumo-card-value.is-money {
+  .resumo-card-money-value {
     font-variant-numeric: tabular-nums;
   }
 
@@ -243,20 +242,19 @@
 
   .resumo-card-amount {
     min-width: 0;
-    max-width: 100%;
+    max-width: none !important;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
   }
 
-  .resumo-card-value.is-count .resumo-card-amount {
+  .resumo-card-count-value .resumo-card-amount {
     overflow: visible;
   }
 }
 
 @media (min-width: 1600px) {
   .financeiro-mobile-section .resumo-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
     gap: 18px !important;
   }
 
@@ -266,14 +264,13 @@
   }
 
   .resumo-card h2.resumo-card-value {
-    font-size: 46px !important;
-    line-height: 52px !important;
+    font-size: clamp(28px, 3vw, 48px) !important;
   }
 }
 
 @media (min-width: 1920px) {
   .financeiro-mobile-section .resumo-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
     gap: 20px !important;
   }
 
@@ -282,8 +279,7 @@
   }
 
   .resumo-card h2.resumo-card-value {
-    font-size: 50px !important;
-    line-height: 56px !important;
+    font-size: clamp(28px, 3vw, 48px) !important;
   }
 }
 
