@@ -275,6 +275,144 @@
   color: #991b1b;
 }
 
+.public-search-page {
+  min-height: 100vh;
+  padding: 28px min(5vw, 56px) 56px;
+  background:
+    radial-gradient(circle at top left, rgba(124, 58, 237, 0.12), transparent 34%),
+    linear-gradient(135deg, #fbf8ff 0%, #ffffff 54%, #f0fdf4 100%);
+  color: #111827;
+}
+
+.public-search-header {
+  width: min(1120px, 100%);
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.public-search-header strong {
+  color: #6b21a8;
+  font-size: 15px;
+}
+
+.public-search-header h1 {
+  margin: 6px 0;
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1;
+  color: #1f2937;
+}
+
+.public-search-header p {
+  margin: 0;
+  max-width: 620px;
+  color: #64748b;
+}
+
+.public-search-filters {
+  width: min(1120px, 100%);
+  margin: 0 auto 18px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(160px, 0.8fr) minmax(180px, 1fr);
+  gap: 12px;
+  border-radius: 8px;
+  border: 1px solid #e9d5ff;
+}
+
+.public-search-filters label {
+  display: grid;
+  gap: 6px;
+}
+
+.public-search-filters span {
+  font-size: 13px;
+  font-weight: 800;
+  color: #6b21a8;
+}
+
+.public-search-error {
+  width: min(1120px, 100%);
+  margin: 0 auto 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.public-arena-grid {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.public-arena-card {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  box-shadow: 0 14px 34px rgba(88, 28, 135, 0.08);
+}
+
+.public-arena-card h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: #1f2937;
+}
+
+.public-arena-card p {
+  margin: 0;
+  color: #64748b;
+}
+
+.public-not-found-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #fbf8ff, #ffffff);
+}
+
+.public-not-found-card {
+  width: min(460px, 100%);
+  padding: 28px;
+  border: 1px solid #e9d5ff;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(88, 28, 135, 0.12);
+}
+
+.public-not-found-card strong {
+  color: #6b21a8;
+}
+
+.public-not-found-card h1 {
+  margin: 8px 0;
+  color: #1f2937;
+}
+
+.public-not-found-card p {
+  color: #64748b;
+}
+
+.public-not-found-card button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 @media (max-width: 760px) {
   .configuracoes-arena {
     width: min(100% - 20px, 680px);
@@ -298,6 +436,16 @@
 
   .primeiros-passos-header,
   .primeiros-passos-list {
+    grid-template-columns: 1fr;
+  }
+
+  .public-search-page {
+    padding: 18px 12px 40px;
+  }
+
+  .public-search-header,
+  .public-search-filters {
+    display: grid;
     grid-template-columns: 1fr;
   }
 }

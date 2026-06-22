@@ -1,10 +1,12 @@
 ﻿import { useEffect, useState } from "react";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
-import { ARENA_SLUG_ATUAL, useArenaAtual } from "./hooks/useArenaAtual";
+import { useArenaAtual } from "./hooks/useArenaAtual";
+import { useArenaPublica } from "./hooks/useArenaPublica";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import Login from "./components/Login";
+import BuscaArenasPublica from "./pages/BuscaArenasPublica";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
@@ -39,7 +41,15 @@ export default function App() {
   const [authCarregando, setAuthCarregando] = useState(true);
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [perfilLogado, setPerfilLogado] = useState(null);
-  const contextoArena = useArenaAtual(sessaoAuth);
+  const [pathname, setPathname] = useState(() => window.location.pathname);
+  const slugPublico = obterSlugPublico(pathname);
+  const temRotaPublicaSlug = Boolean(slugPublico);
+  const contextoArenaLogada = useArenaAtual(sessaoAuth);
+  const contextoArenaPublica = useArenaPublica(slugPublico);
+  const contextoArena = temRotaPublicaSlug
+    ? contextoArenaPublica
+    : contextoArenaLogada;
+  const sessaoOperacional = temRotaPublicaSlug ? null : sessaoAuth;
   const arenaAtualId = contextoArena.arenaAtual?.id;
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
@@ -58,6 +68,24 @@ export default function App() {
   const [buscaCliente, setBuscaCliente] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("Todos");
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
+
+  useEffect(() => {
+  function atualizarPathname() {
+    setPathname(window.location.pathname);
+  }
+
+  window.addEventListener("popstate", atualizarPathname);
+
+  return () => {
+    window.removeEventListener("popstate", atualizarPathname);
+  };
+}, []);
+
+  useEffect(() => {
+  if (temRotaPublicaSlug && contextoArena.arenaAtual?.nome) {
+    document.title = `Horários disponíveis - ${contextoArena.arenaAtual.nome} | ArenaBase`;
+  }
+}, [temRotaPublicaSlug, contextoArena.arenaAtual?.nome]);
 
   useEffect(() => {
   let ativo = true;
@@ -97,7 +125,7 @@ export default function App() {
     setReservas({});
     setReservasArenaId(null);
 
-    const modoVisitante = !sessaoAuth;
+    const modoVisitante = !sessaoOperacional;
     const primeiroDia = dias?.[0] ? formatarDataLocal(dias[0]) : "";
     const ultimoDia = dias?.length
       ? formatarDataLocal(dias[dias.length - 1])
@@ -178,10 +206,10 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId, dias]);
+}, [sessaoOperacional, arenaAtualId, dias]);
 
   useEffect(() => {
-  if (!sessaoAuth || !arenaAtualId) {
+  if (!sessaoOperacional || !arenaAtualId) {
     setNotificacoesPendentes([]);
     setPendenciasPagamento([]);
     return;
@@ -217,10 +245,10 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId]);
+}, [sessaoOperacional, arenaAtualId]);
 
   useEffect(() => {
-  if (!sessaoAuth || !arenaAtualId) {
+  if (!sessaoOperacional || !arenaAtualId) {
     setTotalMensalistasPago(0);
     return;
   }
@@ -278,10 +306,10 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId, mesFiltro, versaoHorariosMensalistas]);
+}, [sessaoOperacional, arenaAtualId, mesFiltro, versaoHorariosMensalistas]);
 
   useEffect(() => {
-  if (!sessaoAuth || !arenaAtualId) {
+  if (!sessaoOperacional || !arenaAtualId) {
     setHorariosMensalistas({});
     return;
   }
@@ -355,13 +383,13 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoAuth, arenaAtualId, versaoHorariosMensalistas]);
+}, [sessaoOperacional, arenaAtualId, versaoHorariosMensalistas]);
 
   async function buscarHorariosOcupadosPublicos(primeiroDia, ultimoDia) {
     const { data, error } = await supabase.rpc(
       "agenda_publica_horarios_ocupados",
       {
-        p_arena_slug: ARENA_SLUG_ATUAL,
+        p_arena_slug: contextoArena.arenaAtual?.slug || "",
         p_data_inicio: primeiroDia,
         p_data_fim: ultimoDia,
       }
@@ -1311,7 +1339,22 @@ return "#14532d";
     );
   }
 
-  if (sessaoAuth && contextoArena.carregandoContexto) {
+  if (!sessaoAuth && !temRotaPublicaSlug) {
+    return <BuscaArenasPublica onEntrar={() => setMostrarLogin(true)} />;
+  }
+
+  if (temRotaPublicaSlug && contextoArena.carregandoContexto) {
+    return <PaginaPublicaCarregando />;
+  }
+
+  if (
+    temRotaPublicaSlug &&
+    (contextoArena.erroContexto || !contextoArena.arenaAtual)
+  ) {
+    return <ArenaPublicaIndisponivel onVoltar={() => irParaRaiz(setPathname)} />;
+  }
+
+  if (sessaoOperacional && contextoArena.carregandoContexto) {
     return (
       <main className="login-page">
         <section className="login-panel" aria-label="Carregando contexto">
@@ -1325,7 +1368,7 @@ return "#14532d";
   }
 
   if (
-    sessaoAuth &&
+    sessaoOperacional &&
     (contextoArena.erroContexto ||
       !contextoArena.usuarioAtual ||
       !contextoArena.arenaAtual)
@@ -1355,7 +1398,7 @@ return "#14532d";
       contextoArena={contextoArena}
       onSair={sair}
       onEntrar={() => setMostrarLogin(true)}
-      modoPublico={!sessaoAuth}
+      modoPublico={!sessaoOperacional}
       dataBase={dataBase}
       mesFiltro={mesFiltro}
       dias={dias}
@@ -1395,6 +1438,57 @@ return "#14532d";
       setFiltroCliente={setFiltroCliente}
       setClienteSelecionado={setClienteSelecionado}
     />
+  );
+}
+
+function obterSlugPublico(pathname) {
+  const partes = String(pathname || "")
+    .split("/")
+    .map((parte) => parte.trim())
+    .filter(Boolean);
+
+  if (partes.length !== 1) return "";
+
+  const [slug] = partes;
+  const rotasInternas = new Set(["agenda", "clientes", "financeiro", "mensalistas"]);
+
+  return rotasInternas.has(slug) ? "" : slug;
+}
+
+function irParaRaiz(setPathname) {
+  window.history.pushState({}, "", "/");
+  setPathname("/");
+}
+
+function PaginaPublicaCarregando() {
+  return (
+    <main className="login-page">
+      <section className="login-panel" aria-label="Carregando agenda pública">
+        <div className="login-brand">
+          <h1>ArenaBase</h1>
+          <p>Carregando horários...</p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function ArenaPublicaIndisponivel({ onVoltar }) {
+  useEffect(() => {
+    document.title = "Arena não encontrada | ArenaBase";
+  }, []);
+
+  return (
+    <main className="public-not-found-page">
+      <section className="public-not-found-card">
+        <strong>ArenaBase</strong>
+        <h1>Arena não encontrada ou indisponível.</h1>
+        <p>Confira o link ou busque uma arena disponível.</p>
+        <button type="button" onClick={onVoltar}>
+          Buscar arenas
+        </button>
+      </section>
+    </main>
   );
 }
 

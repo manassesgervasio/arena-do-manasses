@@ -15,28 +15,11 @@ export function useArenaAtual(session) {
 
     async function carregarContexto() {
       if (!session?.user?.email) {
-        setCarregandoContexto(true);
+        setCarregandoContexto(false);
         setErroContexto("");
+        setArenaAtual(null);
         setUsuarioAtual(null);
         setPerfilAtual(null);
-
-        const {
-          data: arenaPublica,
-          error: arenaPublicaError,
-        } = await carregarArenaPublica();
-
-        if (!montado) return;
-
-        if (arenaPublicaError) {
-          console.error("Erro ao carregar arena publica:", arenaPublicaError);
-          setArenaAtual(null);
-          setErroContexto("");
-          setCarregandoContexto(false);
-          return;
-        }
-
-        setArenaAtual(arenaPublica || null);
-        setCarregandoContexto(false);
         return;
       }
 
@@ -179,49 +162,4 @@ export function useArenaAtual(session) {
     erroContexto,
     atualizarArenaAtual,
   };
-}
-
-async function carregarArenaPublica() {
-  const { data, error } = await supabase
-    .from("agenda_publica_arenas")
-    .select("id,nome,slug,telefone")
-    .eq("slug", ARENA_SLUG_ATUAL)
-    .maybeSingle();
-
-  if (!error) {
-    return {
-      data: data ? { ...data, ativa: true } : null,
-      error: null,
-    };
-  }
-
-  if (!erroRecursoPublicoInexistente(error)) {
-    return { data: null, error };
-  }
-
-  console.warn(
-    "Fallback temporario: agenda_publica_arenas ainda nao existe. Remover apos aplicar a migration RLS ArenaBase.",
-    error
-  );
-
-  // Fallback temporario para ambiente antes da migration RLS ArenaBase.
-  // Remover depois que agenda_publica_arenas estiver aplicada.
-  return supabase
-    .from("arenas")
-    .select("id,nome,slug,telefone,cidade,estado,ativa")
-    .eq("slug", ARENA_SLUG_ATUAL)
-    .eq("ativa", true)
-    .maybeSingle();
-}
-
-function erroRecursoPublicoInexistente(error) {
-  const mensagem = `${error?.code || ""} ${error?.message || ""}`.toLowerCase();
-
-  return (
-    mensagem.includes("agenda_publica_arenas") ||
-    mensagem.includes("does not exist") ||
-    mensagem.includes("could not find") ||
-    mensagem.includes("pgrst202") ||
-    mensagem.includes("42p01")
-  );
 }
