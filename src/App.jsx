@@ -1073,6 +1073,11 @@ novasReservas[novaChave] = {
     totalMensalistas: totalMensalistasPago,
     totalGeral: Number(resumo.faturamentoMes || 0) + totalMensalistasPago,
   };
+  const onboardingRefreshKey = [
+    arenaAtualId || "",
+    Object.keys(reservasDaArenaAtual).length,
+    versaoHorariosMensalistas,
+  ].join(":");
   
   const { clientes, clientesFiltrados } = useClientes(
     resumo.lista,
@@ -1360,6 +1365,7 @@ return "#14532d";
       statusLista={statusLista}
       horariosMensalistas={horariosMensalistas}
       onMensalistasChange={recarregarHorariosMensalistas}
+      onboardingRefreshKey={onboardingRefreshKey}
       resumo={resumoFinanceiro}
       clientes={clientes}
       clientesFiltrados={clientesFiltrados}

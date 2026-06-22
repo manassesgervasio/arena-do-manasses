@@ -7,6 +7,7 @@ import FinanceiroProfissional from "../components/FinanceiroProfissional";
 import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
 import PainelCentralSaaS from "../components/PainelCentralSaaS";
+import PrimeirosPassos from "../components/PrimeirosPassos";
 import ResumoCards from "../components/ResumoCards";
 import UsuariosArena from "../components/UsuariosArena";
 import WeekControls from "../components/WeekControls";
@@ -37,6 +38,7 @@ export default function Home({
   statusLista,
   horariosMensalistas,
   onMensalistasChange,
+  onboardingRefreshKey,
   resumo,
   clientes,
   clientesFiltrados,
@@ -351,6 +353,10 @@ export default function Home({
 
     return (
       <>
+        <PrimeirosPassos
+          contextoArena={contextoArena}
+          refreshKey={onboardingRefreshKey}
+        />
         {renderWeekControls()}
         {renderAgenda()}
       </>
@@ -400,6 +406,10 @@ export default function Home({
 
     return (
       <>
+        <PrimeirosPassos
+          contextoArena={contextoArena}
+          refreshKey={onboardingRefreshKey}
+        />
         {renderWeekControls()}
         {renderAgenda()}
       </>

@@ -144,6 +144,137 @@
   color: #111827;
 }
 
+.primeiros-passos-card {
+  width: min(1120px, calc(100vw - 32px));
+  margin: 20px auto 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+  box-shadow: 0 14px 34px rgba(88, 28, 135, 0.1);
+  display: grid;
+  gap: 14px;
+}
+
+.primeiros-passos-header {
+  display: grid;
+  grid-template-columns: minmax(0, 140px) 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.primeiros-passos-header span {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  color: #6b21a8;
+}
+
+.primeiros-passos-header h2 {
+  margin: 2px 0 0;
+  font-size: 34px;
+  line-height: 1;
+  color: #1f2937;
+}
+
+.primeiros-passos-progress {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ede9fe;
+}
+
+.primeiros-passos-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c3aed, #22c55e);
+  transition: width 180ms ease;
+}
+
+.primeiros-passos-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.primeiros-passos-item {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e9d5ff;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.primeiros-passos-item .ds-button {
+  grid-column: 1 / -1;
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.primeiros-passos-item.is-done {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.primeiros-passos-check {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c4b5fd;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #16a34a;
+  font-weight: 900;
+}
+
+.primeiros-passos-success {
+  padding: 14px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.primeiros-passos-success strong {
+  display: block;
+  font-size: 18px;
+}
+
+.primeiros-passos-success p,
+.primeiros-passos-muted,
+.primeiros-passos-error {
+  margin: 4px 0 0;
+  font-size: 13px;
+}
+
+.primeiros-passos-link {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.primeiros-passos-muted {
+  color: #64748b;
+}
+
+.primeiros-passos-error {
+  color: #991b1b;
+}
+
 @media (max-width: 760px) {
   .configuracoes-arena {
     width: min(100% - 20px, 680px);
@@ -158,6 +289,16 @@
 
   .configuracoes-arena-header {
     display: grid;
+  }
+
+  .primeiros-passos-card {
+    width: min(100% - 20px, 680px);
+    margin: 12px auto;
+  }
+
+  .primeiros-passos-header,
+  .primeiros-passos-list {
+    grid-template-columns: 1fr;
   }
 }
 
