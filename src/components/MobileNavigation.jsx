@@ -42,7 +42,7 @@ export default function MobileNavigation({
             aria-label="Fechar menu"
           />
 
-          <nav className="mobile-navigation" aria-label="Navegacao principal">
+          <nav className="mobile-navigation" aria-label="Navegação principal">
             <div className="main-menu-header">
               <span>ArenaBase</span>
               <button type="button" onClick={() => setMenuAberto(false)}>

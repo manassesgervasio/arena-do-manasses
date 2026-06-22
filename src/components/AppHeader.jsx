@@ -2,6 +2,7 @@ import { useState } from "react";
 import CentralNotificacoes from "./CentralNotificacoes";
 import CentralPagamentos from "./CentralPagamentos";
 import {
+  canAccessConfiguracoesArena,
   canAccessPainelSaaS,
   canAccessUsuariosArena,
 } from "../utils/permissoes";
@@ -12,6 +13,7 @@ export default function AppHeader({
   contextoArena,
   onAbrirPainelSaaS,
   onAbrirUsuariosArena,
+  onAbrirConfiguracoesArena,
   onSair,
   onEntrar,
   modoPublico = false,
@@ -34,6 +36,10 @@ export default function AppHeader({
   } = contextoArena || {};
   const podeAcessarPainelSaaS = canAccessPainelSaaS(usuarioAtual);
   const podeAcessarUsuariosArena = canAccessUsuariosArena(
+    usuarioAtual,
+    perfilAtual
+  );
+  const podeAcessarConfiguracoesArena = canAccessConfiguracoesArena(
     usuarioAtual,
     perfilAtual
   );
@@ -82,56 +88,69 @@ export default function AppHeader({
               aria-label="Fechar conta"
             />
 
-          <aside className="app-account-menu">
-            <div className="app-account-panel-header">
-              <span>Perfil</span>
-              <button type="button" onClick={() => setMenuAberto(false)}>
-                ×
-              </button>
-            </div>
+            <aside className="app-account-menu">
+              <div className="app-account-panel-header">
+                <span>Perfil</span>
+                <button type="button" onClick={() => setMenuAberto(false)}>
+                  ×
+                </button>
+              </div>
 
-            <div className="app-account-info">
-              {carregandoContexto ? (
-                <span>Carregando arena...</span>
-              ) : erroContexto ? (
-                <span>{erroContexto}</span>
-              ) : modoPublico ? (
-                <>
-                  {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
-                  <span>Visitante</span>
-                </>
-              ) : (
-                <>
-                  {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
-                  {usuarioAtual?.nome && <span>Usuário: {usuarioAtual.nome}</span>}
-                  {perfilAtual && <span>Perfil: {perfilAtual}</span>}
-                  {!usuarioAtual && perfilLogado && (
-                    <span>Perfil: {perfilLogado}</span>
-                  )}
-                </>
+              <div className="app-account-info">
+                {carregandoContexto ? (
+                  <span>Carregando arena...</span>
+                ) : erroContexto ? (
+                  <span>{erroContexto}</span>
+                ) : modoPublico ? (
+                  <>
+                    {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
+                    <span>Visitante</span>
+                  </>
+                ) : (
+                  <>
+                    {arenaAtual?.nome && <span>Arena: {arenaAtual.nome}</span>}
+                    {usuarioAtual?.nome && (
+                      <span>Usuário: {usuarioAtual.nome}</span>
+                    )}
+                    {perfilAtual && <span>Perfil: {perfilAtual}</span>}
+                    {!usuarioAtual && perfilLogado && (
+                      <span>Perfil: {perfilLogado}</span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {podeAcessarPainelSaaS && (
+                <button type="button" onClick={onAbrirPainelSaaS}>
+                  Painel SaaS
+                </button>
               )}
-            </div>
-
-            {podeAcessarPainelSaaS && (
-              <button type="button" onClick={onAbrirPainelSaaS}>
-                Painel SaaS
-              </button>
-            )}
-            {podeAcessarUsuariosArena && (
-              <button type="button" onClick={onAbrirUsuariosArena}>
-                Usuários
-              </button>
-            )}
-            {modoPublico ? (
-              <button type="button" onClick={onEntrar}>
-                Entrar
-              </button>
-            ) : (usuarioAtual || (perfilLogado && permissoesLogado)) && (
-              <button type="button" className="app-account-danger" onClick={onSair}>
-                Sair
-              </button>
-            )}
-          </aside>
+              {podeAcessarUsuariosArena && (
+                <button type="button" onClick={onAbrirUsuariosArena}>
+                  Usuários
+                </button>
+              )}
+              {podeAcessarConfiguracoesArena && (
+                <button type="button" onClick={onAbrirConfiguracoesArena}>
+                  Configurações da Arena
+                </button>
+              )}
+              {modoPublico ? (
+                <button type="button" onClick={onEntrar}>
+                  Entrar
+                </button>
+              ) : (
+                (usuarioAtual || (perfilLogado && permissoesLogado)) && (
+                  <button
+                    type="button"
+                    className="app-account-danger"
+                    onClick={onSair}
+                  >
+                    Sair
+                  </button>
+                )
+              )}
+            </aside>
           </div>
         )}
       </div>

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
 import ClientesSection from "../components/ClientesSection";
+import ConfiguracoesArena from "../components/ConfiguracoesArena";
 import FinanceiroProfissional from "../components/FinanceiroProfissional";
 import MensalistasSection from "../components/MensalistasSection";
 import MobileNavigation from "../components/MobileNavigation";
@@ -12,6 +13,7 @@ import WeekControls from "../components/WeekControls";
 import { navigationItems } from "../navigation";
 import {
   canAccessClientes,
+  canAccessConfiguracoesArena,
   canAccessFinanceiro,
   canAccessMensalistas,
   canAccessPainelSaaS,
@@ -69,6 +71,8 @@ export default function Home({
     useState(false);
   const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
   const [mostrarUsuariosArena, setMostrarUsuariosArena] = useState(false);
+  const [mostrarConfiguracoesArena, setMostrarConfiguracoesArena] =
+    useState(false);
   const [mostrarApenasOcupados, setMostrarApenasOcupados] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     window.matchMedia("(max-width: 640px)").matches
@@ -81,6 +85,7 @@ export default function Home({
     mensalistas: canAccessMensalistas(usuarioAtual, perfilAtual),
     painelSaaS: canAccessPainelSaaS(usuarioAtual),
     usuarios: canAccessUsuariosArena(usuarioAtual, perfilAtual),
+    configuracoes: canAccessConfiguracoesArena(usuarioAtual, perfilAtual),
   };
   const mobileNavigationItems = navigationItems.filter((item) => {
     if (item.id === "clientes") return permissoesArena.clientes;
@@ -97,6 +102,7 @@ export default function Home({
           label: "Painel SaaS",
           onClick: () => {
             setMostrarUsuariosArena(false);
+            setMostrarConfiguracoesArena(false);
             setMostrarPainelSaaS(true);
           },
         }
@@ -107,7 +113,19 @@ export default function Home({
           label: "Usuários",
           onClick: () => {
             setMostrarPainelSaaS(false);
+            setMostrarConfiguracoesArena(false);
             setMostrarUsuariosArena(true);
+          },
+        }
+      : null,
+    !modoPublico && permissoesArena.configuracoes
+      ? {
+          id: "configuracoes-arena",
+          label: "Configurações da Arena",
+          onClick: () => {
+            setMostrarPainelSaaS(false);
+            setMostrarUsuariosArena(false);
+            setMostrarConfiguracoesArena(true);
           },
         }
       : null,
@@ -154,12 +172,17 @@ export default function Home({
     if (!permissoesArena.usuarios) {
       setMostrarUsuariosArena(false);
     }
+
+    if (!permissoesArena.configuracoes) {
+      setMostrarConfiguracoesArena(false);
+    }
   }, [
     activeMobileTab,
     mobileNavigationItems,
     permissoesArena.financeiro,
     permissoesArena.painelSaaS,
     permissoesArena.usuarios,
+    permissoesArena.configuracoes,
   ]);
 
   function renderWeekControls() {
@@ -299,6 +322,17 @@ export default function Home({
       );
     }
 
+    if (mostrarConfiguracoesArena) {
+      if (!permissoesArena.configuracoes) return <AccessDenied />;
+
+      return (
+        <ConfiguracoesArena
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarConfiguracoesArena(false)}
+        />
+      );
+    }
+
     if (activeMobileTab === "clientes") {
       return renderClientes();
     }
@@ -346,6 +380,17 @@ export default function Home({
       );
     }
 
+    if (mostrarConfiguracoesArena) {
+      return permissoesArena.configuracoes ? (
+        <ConfiguracoesArena
+          contextoArena={contextoArena}
+          onVoltar={() => setMostrarConfiguracoesArena(false)}
+        />
+      ) : (
+        <AccessDenied />
+      );
+    }
+
     if (activeMobileTab === "clientes") return renderClientes();
     if (activeMobileTab === "financeiro") return renderFinanceiro();
     if (activeMobileTab === "financeiro-profissional") {
@@ -374,13 +419,22 @@ export default function Home({
           if (!permissoesArena.painelSaaS) return;
 
           setMostrarUsuariosArena(false);
+          setMostrarConfiguracoesArena(false);
           setMostrarPainelSaaS(true);
         }}
         onAbrirUsuariosArena={() => {
           if (!permissoesArena.usuarios) return;
 
           setMostrarPainelSaaS(false);
+          setMostrarConfiguracoesArena(false);
           setMostrarUsuariosArena(true);
+        }}
+        onAbrirConfiguracoesArena={() => {
+          if (!permissoesArena.configuracoes) return;
+
+          setMostrarPainelSaaS(false);
+          setMostrarUsuariosArena(false);
+          setMostrarConfiguracoesArena(true);
         }}
         onSair={onSair}
         onEntrar={onEntrar}
@@ -393,6 +447,7 @@ export default function Home({
         onIrParaReserva={(reserva) => {
           setMostrarPainelSaaS(false);
           setMostrarUsuariosArena(false);
+          setMostrarConfiguracoesArena(false);
           setMostrarFinanceiroProfissional(false);
           setActiveMobileTab("agenda");
           onIrParaReserva?.(reserva);
@@ -408,6 +463,7 @@ export default function Home({
         onTabChange={(tab) => {
           setMostrarPainelSaaS(false);
           setMostrarUsuariosArena(false);
+          setMostrarConfiguracoesArena(false);
           setActiveMobileTab(tab);
         }}
       />

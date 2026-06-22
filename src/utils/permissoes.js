@@ -10,6 +10,10 @@ export function canAccessUsuariosArena(usuarioAtual, perfilAtual) {
   return isSuperAdmin(usuarioAtual) || perfilAtual === "admin_arena";
 }
 
+export function canAccessConfiguracoesArena(usuarioAtual, perfilAtual) {
+  return isSuperAdmin(usuarioAtual) || perfilAtual === "admin_arena";
+}
+
 export function canAccessFinanceiro(usuarioAtual, perfilAtual) {
   return (
     isSuperAdmin(usuarioAtual) ||

@@ -72,7 +72,7 @@ export function useArenaAtual(session) {
       if (usuario.tipo_usuario === "super_admin") {
         const { data: arenaPadrao, error: arenaPadraoError } = await supabase
           .from("arenas")
-          .select("id,nome,slug,telefone,ativa")
+          .select("id,nome,slug,telefone,cidade,estado,ativa")
           .eq("slug", ARENA_SLUG_ATUAL)
           .eq("ativa", true)
           .maybeSingle();
@@ -127,7 +127,7 @@ export function useArenaAtual(session) {
       const arenaIds = vinculos.map((vinculo) => vinculo.arena_id);
       const { data: arenas, error: arenasError } = await supabase
         .from("arenas")
-        .select("id,nome,slug,telefone,ativa")
+        .select("id,nome,slug,telefone,cidade,estado,ativa")
         .in("id", arenaIds)
         .eq("ativa", true);
 
@@ -164,12 +164,20 @@ export function useArenaAtual(session) {
     };
   }, [session]);
 
+  function atualizarArenaAtual(dadosArena) {
+    setArenaAtual((arenaAnterior) => ({
+      ...(arenaAnterior || {}),
+      ...(dadosArena || {}),
+    }));
+  }
+
   return {
     arenaAtual,
     usuarioAtual,
     perfilAtual,
     carregandoContexto,
     erroContexto,
+    atualizarArenaAtual,
   };
 }
 
@@ -200,7 +208,7 @@ async function carregarArenaPublica() {
   // Remover depois que agenda_publica_arenas estiver aplicada.
   return supabase
     .from("arenas")
-    .select("id,nome,slug,telefone,ativa")
+    .select("id,nome,slug,telefone,cidade,estado,ativa")
     .eq("slug", ARENA_SLUG_ATUAL)
     .eq("ativa", true)
     .maybeSingle();
