@@ -60,15 +60,17 @@ function criarFormularioVazio() {
 
 export default function MensalistasSection({
   moeda,
-  perfilLogado,
   contextoArena,
   onMensalistasChange,
 }) {
   const competenciaAtual = obterCompetenciaAtual();
   const arenaAtualId = contextoArena?.arenaAtual?.id;
+  const usuarioAtual = contextoArena?.usuarioAtual;
+  const perfilAtual = contextoArena?.perfilAtual;
   const carregandoContexto = contextoArena?.carregandoContexto;
   const erroContexto = contextoArena?.erroContexto;
-  const podeExcluirMensalista = perfilLogado === "Administrador";
+  const podeExcluirMensalista =
+    usuarioAtual?.tipo_usuario === "super_admin" || perfilAtual === "admin_arena";
   const [mensalistas, setMensalistas] = useState([]);
   const [horariosContratados, setHorariosContratados] = useState({});
   const [pagamentos, setPagamentos] = useState({});
@@ -394,13 +396,6 @@ export default function MensalistasSection({
     );
 
     if (!confirmar) return;
-
-    const senha = prompt("Digite a senha de administrador para excluir o mensalista:");
-
-    if (senha !== "1234") {
-      alert("Senha incorreta.");
-      return;
-    }
 
     setErro("");
     setMensalistaExcluindoId(mensalista.id);

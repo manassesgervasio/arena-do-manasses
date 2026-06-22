@@ -13,9 +13,6 @@ const formularioInicial = {
   observacao: "",
 };
 
-// Senha temporaria para reabertura. Depois sera substituida por permissao real de usuario/perfil.
-const SENHA_ADMIN_FECHAMENTO = "1234";
-
 function moeda(valor) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -680,13 +677,6 @@ export default function FinanceiroProfissional({
     }
 
     if (!fechamentoMensal?.id) return;
-
-    const senha = prompt("Digite a senha de administrador para reabrir este mês.");
-
-    if (senha !== SENHA_ADMIN_FECHAMENTO) {
-      setFechamentoErro("Senha de administrador inválida.");
-      return;
-    }
 
     const agora = new Date().toISOString();
     const reaberturaTexto = `Mês reaberto em ${formatarDataHora(agora)}`;

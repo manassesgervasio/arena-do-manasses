@@ -275,7 +275,6 @@ export default function Home({
     return (
       <MensalistasSection
         moeda={moeda}
-        perfilLogado={perfilLogado}
         contextoArena={contextoArena}
         onMensalistasChange={onMensalistasChange}
       />
