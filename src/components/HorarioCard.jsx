@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import ReservaBadges from "./ReservaBadges";
 import { Button, Input, Select } from "./ui";
 
@@ -66,7 +66,7 @@ export default function HorarioCard({
 
   async function salvarAluguelAvulso() {
     if (!aluguelAvulso.cliente.trim()) {
-      alert("Informe o nome do cliente/time para alugar este horario.");
+      alert("Informe o nome do cliente/time para alugar este hor\u00e1rio.");
       return;
     }
 
@@ -94,7 +94,7 @@ export default function HorarioCard({
     }
 
     if (telefone.length < 10) {
-      alert("Informe um telefone/WhatsApp com pelo menos 10 digitos.");
+      alert("Informe um telefone/WhatsApp com pelo menos 10 d\u00edgitos.");
       return;
     }
 
@@ -106,7 +106,7 @@ export default function HorarioCard({
       setWhatsappPublicoUrl("");
       alert(
         resultado?.mensagem ||
-          "Nao foi possivel enviar a solicitacao. Tente novamente."
+          "N\u00e3o foi poss\u00edvel enviar a solicita\u00e7\u00e3o. Tente novamente."
       );
       return;
     }
@@ -178,7 +178,7 @@ export default function HorarioCard({
         type="button"
         onClick={onToggleExpandido}
         aria-expanded={expandido}
-        aria-label={`${expandido ? "Fechar" : "Abrir"} horario ${hora}`}
+        aria-label={`${expandido ? "Fechar" : "Abrir"} horário ${hora}`}
       >
         <span className="horario-card-meta">
           <span className="horario-card-hour">
@@ -254,7 +254,7 @@ export default function HorarioCard({
 
           {reservaIndisponivel && compactoLivre && (
             <span className="horario-public-unavailable">
-              Indisponivel para reserva
+              {"Indispon\u00edvel para reserva"}
             </span>
           )}
 
@@ -299,7 +299,7 @@ export default function HorarioCard({
                 <>
                   <Input
                     className="horario-card-input"
-                    placeholder="cliente/Time"
+                    placeholder="Cliente/time"
                     value={aluguelAvulso.cliente}
                     onChange={(event) =>
                       atualizarAluguelAvulso("cliente", event.target.value)
@@ -360,7 +360,7 @@ export default function HorarioCard({
             <>
               <Input
                 className="horario-card-input"
-                placeholder="cliente/Time"
+                placeholder="Cliente/time"
                 value={item.cliente}
                 onChange={onClienteChange}
                 disabled={item.status === "Pago"}
@@ -427,7 +427,7 @@ export default function HorarioCard({
                     rel="noreferrer"
                     variant="primary"
                   >
-                    Enviar confirmacao pelo WhatsApp
+                    {"Enviar confirma\u00e7\u00e3o pelo WhatsApp"}
                   </Button>
                 )}
 

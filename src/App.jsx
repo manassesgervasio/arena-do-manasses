@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
-import { useArenaAtual } from "./hooks/useArenaAtual";
+import { ARENA_SLUG_ATUAL, useArenaAtual } from "./hooks/useArenaAtual";
 import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import Login from "./components/Login";
@@ -121,18 +121,13 @@ export default function App() {
       return;
     }
 
-    let query = supabase
-      .from("reservas")
-      .select("*")
-      .eq("arena_id", arenaAtualId);
-
-    if (modoVisitante && primeiroDia && ultimoDia) {
-      query = query
-        .gte("data", primeiroDia)
-        .lte("data", ultimoDia);
-    }
-
-    const { data, error } = await query;
+    const { data, error } =
+      modoVisitante && primeiroDia && ultimoDia
+        ? await buscarHorariosOcupadosPublicos(primeiroDia, ultimoDia)
+        : await supabase
+            .from("reservas")
+            .select("*")
+            .eq("arena_id", arenaAtualId);
 
     if (!ativo) return;
 
@@ -153,19 +148,21 @@ export default function App() {
     data.forEach((reserva) => {
       const chave = `${reserva.data}_${reserva.horario}`;
 
-      reservasFormatadas[chave] = {
-        id: reserva.id || "",
-        arena_id: reserva.arena_id || "",
-        data: reserva.data || "",
-        horario: reserva.horario || "",
-        origem: reserva.origem || "",
-        cliente: reserva.cliente || "",
-        telefone: reserva.telefone || "",
-        valor: reserva.valor || "",
-        status: reserva.status || "Livre",
-        tipo: reserva.tipo || "Avulso",
-        grupoFixo: reserva.grupo_fixo || "",
-      };
+      reservasFormatadas[chave] = modoVisitante
+        ? normalizarHorarioPublicoOcupado(reserva)
+        : {
+            id: reserva.id || "",
+            arena_id: reserva.arena_id || "",
+            data: reserva.data || "",
+            horario: reserva.horario || "",
+            origem: reserva.origem || "",
+            cliente: reserva.cliente || "",
+            telefone: reserva.telefone || "",
+            valor: reserva.valor || "",
+            status: reserva.status || "Livre",
+            tipo: reserva.tipo || "Avulso",
+            grupoFixo: reserva.grupo_fixo || "",
+          };
     });
 
     if (modoVisitante) {
@@ -284,7 +281,7 @@ export default function App() {
 }, [sessaoAuth, arenaAtualId, mesFiltro, versaoHorariosMensalistas]);
 
   useEffect(() => {
-  if (!arenaAtualId) {
+  if (!sessaoAuth || !arenaAtualId) {
     setHorariosMensalistas({});
     return;
   }
@@ -328,7 +325,7 @@ export default function App() {
     if (!ativo) return;
 
     if (horariosError) {
-      console.log("Erro ao carregar horÃ¡rios de mensalistas:", horariosError);
+      console.log("Erro ao carregar horários de mensalistas:", horariosError);
       setHorariosMensalistas({});
       return;
     }
@@ -358,7 +355,108 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [arenaAtualId, versaoHorariosMensalistas]);
+}, [sessaoAuth, arenaAtualId, versaoHorariosMensalistas]);
+
+  async function buscarHorariosOcupadosPublicos(primeiroDia, ultimoDia) {
+    const { data, error } = await supabase.rpc(
+      "agenda_publica_horarios_ocupados",
+      {
+        p_arena_slug: ARENA_SLUG_ATUAL,
+        p_data_inicio: primeiroDia,
+        p_data_fim: ultimoDia,
+      }
+    );
+
+    if (!error) {
+      return { data: data || [], error: null };
+    }
+
+    if (!erroRecursoPublicoInexistente(error)) {
+      return { data: null, error };
+    }
+
+    console.warn(
+      "Fallback temporario: agenda_publica_horarios_ocupados ainda nao existe. Remover apos aplicar a migration RLS ArenaBase.",
+      error
+    );
+
+    // Fallback temporario para ambiente antes da migration RLS ArenaBase.
+    // Remover depois que agenda_publica_horarios_ocupados estiver aplicada.
+    return buscarHorariosOcupadosPublicosFallback(primeiroDia, ultimoDia);
+  }
+
+  async function buscarHorariosOcupadosPublicosFallback(primeiroDia, ultimoDia) {
+    const { data: reservasData, error: reservasError } = await supabase
+      .from("reservas")
+      .select("arena_id,data,horario,status,tipo")
+      .eq("arena_id", arenaAtualId)
+      .gte("data", primeiroDia)
+      .lte("data", ultimoDia);
+
+    if (reservasError) {
+      return { data: null, error: reservasError };
+    }
+
+    const { data: mensalistasData, error: mensalistasError } = await supabase
+      .from("mensalistas")
+      .select("id,status")
+      .eq("arena_id", arenaAtualId)
+      .eq("status", "Ativo");
+
+    if (mensalistasError) {
+      return { data: null, error: mensalistasError };
+    }
+
+    const mensalistaIds = (mensalistasData || []).map((mensalista) => mensalista.id);
+
+    if (!mensalistaIds.length) {
+      return { data: reservasData || [], error: null };
+    }
+
+    const { data: horariosData, error: horariosError } = await supabase
+      .from("mensalista_horarios")
+      .select("arena_id,mensalista_id,dia_semana,horario,ativo")
+      .eq("arena_id", arenaAtualId)
+      .in("mensalista_id", mensalistaIds)
+      .eq("ativo", true);
+
+    if (horariosError) {
+      return { data: null, error: horariosError };
+    }
+
+    return {
+      data: [
+        ...(reservasData || []),
+        ...expandirHorariosMensalistasPublicos(
+          horariosData || [],
+          primeiroDia,
+          ultimoDia
+        ),
+      ],
+      error: null,
+    };
+  }
+
+  function normalizarHorarioPublicoOcupado(reserva) {
+    const statusPublico =
+      reserva.status_publico === "Pendente" || reserva.status === "Pendente"
+        ? "Pendente"
+        : "Reservado";
+
+    return {
+      id: "",
+      arena_id: reserva.arena_id || arenaAtualId,
+      data: reserva.data || "",
+      horario: reserva.horario || "",
+      origem: "",
+      cliente: "",
+      telefone: "",
+      valor: "",
+      status: statusPublico,
+      tipo: "Avulso",
+      grupoFixo: "",
+    };
+  }
 
   function recarregarHorariosMensalistas() {
     setVersaoHorariosMensalistas((versao) => versao + 1);
@@ -636,13 +734,8 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     };
   }
 
-  const { data: reservaExistente, error: erroBuscaReserva } = await supabase
-    .from("reservas")
-    .select("*")
-    .eq("arena_id", arenaAtualId)
-    .eq("data", dataTexto)
-    .eq("horario", horario)
-    .maybeSingle();
+  const { data: horariosOcupados, error: erroBuscaReserva } =
+    await buscarHorariosOcupadosPublicos(dataTexto, dataTexto);
 
   if (erroBuscaReserva) {
     console.error("Erro ao verificar horario publico:", erroBuscaReserva);
@@ -652,6 +745,10 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
         "Nao foi possivel verificar se o horario esta livre. Tente novamente.",
     };
   }
+
+  const reservaExistente = (horariosOcupados || []).find(
+    (item) => item.data === dataTexto && item.horario === horario
+  );
 
   if (reservaTemOcupacao(reservaExistente)) {
     return {
@@ -687,11 +784,9 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
     telefone,
   });
 
-  const { data: reservaCriada, error: erroInsert } = await supabase
+  const { error: erroInsert } = await supabase
     .from("reservas")
-    .insert(reservaPublica)
-    .select("*")
-    .single();
+    .insert(reservaPublica);
 
   if (erroInsert) {
     console.error("Erro ao criar reserva publica:", erroInsert);
@@ -709,17 +804,17 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
   setReservas((anterior) => ({
     ...anterior,
     [chaveReserva(dataTexto, horario)]: {
-      id: reservaCriada.id || "",
-      arena_id: reservaCriada.arena_id || arenaAtualId,
-      data: reservaCriada.data || dataTexto,
-      horario: reservaCriada.horario || horario,
-      origem: reservaCriada.origem || "Publica",
-      cliente: reservaCriada.cliente || nome,
-      telefone: reservaCriada.telefone || telefone,
-      valor: reservaCriada.valor || "",
-      status: reservaCriada.status || "Pendente",
-      tipo: reservaCriada.tipo || "Avulso",
-      grupoFixo: reservaCriada.grupo_fixo || "",
+      id: "",
+      arena_id: arenaAtualId,
+      data: dataTexto,
+      horario,
+      origem: "Publica",
+      cliente: nome,
+      telefone,
+      valor: "",
+      status: "Pendente",
+      tipo: "Avulso",
+      grupoFixo: "",
     },
   }));
   setReservasArenaId(arenaAtualId);
@@ -727,10 +822,10 @@ async function solicitarReservaPublica(dataTexto, horario, dadosCliente) {
   await notificarGestorNovaReserva({
     arena: contextoArena.arenaAtual,
     reserva: {
-      ...reservaCriada,
-      data: reservaCriada.data || dataTexto,
-      horario: reservaCriada.horario || horario,
-      status: reservaCriada.status || "Pendente",
+      ...reservaPublica,
+      data: dataTexto,
+      horario,
+      status: "Pendente",
     },
     cliente: {
       nome,
@@ -869,7 +964,7 @@ async function excluirReservaBanco(dataTexto, horario) {
     }));
 
     alert(
-      `Nao foi possivel salvar a reserva no banco: ${error.message || "erro desconhecido"}`
+      `Não foi possível salvar a reserva: ${error.message || "erro desconhecido"}`
     );
   }
 }
@@ -881,7 +976,7 @@ async function limparReserva(dataTexto, horario) {
     alert(
       resultado.error?.message
         ? resultado.error.message
-        : "Nao foi possivel limpar a reserva no banco: erro desconhecido"
+        : "Não foi possível limpar a reserva. Tente novamente."
     );
     return;
   }
@@ -896,19 +991,19 @@ async function limparReserva(dataTexto, horario) {
 }
 
   async function copiarFixosProximaSemana() {
-  const quantidade = prompt("Quantas semanas deseja repetir os horÃ¡rios fixos?", "4");
+  const quantidade = prompt("Por quantas semanas deseja repetir os horários fixos?", "4");
 
   if (!quantidade) return;
 
   const semanas = Number(quantidade);
 
   if (!semanas || semanas < 1) {
-    alert("Informe uma quantidade vÃ¡lida de semanas.");
+    alert("Informe uma quantidade válida de semanas.");
     return;
   }
 
   const confirmar = confirm(
-    `Copiar todos os horÃ¡rios FIXOS por ${semanas} semana(s)?`
+    `Copiar todos os horários fixos por ${semanas} semana(s)?`
   );
 
   if (!confirmar) return;
@@ -965,7 +1060,7 @@ novasReservas[novaChave] = {
     ...novasReservas,
   }));
 
-  alert(`HorÃ¡rios fixos copiados por ${semanas} semana(s)!`);
+  alert(`Horários fixos copiados por ${semanas} semana(s).`);
 }
 
 
@@ -1024,7 +1119,7 @@ return "#14532d";
 
       if (error) {
         alert(
-          `Nao foi possivel confirmar a reserva: ${
+          `Não foi possível confirmar a reserva: ${
             error.message || "erro desconhecido"
           }`
         );
@@ -1051,7 +1146,7 @@ return "#14532d";
 
     if (error) {
       alert(
-        `Nao foi possivel reservar o horario: ${
+        `Não foi possível reservar o horário: ${
           error.message || "erro desconhecido"
         }`
       );
@@ -1063,23 +1158,23 @@ return "#14532d";
       [chaveReserva(dataTexto, horario)]: novaReserva,
     }));
 
-    alert("HorÃ¡rio reservado!");
+    alert("Horário reservado.");
     return;
   }
 
-  const quantidade = prompt("Quantas semanas deseja repetir este horÃ¡rio fixo?", "24");
+  const quantidade = prompt("Por quantas semanas deseja repetir este horário fixo?", "24");
 
   if (!quantidade) return;
 
   const semanas = Number(quantidade);
 
   if (!semanas || semanas < 1) {
-    alert("Informe uma quantidade vÃ¡lida de semanas.");
+    alert("Informe uma quantidade válida de semanas.");
     return;
   }
 
   const confirmar = confirm(
-    `Reservar este horÃ¡rio fixo por ${semanas} semana(s)?`
+    `Reservar este horário fixo por ${semanas} semana(s)?`
   );
 
   if (!confirmar) return;
@@ -1121,7 +1216,7 @@ return "#14532d";
     ...novasReservas,
   }));
 
-  alert(`HorÃ¡rio fixo reservado por ${semanas} semana(s)!`);
+  alert(`Horário fixo reservado por ${semanas} semana(s).`);
 }
 
   async function alugarMensalistaComoAvulso(dataTexto, horario, dadosReserva) {
@@ -1134,7 +1229,7 @@ return "#14532d";
     Number(reservaAtual.valor || 0) > 0;
 
   if (temReservaReal) {
-    return "Este horÃƒÂ¡rio jÃƒÂ¡ possui uma reserva real.";
+    return "Este horário já possui uma reserva.";
   }
 
   const novaReserva = {
@@ -1150,7 +1245,7 @@ return "#14532d";
   const error = await salvarReservaBanco(novaReserva);
 
   if (error) {
-    return "NÃƒÂ£o foi possÃƒÂ­vel alugar este horÃƒÂ¡rio como avulso. Tente novamente.";
+    return "Não foi possível alugar este horário como avulso. Tente novamente.";
   }
 
   setReservas((anterior) => ({
@@ -1192,10 +1287,10 @@ return "#14532d";
   if (authCarregando) {
     return (
       <main className="login-page">
-        <section className="login-panel" aria-label="Carregando sessÃ£o">
+        <section className="login-panel" aria-label="Carregando sessão">
           <div className="login-brand">
             <h1>ArenaBase</h1>
-            <p>Carregando sessÃ£o...</p>
+            <p>Carregando sessão...</p>
           </div>
         </section>
       </main>
@@ -1323,12 +1418,60 @@ function reservaTemOcupacao(reserva) {
   if (!reserva) return false;
 
   return (
+    reserva.ocupado === true ||
     reserva.status !== "Livre" ||
     (reserva.tipo && reserva.tipo !== "Avulso") ||
     Boolean(reserva.cliente?.trim()) ||
     Boolean(reserva.telefone?.trim()) ||
     Number(reserva.valor || 0) > 0
   );
+}
+
+function erroRecursoPublicoInexistente(error) {
+  const mensagem = `${error?.code || ""} ${error?.message || ""}`.toLowerCase();
+
+  return (
+    mensagem.includes("agenda_publica_horarios_ocupados") ||
+    mensagem.includes("does not exist") ||
+    mensagem.includes("could not find") ||
+    mensagem.includes("pgrst202") ||
+    mensagem.includes("42p01")
+  );
+}
+
+function expandirHorariosMensalistasPublicos(horariosContratados, inicio, fim) {
+  const datas = listarDatasNoPeriodo(inicio, fim);
+
+  return horariosContratados.flatMap((horarioContratado) =>
+    datas
+      .filter((data) => data.getDay() === Number(horarioContratado.dia_semana))
+      .map((data) => ({
+        arena_id: horarioContratado.arena_id,
+        data: formatarDataLocal(data),
+        horario: horarioContratado.horario,
+        ocupado: true,
+        status_publico: "Ocupado",
+      }))
+  );
+}
+
+function listarDatasNoPeriodo(inicio, fim) {
+  const datas = [];
+  const cursor = criarDataLocal(inicio);
+  const dataFim = criarDataLocal(fim);
+
+  while (cursor <= dataFim) {
+    datas.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return datas;
+}
+
+function criarDataLocal(dataTexto) {
+  const [ano, mes, dia] = String(dataTexto).split("-").map(Number);
+
+  return new Date(ano, mes - 1, dia);
 }
 
 function ehSolicitacaoAgendamento(reserva) {

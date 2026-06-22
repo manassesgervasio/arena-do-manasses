@@ -48,7 +48,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     if (carregandoContexto) return;
 
     if (!arenaAtualId) {
-      setErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+      setErro(erroContexto || "Não foi possível carregar o contexto da arena.");
       setUsuarios([]);
       setVinculos([]);
       setCarregando(false);
@@ -65,8 +65,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       .order("created_at", { ascending: true });
 
     if (vinculosError) {
-      console.error("Erro ao carregar vinculos da arena:", vinculosError);
-      setErro(`Nao foi possivel carregar os usuarios da arena. ${vinculosError.message}`);
+      console.error("Erro ao carregar vínculos da arena:", vinculosError);
+      setErro(`Não foi possível carregar os usuários da arena. ${vinculosError.message}`);
       setUsuarios([]);
       setVinculos([]);
       setCarregando(false);
@@ -89,8 +89,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       .order("nome", { ascending: true });
 
     if (usuariosError) {
-      console.error("Erro ao carregar usuarios da arena:", usuariosError);
-      setErro(`Nao foi possivel carregar os dados dos usuarios. ${usuariosError.message}`);
+      console.error("Erro ao carregar usuários da arena:", usuariosError);
+      setErro(`Não foi possível carregar os dados dos usuários. ${usuariosError.message}`);
       setUsuarios([]);
       setVinculos([]);
       setCarregando(false);
@@ -159,12 +159,12 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     event.preventDefault();
 
     if (!podeGerenciarUsuarios) {
-      setErro("Voce nao tem permissao para gerenciar usuarios desta arena.");
+      setErro("Você não tem permissão para gerenciar usuários desta arena.");
       return;
     }
 
     if (!arenaAtualId) {
-      setErro("Nao foi possivel carregar o contexto da arena.");
+      setErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -191,8 +191,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       .maybeSingle();
 
     if (buscarUsuarioError) {
-      console.error("Erro ao buscar usuario:", buscarUsuarioError);
-      setErro(`Nao foi possivel verificar o usuario. ${buscarUsuarioError.message}`);
+      console.error("Erro ao buscar usuário:", buscarUsuarioError);
+      setErro(`Não foi possível verificar o usuário. ${buscarUsuarioError.message}`);
       setSalvando(false);
       return;
     }
@@ -213,8 +213,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
         .single();
 
       if (atualizarUsuarioError) {
-        console.error("Erro ao atualizar usuario:", atualizarUsuarioError);
-        setErro(`Nao foi possivel atualizar o usuario. ${atualizarUsuarioError.message}`);
+        console.error("Erro ao atualizar usuário:", atualizarUsuarioError);
+        setErro(`Não foi possível atualizar o usuário. ${atualizarUsuarioError.message}`);
         setSalvando(false);
         return;
       }
@@ -235,8 +235,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
         .single();
 
       if (inserirUsuarioError) {
-        console.error("Erro ao cadastrar usuario:", inserirUsuarioError);
-        setErro(`Nao foi possivel cadastrar o usuario. ${inserirUsuarioError.message}`);
+        console.error("Erro ao cadastrar usuário:", inserirUsuarioError);
+        setErro(`Não foi possível cadastrar o usuário. ${inserirUsuarioError.message}`);
         setSalvando(false);
         return;
       }
@@ -252,8 +252,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       .maybeSingle();
 
     if (buscarVinculoError) {
-      console.error("Erro ao buscar vinculo usuario-arena:", buscarVinculoError);
-      setErro(`Nao foi possivel verificar o vinculo com a arena. ${buscarVinculoError.message}`);
+      console.error("Erro ao buscar vínculo usuário-arena:", buscarVinculoError);
+      setErro(`Não foi possível verificar o vínculo com a arena. ${buscarVinculoError.message}`);
       setSalvando(false);
       return;
     }
@@ -278,8 +278,8 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     const { error: salvarVinculoError } = await operacaoVinculo;
 
     if (salvarVinculoError) {
-      console.error("Erro ao salvar vinculo usuario-arena:", salvarVinculoError);
-      setErro(`Nao foi possivel vincular o usuario a arena. ${salvarVinculoError.message}`);
+      console.error("Erro ao salvar vínculo usuário-arena:", salvarVinculoError);
+      setErro(`Não foi possível vincular o usuário à arena. ${salvarVinculoError.message}`);
       setSalvando(false);
       return;
     }
@@ -288,9 +288,9 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       const resultadoAuth = await criarUsuarioAuth({ email, nome });
 
       if (resultadoAuth.auth_existia) {
-        setMensagem("Usuario vinculado com sucesso. O login Auth ja existia.");
+        setMensagem("Usuário vinculado com sucesso. O acesso já existia.");
       } else {
-        setMensagem("Usuario cadastrado e login criado com sucesso.");
+        setMensagem("Usuário cadastrado e acesso criado com sucesso.");
         if (resultadoAuth.senha_temporaria) {
           setSenhaTemporariaAuth(resultadoAuth.senha_temporaria);
         }
@@ -298,7 +298,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     } catch (authError) {
       console.error("Erro ao criar login Auth automaticamente:", authError);
       setMensagem(
-        "Usuario vinculado a arena, mas nao foi possivel criar o login automaticamente. Crie o acesso manualmente no Supabase Auth."
+        "Usuário vinculado à arena, mas não foi possível criar o acesso automaticamente. Acione o suporte para finalizar o login."
       );
     }
 
@@ -309,7 +309,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
   async function alterarStatusVinculo(vinculo, ativo) {
     if (!podeGerenciarUsuarios) {
-      setErro("Voce nao tem permissao para gerenciar usuarios desta arena.");
+      setErro("Você não tem permissão para gerenciar usuários desta arena.");
       return;
     }
 
@@ -318,16 +318,16 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       const unicoAdminAtivo = adminsAtivos.length === 1;
 
       if (ehProprioUsuario && unicoAdminAtivo) {
-        setErro("Nao e permitido desativar seu proprio acesso sendo o unico admin_arena ativo.");
+        setErro("Não é permitido desativar seu próprio acesso sendo o único administrador ativo.");
         return;
       }
 
       const confirmarAdmin = confirm(
-        "Este usuario e admin_arena. Desativar este acesso pode limitar a administracao da arena. Deseja continuar?"
+        "Este usuário é administrador. Desativar este acesso pode limitar a administração da arena. Deseja continuar?"
       );
 
       if (!confirmarAdmin) return;
-    } else if (!confirm("Confirmar alteracao de acesso deste usuario?")) {
+    } else if (!confirm("Confirmar alteração de acesso deste usuário?")) {
       return;
     }
 
@@ -345,13 +345,13 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       .eq("arena_id", arenaAtualId);
 
     if (error) {
-      console.error("Erro ao alterar acesso do usuario:", error);
-      setErro(`Nao foi possivel alterar o acesso do usuario. ${error.message}`);
+      console.error("Erro ao alterar acesso do usuário:", error);
+      setErro(`Não foi possível alterar o acesso do usuário. ${error.message}`);
       setAlterandoId(null);
       return;
     }
 
-    setMensagem(ativo ? "Usuario reativado com sucesso." : "Usuario desativado com sucesso.");
+    setMensagem(ativo ? "Usuário reativado com sucesso." : "Usuário desativado com sucesso.");
     await carregarUsuarios();
     setAlterandoId(null);
   }
@@ -361,7 +361,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       <section className="usuarios-arena">
         <div className="usuarios-arena-header">
           <div>
-            <h2>Usuarios da Arena</h2>
+            <h2>Usuários da arena</h2>
             <p>Gerencie os acessos da arena atual</p>
           </div>
           <Button type="button" onClick={onVoltar}>
@@ -369,7 +369,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
           </Button>
         </div>
         <div className="usuarios-arena-error">
-          Voce nao tem permissao para gerenciar usuarios desta arena.
+          Você não tem permissão para gerenciar usuários desta arena.
         </div>
       </section>
     );
@@ -379,7 +379,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
     <section className="usuarios-arena">
       <div className="usuarios-arena-header">
         <div>
-          <h2>Usuarios da Arena</h2>
+          <h2>Usuários da arena</h2>
           <p>Gerencie os acessos da arena atual</p>
           <span>
             Arena: <strong>{arenaAtual?.nome || "-"}</strong>
@@ -393,7 +393,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
       <div className="usuarios-arena-toolbar">
         <Button type="button" onClick={abrirFormulario}>
-          Adicionar usuario
+          Adicionar usuário
         </Button>
       </div>
 
@@ -401,7 +401,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       {senhaTemporariaAuth && (
         <div className="usuarios-arena-auth-secret">
           <span>Senha temporaria: {senhaTemporariaAuth}</span>
-          <small>Anote esta senha. Ela sera exibida apenas agora.</small>
+          <small>Anote esta senha. Ela será exibida apenas agora.</small>
         </div>
       )}
       {erro && <div className="usuarios-arena-error">{erro}</div>}
@@ -409,7 +409,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
       {mostrarFormulario && (
         <form className="usuarios-arena-form" onSubmit={salvarUsuario}>
           <div className="usuarios-arena-form-header">
-            <h3>Adicionar usuario</h3>
+            <h3>Adicionar usuário</h3>
             <Button type="button" onClick={fecharFormulario}>
               Cancelar
             </Button>
@@ -460,14 +460,14 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
           </label>
 
           <Button type="submit" disabled={salvando}>
-            {salvando ? "Salvando..." : "Salvar usuario"}
+            {salvando ? "Salvando..." : "Salvar usuário"}
           </Button>
         </form>
       )}
 
       {carregando ? (
         <LoadingState className="usuarios-arena-loading">
-          Carregando usuarios...
+          Carregando usuários...
         </LoadingState>
       ) : (
         <div className="usuarios-arena-table-wrap">
@@ -496,7 +496,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
                       {rotulo(vinculo.perfil)}
                     </span>
                   </td>
-                  <td>{vinculo.ativo ? "Sim" : "Nao"}</td>
+                  <td>{vinculo.ativo ? "Sim" : "Não"}</td>
                   <td>{formatarData(vinculo.created_at)}</td>
                   <td>
                     <Button
@@ -515,7 +515,7 @@ export default function UsuariosArena({ contextoArena, onVoltar }) {
 
           {usuariosVinculados.length === 0 && (
             <EmptyState className="usuarios-arena-empty">
-              Nenhum usuario vinculado.
+              Nenhum usuário vinculado.
             </EmptyState>
           )}
         </div>

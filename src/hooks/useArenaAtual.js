@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
-const ARENA_SLUG_ATUAL = "arena-do-manasses";
+export const ARENA_SLUG_ATUAL = "arena-do-manasses";
 
 export function useArenaAtual(session) {
   const [arenaAtual, setArenaAtual] = useState(null);
@@ -20,12 +20,10 @@ export function useArenaAtual(session) {
         setUsuarioAtual(null);
         setPerfilAtual(null);
 
-        const { data: arenaPublica, error: arenaPublicaError } = await supabase
-          .from("arenas")
-          .select("id,nome,slug,telefone,ativa")
-          .eq("slug", ARENA_SLUG_ATUAL)
-          .eq("ativa", true)
-          .maybeSingle();
+        const {
+          data: arenaPublica,
+          error: arenaPublicaError,
+        } = await carregarArenaPublica();
 
         if (!montado) return;
 
@@ -173,4 +171,49 @@ export function useArenaAtual(session) {
     carregandoContexto,
     erroContexto,
   };
+}
+
+async function carregarArenaPublica() {
+  const { data, error } = await supabase
+    .from("agenda_publica_arenas")
+    .select("id,nome,slug,telefone")
+    .eq("slug", ARENA_SLUG_ATUAL)
+    .maybeSingle();
+
+  if (!error) {
+    return {
+      data: data ? { ...data, ativa: true } : null,
+      error: null,
+    };
+  }
+
+  if (!erroRecursoPublicoInexistente(error)) {
+    return { data: null, error };
+  }
+
+  console.warn(
+    "Fallback temporario: agenda_publica_arenas ainda nao existe. Remover apos aplicar a migration RLS ArenaBase.",
+    error
+  );
+
+  // Fallback temporario para ambiente antes da migration RLS ArenaBase.
+  // Remover depois que agenda_publica_arenas estiver aplicada.
+  return supabase
+    .from("arenas")
+    .select("id,nome,slug,telefone,ativa")
+    .eq("slug", ARENA_SLUG_ATUAL)
+    .eq("ativa", true)
+    .maybeSingle();
+}
+
+function erroRecursoPublicoInexistente(error) {
+  const mensagem = `${error?.code || ""} ${error?.message || ""}`.toLowerCase();
+
+  return (
+    mensagem.includes("agenda_publica_arenas") ||
+    mensagem.includes("does not exist") ||
+    mensagem.includes("could not find") ||
+    mensagem.includes("pgrst202") ||
+    mensagem.includes("42p01")
+  );
 }

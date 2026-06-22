@@ -614,7 +614,7 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
     } catch (authError) {
       console.error("Erro ao criar login Auth automaticamente:", authError);
       setMensagem(
-        "Usuario vinculado a arena, mas nao foi possivel criar o login automaticamente. Crie o acesso manualmente no Supabase Auth."
+        "Usuário vinculado à arena, mas não foi possível criar o acesso automaticamente. Acione o suporte para finalizar o login."
       );
     }
 

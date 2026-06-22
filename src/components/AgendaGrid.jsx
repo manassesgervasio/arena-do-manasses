@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import DiaCabecalho from "./DiaCabecalho";
 import HorarioCard from "./HorarioCard";
 
@@ -167,13 +167,13 @@ const jogosDia = horarios.filter((horaAtual) => {
         onLimpar={async () => {
   if (item.status === "Pago") {
     if (!podeLimparHorarioPago) {
-      alert("Seu perfil nao permite limpar horarios pagos. Peca ajuda a um administrador.");
+      alert("Seu perfil não permite limpar horários pagos. Peça ajuda a um administrador.");
       return;
     }
   }
 
   const confirmar = confirm(
-    "Tem certeza que deseja limpar esta reserva?");
+    "Deseja limpar esta reserva?");
 
   if (confirmar) {
     await limparReserva(dataTexto, hora);
@@ -193,7 +193,7 @@ const jogosDia = horarios.filter((horaAtual) => {
           disabled={!podeVoltarSemana}
           aria-label="Semana anterior"
         >
-          â—€
+          {"‹"}
         </button>
 
         <div className="agenda-desktop-day-selector">
@@ -230,9 +230,9 @@ const jogosDia = horarios.filter((horaAtual) => {
           className="agenda-week-arrow"
           type="button"
           onClick={onSemanaProxima}
-          aria-label="Proxima semana"
+          aria-label="Próxima semana"
         >
-          â–¶
+          {"›"}
         </button>
       </div>
     );
@@ -263,7 +263,7 @@ const jogosDia = horarios.filter((horaAtual) => {
             disabled={!podeVoltarSemana}
             aria-label="Semana anterior"
           >
-            ◀
+            {"‹"}
           </button>
 
           <div className="agenda-mobile-day-selector">
@@ -298,9 +298,9 @@ const jogosDia = horarios.filter((horaAtual) => {
             className="agenda-week-arrow"
             type="button"
             onClick={onSemanaProxima}
-            aria-label="Proxima semana"
+            aria-label="Próxima semana"
           >
-            ▶
+            {"›"}
           </button>
         </div>
 

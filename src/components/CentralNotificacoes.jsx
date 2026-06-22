@@ -17,7 +17,7 @@ export default function CentralNotificacoes({
         className="notifications-button"
         onClick={() => setAberta((valor) => !valor)}
         aria-expanded={aberta}
-        aria-label="Abrir notificacoes"
+        aria-label="Abrir notificações"
       >
         <span aria-hidden="true">!</span>
         {quantidade > 0 && (
@@ -31,12 +31,12 @@ export default function CentralNotificacoes({
             type="button"
             className="notifications-backdrop"
             onClick={() => setAberta(false)}
-            aria-label="Fechar notificacoes"
+            aria-label="Fechar notificações"
           />
 
           <Drawer className="notifications-panel">
             <div className="notifications-header">
-              <strong>Notificacoes</strong>
+              <strong>Notificações</strong>
               <Button type="button" onClick={() => setAberta(false)}>
                 Fechar
               </Button>
@@ -44,7 +44,7 @@ export default function CentralNotificacoes({
 
             {quantidade === 0 ? (
               <EmptyState className="notifications-empty">
-                Nenhuma solicitacao pendente.
+                Nenhuma solicitação pendente.
               </EmptyState>
             ) : (
               <div className="notifications-list">
@@ -100,10 +100,10 @@ function criarLinkWhatsAppCliente({ nome, telefone, data, horario }) {
   const mensagem = [
     `Ola, ${nome || "tudo bem"}.`,
     "",
-    "Estamos analisando sua solicitacao de reserva.",
+    "Estamos analisando sua solicitação de reserva.",
     "",
     `Data: ${data || ""}`,
-    `Horario: ${horario || ""}`,
+    `Horário: ${horario || ""}`,
     "",
     "Entraremos em contato em instantes.",
   ].join("\n");

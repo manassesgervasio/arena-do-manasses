@@ -111,11 +111,6 @@ export default function Home({
           },
         }
       : null,
-    {
-      id: "configuracoes",
-      label: "Configurações",
-      disabled: true,
-    },
     modoPublico
       ? {
           id: "entrar",

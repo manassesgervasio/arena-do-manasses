@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import { diasSemana, horarios } from "../constants";
 import { Button, Card, EmptyState, Input, LoadingState, Select } from "./ui";
@@ -98,7 +98,7 @@ export default function MensalistasSection({
         setHorariosContratados({});
         setPagamentos({});
         setHistoricoPagamentos({});
-        setErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setErro(erroContexto || "Não foi possível carregar o contexto da arena.");
         setCarregando(false);
         return;
       }
@@ -224,7 +224,7 @@ export default function MensalistasSection({
     event.preventDefault();
 
     if (!arenaAtualId) {
-      setErro("Nao foi possivel carregar o contexto da arena.");
+      setErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -333,7 +333,7 @@ export default function MensalistasSection({
 
   async function marcarMensalidadeComoPaga(mensalista) {
     if (!arenaAtualId) {
-      setErro("Nao foi possivel carregar o contexto da arena.");
+      setErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -382,7 +382,7 @@ export default function MensalistasSection({
 
   async function excluirMensalista(mensalista) {
     if (!arenaAtualId) {
-      setErro("Nao foi possivel carregar o contexto da arena.");
+      setErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -408,7 +408,7 @@ export default function MensalistasSection({
 
     if (pagamentosError) {
       setMensalistaExcluindoId(null);
-      setErro("Nao foi possivel excluir os pagamentos do mensalista. Tente novamente.");
+      setErro("Não foi possível excluir os pagamentos do mensalista. Tente novamente.");
       return;
     }
 
@@ -420,7 +420,7 @@ export default function MensalistasSection({
 
     if (horariosError) {
       setMensalistaExcluindoId(null);
-      setErro("Nao foi possivel excluir os horarios contratados do mensalista. Tente novamente.");
+      setErro("Não foi possível excluir os horários contratados do mensalista. Tente novamente.");
       return;
     }
 
@@ -465,7 +465,7 @@ export default function MensalistasSection({
       pagamentosVerificacaoError ||
       horariosVerificacaoError
     ) {
-      setErro("Mensalista excluido, mas nao foi possivel verificar todos os registros relacionados.");
+      setErro("Mensalista excluído, mas não foi possível verificar todos os registros relacionados.");
     }
 
     if (
@@ -473,7 +473,7 @@ export default function MensalistasSection({
       pagamentosRestantes?.length ||
       horariosRestantes?.length
     ) {
-      setErro("A exclusao nao removeu todos os dados relacionados. Atualize a pagina e tente novamente.");
+      setErro("A exclusão não removeu todos os dados relacionados. Atualize a página e tente novamente.");
       return;
     }
 
@@ -500,7 +500,7 @@ export default function MensalistasSection({
 
   async function excluirPagamentoMensal(mensalista) {
     if (!arenaAtualId) {
-      setErro("Nao foi possivel carregar o contexto da arena.");
+      setErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -791,8 +791,8 @@ export default function MensalistasSection({
                         }
                       />
                       <Info
-                        label="Horario contratado"
-                        value={horarioContratado?.horario || "Sem horario"}
+                        label="Horário contratado"
+                        value={horarioContratado?.horario || "Sem horário"}
                       />
                     </div>
 

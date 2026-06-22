@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import { canManageFechamento } from "../utils/permissoes";
 import { Button, Card, Input, LoadingState, Select, Textarea } from "./ui";
@@ -90,7 +90,7 @@ export default function FinanceiroProfissional({
 
   async function carregarLancamentosManuais() {
     if (!arenaAtualId) {
-      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      setLancamentosErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -112,7 +112,7 @@ export default function FinanceiroProfissional({
 
     if (error) {
       setLancamentosErro(
-        `Nao foi possivel carregar os lancamentos manuais. ${error.message}`
+        `Não foi possível carregar os lançamentos manuais. ${error.message}`
       );
       setLancamentos([]);
       setLancamentosCarregando(false);
@@ -152,7 +152,7 @@ export default function FinanceiroProfissional({
         const erro = categoriasError || formasPagamentoError;
 
         setCadastrosErro(
-          `Nao foi possivel carregar categorias e formas de pagamento. ${erro.message}`
+          `Não foi possível carregar categorias e formas de pagamento. ${erro.message}`
         );
         setCategorias([]);
         setFormasPagamento([]);
@@ -180,7 +180,7 @@ export default function FinanceiroProfissional({
 
       if (!arenaAtualId) {
         setLancamentos([]);
-        setLancamentosErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setLancamentosErro(erroContexto || "Não foi possível carregar o contexto da arena.");
         setLancamentosCarregando(false);
         return;
       }
@@ -205,7 +205,7 @@ export default function FinanceiroProfissional({
 
       if (error) {
         setLancamentosErro(
-          `Nao foi possivel carregar os lancamentos manuais. ${error.message}`
+          `Não foi possível carregar os lançamentos manuais. ${error.message}`
         );
         setLancamentos([]);
         setLancamentosCarregando(false);
@@ -230,7 +230,7 @@ export default function FinanceiroProfissional({
       if (carregandoContexto) return;
 
       if (!arenaAtualId) {
-        setResumoPeriodoErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setResumoPeriodoErro(erroContexto || "Não foi possível carregar o contexto da arena.");
         setReservasPagasPeriodo(0);
         setMensalistasPagosPeriodo(0);
         setResumoPeriodoCarregando(false);
@@ -268,7 +268,7 @@ export default function FinanceiroProfissional({
         const erro = reservasError || mensalistasError;
 
         setResumoPeriodoErro(
-          `Nao foi possivel carregar o resumo do periodo. ${erro.message}`
+          `Não foi possível carregar o resumo do período. ${erro.message}`
         );
         setReservasPagasPeriodo(0);
         setMensalistasPagosPeriodo(0);
@@ -305,7 +305,7 @@ export default function FinanceiroProfissional({
       if (carregandoContexto) return;
 
       if (!arenaAtualId) {
-        setFechamentoErro(erroContexto || "Nao foi possivel carregar o contexto da arena.");
+        setFechamentoErro(erroContexto || "Não foi possível carregar o contexto da arena.");
         setFechamentoMensal(null);
         setFechamentoCarregando(false);
         return;
@@ -332,7 +332,7 @@ export default function FinanceiroProfissional({
       if (error) {
         console.error("Erro ao carregar fechamento mensal:", error);
         setFechamentoErro(
-          `Nao foi possivel carregar o fechamento mensal. ${error.message}`
+          `Não foi possível carregar o fechamento mensal. ${error.message}`
         );
         setFechamentoMensal(null);
         setFechamentoCarregando(false);
@@ -427,7 +427,7 @@ export default function FinanceiroProfissional({
     event.preventDefault();
 
     if (!arenaAtualId) {
-      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      setLancamentosErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -448,7 +448,7 @@ export default function FinanceiroProfissional({
       !formulario.formaPagamentoId ||
       !formulario.data
     ) {
-      setLancamentosErro("Preencha descricao, valor, tipo, categoria, forma de pagamento e data.");
+      setLancamentosErro("Preencha descrição, valor, tipo, categoria, forma de pagamento e data.");
       return;
     }
 
@@ -482,7 +482,7 @@ export default function FinanceiroProfissional({
 
     if (error) {
       setLancamentosErro(
-        `Nao foi possivel salvar o lancamento manual. ${error.message}`
+        `Não foi possível salvar o lançamento manual. ${error.message}`
       );
       setSalvandoLancamento(false);
       return;
@@ -495,7 +495,7 @@ export default function FinanceiroProfissional({
 
   function editarLancamento(lancamento) {
     if (!arenaAtualId) {
-      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      setLancamentosErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -518,7 +518,7 @@ export default function FinanceiroProfissional({
 
   async function excluirLancamento(id) {
     if (!arenaAtualId) {
-      setLancamentosErro("Nao foi possivel carregar o contexto da arena.");
+      setLancamentosErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -527,7 +527,7 @@ export default function FinanceiroProfissional({
       return;
     }
 
-    const confirmar = confirm("Excluir este lancamento manual?");
+    const confirmar = confirm("Excluir este lançamento manual?");
 
     if (!confirmar) return;
 
@@ -542,7 +542,7 @@ export default function FinanceiroProfissional({
 
     if (error) {
       setLancamentosErro(
-        `Nao foi possivel excluir o lancamento manual. ${error.message}`
+        `Não foi possível excluir o lançamento manual. ${error.message}`
       );
       return;
     }
@@ -559,12 +559,12 @@ export default function FinanceiroProfissional({
     }
 
     if (!arenaAtualId) {
-      setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
+      setFechamentoErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
     const confirmar = confirm(
-      "Tem certeza que deseja fechar este mês? O fechamento salvará o resumo financeiro atual deste período, mas não bloqueará o uso do sistema nesta versão."
+      "Deseja fechar este mês? O fechamento salvará o resumo financeiro atual do período."
     );
 
     if (!confirmar) return;
@@ -597,15 +597,13 @@ export default function FinanceiroProfissional({
 
     if (fechamentoExistente?.fechado) {
       console.log("Fechamento mensal: registro ja esta fechado, sem insert/update.");
-      setFechamentoMensal(fechamentoExistente);
-      setFechamentoMensagem("Este mês já possui fechamento registrado.");
+      setFechamentoMensagem("Este m\u00eas j\u00e1 possui fechamento registrado.");
       setFechamentoSalvando(false);
       return;
     }
 
     const agora = new Date().toISOString();
-    const observacaoAtual = fechamentoExistente?.observacao?.trim();
-    const observacaoRefechamento = `Mes fechado novamente em ${formatarDataHora(agora)}`;
+    const observacaoRefechamento = `Mês fechado novamente em ${formatarDataHora(agora)}`;
     const payload = {
       ano,
       mes,
@@ -672,7 +670,7 @@ export default function FinanceiroProfissional({
     }
 
     if (!arenaAtualId) {
-      setFechamentoErro("Nao foi possivel carregar o contexto da arena.");
+      setFechamentoErro("Não foi possível carregar o contexto da arena.");
       return;
     }
 
@@ -725,7 +723,7 @@ export default function FinanceiroProfissional({
         </div>
 
         <label className="financeiro-profissional-filter">
-          <span>Mes e ano</span>
+          <span>Mês e ano</span>
           <Input
             type="month"
             value={mesAno}
@@ -756,7 +754,7 @@ export default function FinanceiroProfissional({
           onSubmit={salvarLancamento}
         >
           <div className="financeiro-profissional-card-header">
-            <h3>Lancamentos manuais</h3>
+            <h3>Lançamentos manuais</h3>
             {lancamentoEditandoId && (
               <Button type="button" onClick={limparFormulario}>
                 Cancelar edicao
@@ -852,7 +850,7 @@ export default function FinanceiroProfissional({
               <Textarea
                 value={formulario.observacao}
                 onChange={(event) => atualizarCampo("observacao", event.target.value)}
-                placeholder="Detalhes internos do lancamento"
+                placeholder="Detalhes internos do lançamento"
               />
             </label>
           </div>
@@ -873,7 +871,7 @@ export default function FinanceiroProfissional({
 
           {resumoPeriodoCarregando && (
             <LoadingState className="financeiro-profissional-loading">
-              Carregando resumo financeiro do periodo...
+              Carregando resumo financeiro do período...
             </LoadingState>
           )}
 
@@ -890,7 +888,7 @@ export default function FinanceiroProfissional({
               ? "Salvando..."
               : lancamentoEditandoId
                 ? "Salvar alteracoes"
-                : "Adicionar lancamento"}
+                : "Adicionar lançamento"}
           </Button>
         </Card>
 
@@ -917,7 +915,7 @@ export default function FinanceiroProfissional({
           </div>
 
           <div className="financeiro-profissional-close-summary">
-            <span>Resumo do mes</span>
+            <span>Resumo do mês</span>
             <strong>{moeda(totais.saldoLiquido)}</strong>
             <p>
               Entradas totais:{" "}
@@ -948,7 +946,7 @@ export default function FinanceiroProfissional({
                 fechamentoCarregando || fechamentoSalvando || resumoPeriodoCarregando
               }
             >
-              {fechamentoSalvando ? "Fechando..." : "Fechar mes"}
+              {fechamentoSalvando ? "Fechando..." : "Fechar mês"}
             </Button>
           ))}
 
@@ -972,13 +970,13 @@ export default function FinanceiroProfissional({
 
       <Card className="financeiro-profissional-card">
         <div className="financeiro-profissional-card-header">
-          <h3>Tabela de lancamentos</h3>
-          <span>{totais.lancamentosDoMes.length} no mes</span>
+          <h3>Tabela de lançamentos</h3>
+          <span>{totais.lancamentosDoMes.length} no mês</span>
         </div>
 
         {lancamentosCarregando && (
           <LoadingState className="financeiro-profissional-loading">
-            Carregando lancamentos manuais...
+            Carregando lançamentos manuais...
           </LoadingState>
         )}
 
@@ -1017,11 +1015,11 @@ export default function FinanceiroProfissional({
                     </td>
                     <td>
                       {categoriasPorId[lancamento.categoria_id]?.nome ||
-                        "Categoria nao encontrada"}
+                        "Categoria não encontrada"}
                     </td>
                     <td>
                       {formasPagamentoPorId[lancamento.forma_pagamento_id]?.nome ||
-                        "Forma nao encontrada"}
+                        "Forma não encontrada"}
                     </td>
                     <td
                       className={
@@ -1057,7 +1055,7 @@ export default function FinanceiroProfissional({
               {!lancamentosCarregando && totais.lancamentosDoMes.length === 0 && (
                 <tr>
                   <td colSpan="7" className="financeiro-profissional-empty">
-                    Nenhum lancamento manual para este mes.
+                    Nenhum lançamento manual para este mês.
                   </td>
                 </tr>
               )}

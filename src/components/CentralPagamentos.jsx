@@ -18,7 +18,7 @@ export default function CentralPagamentos({
         className="notifications-button payments-button"
         onClick={() => setAberta((valor) => !valor)}
         aria-expanded={aberta}
-        aria-label="Abrir pendencias de pagamento"
+        aria-label="Abrir pendências de pagamento"
       >
         <span aria-hidden="true">$</span>
         {quantidade > 0 && (
@@ -34,12 +34,12 @@ export default function CentralPagamentos({
             type="button"
             className="notifications-backdrop"
             onClick={() => setAberta(false)}
-            aria-label="Fechar pendencias de pagamento"
+            aria-label="Fechar pendências de pagamento"
           />
 
           <Drawer className="notifications-panel payments-panel">
             <div className="notifications-header">
-              <strong>Pendencias de Pagamento</strong>
+              <strong>Pendências de pagamento</strong>
               <Button type="button" onClick={() => setAberta(false)}>
                 Fechar
               </Button>
@@ -47,7 +47,7 @@ export default function CentralPagamentos({
 
             {quantidade === 0 ? (
               <EmptyState className="notifications-empty">
-                Nenhuma pendencia de pagamento.
+                Nenhuma pendência de pagamento.
               </EmptyState>
             ) : (
               <div className="notifications-list">
@@ -68,7 +68,7 @@ export default function CentralPagamentos({
                         onClick={() => onMarcarPago?.(reserva)}
                         variant="primary"
                       >
-                        Marcar como Pago
+                        Marcar como pago
                       </Button>
                       {reserva.telefone && (
                         <Button
@@ -95,7 +95,7 @@ export default function CentralPagamentos({
                           setAberta(false);
                         }}
                       >
-                        Ir para horario
+                        Ir para horário
                       </Button>
                     </div>
                   </article>
@@ -114,7 +114,7 @@ function criarLinkWhatsAppPagamento({ nome, telefone, data, horario, valor }) {
     `Ola, ${nome || "tudo bem"}. Identificamos que sua reserva ainda esta pendente de pagamento.`,
     "",
     `Data: ${data || ""}`,
-    `Horario: ${horario || ""}`,
+    `Horário: ${horario || ""}`,
     `Valor: ${valor || "R$ 0"}`,
     "",
     "Pode nos enviar o comprovante por aqui?",

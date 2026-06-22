@@ -122,9 +122,6 @@ export default function AppHeader({
                 Usuários
               </button>
             )}
-            <button type="button" disabled>
-              Configurações
-            </button>
             {modoPublico ? (
               <button type="button" onClick={onEntrar}>
                 Entrar
