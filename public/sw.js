@@ -1,4 +1,4 @@
-const CACHE_NAME = "arena-manasses-static-v1";
+const CACHE_NAME = "arenabase-static-v1";
 
 const STATIC_ASSETS = [
   "/",

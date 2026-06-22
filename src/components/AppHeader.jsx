@@ -41,7 +41,7 @@ export default function AppHeader({
   return (
     <header className="app-header">
       <div className="app-brand-block">
-        <div className="app-brand">ARENA</div>
+        <div className="app-brand">ArenaBase</div>
       </div>
 
       <div className="app-account">

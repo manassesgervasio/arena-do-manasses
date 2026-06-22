@@ -206,7 +206,7 @@ export default function Home({
         limparReserva={limparReserva}
         mostrarApenasOcupados={mostrarApenasOcupados}
         modoPublico={modoPublico}
-        arenaNome={contextoArena?.arenaAtual?.nome || "Arena do Manasses"}
+        arenaNome={contextoArena?.arenaAtual?.nome || "ArenaBase"}
         onSemanaAnterior={() => mudarSemanaAgenda(-1)}
         onSemanaProxima={() => mudarSemanaAgenda(1)}
         podeLimparHorarioPago={canLimparHorarioPago(

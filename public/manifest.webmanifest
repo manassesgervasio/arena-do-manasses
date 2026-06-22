@@ -1,7 +1,7 @@
 {
-  "name": "Arena do Manassés",
-  "short_name": "Manassés",
-  "description": "Agenda de reservas da Arena do Manassés",
+  "name": "ArenaBase",
+  "short_name": "ArenaBase",
+  "description": "Agenda de reservas ArenaBase",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -4659,3 +4659,9 @@ code {
     box-shadow: 0 14px 30px rgba(76, 29, 149, 0.14);
   }
 }
+
+.app-brand,
+.main-menu-header > span {
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
