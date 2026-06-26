@@ -7,6 +7,7 @@ import { useClientes } from "./hooks/useClientes";
 import { useResumoReservas } from "./hooks/useResumoReservas";
 import Login from "./components/Login";
 import BuscaArenasPublica from "./pages/BuscaArenasPublica";
+import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
@@ -43,6 +44,7 @@ export default function App() {
   const [perfilLogado, setPerfilLogado] = useState(null);
   const [pathname, setPathname] = useState(() => window.location.pathname);
   const rotaLogin = normalizarPathname(pathname) === "/login";
+  const rotaBuscaArenas = normalizarPathname(pathname) === "/arenas";
   const slugPublico = obterSlugPublico(pathname);
   const temRotaPublicaSlug = Boolean(slugPublico);
   const contextoArenaLogada = useArenaAtual(sessaoAuth);
@@ -1346,13 +1348,25 @@ return "#14532d";
     return (
       <Login
         onEntrar={entrarComEmailSenha}
-        onVoltar={() => setMostrarLogin(false)}
+        onVoltar={() => {
+          setMostrarLogin(false);
+          if (rotaLogin) irParaRaiz(setPathname, { replace: true });
+        }}
       />
     );
   }
 
-  if (!sessaoAuth && !temRotaPublicaSlug) {
+  if (!sessaoAuth && rotaBuscaArenas) {
     return <BuscaArenasPublica onEntrar={() => setMostrarLogin(true)} />;
+  }
+
+  if (!sessaoAuth && !temRotaPublicaSlug) {
+    return (
+      <LandingPage
+        onEntrar={() => setMostrarLogin(true)}
+        onBuscarArenas={() => irParaBuscaArenas(setPathname)}
+      />
+    );
   }
 
   if (temRotaPublicaSlug && contextoArena.carregandoContexto) {
@@ -1464,6 +1478,7 @@ function obterSlugPublico(pathname) {
   const [slug] = partes;
   const rotasInternas = new Set([
     "agenda",
+    "arenas",
     "clientes",
     "financeiro",
     "login",
@@ -1484,6 +1499,11 @@ function irParaRaiz(setPathname, opcoes = {}) {
   const metodoHistorico = opcoes.replace ? "replaceState" : "pushState";
   window.history[metodoHistorico]({}, "", "/");
   setPathname("/");
+}
+
+function irParaBuscaArenas(setPathname) {
+  window.history.pushState({}, "", "/arenas");
+  setPathname("/arenas");
 }
 
 function PaginaPublicaCarregando() {

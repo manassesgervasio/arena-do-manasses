@@ -1,0 +1,13 @@
+export { default as Beneficios } from "./Beneficios";
+export { default as ComoFunciona } from "./ComoFunciona";
+export { default as CTAFinal } from "./CTAFinal";
+export { default as Depoimentos } from "./Depoimentos";
+export { default as Diferenciais } from "./Diferenciais";
+export { default as FAQ } from "./FAQ";
+export { default as Footer } from "./Footer";
+export { default as Funcionalidades } from "./Funcionalidades";
+export { default as Hero } from "./Hero";
+export { default as Planos } from "./Planos";
+export { default as Problemas } from "./Problemas";
+export { default as Screenshots } from "./Screenshots";
+export { default as TrustBar } from "./TrustBar";
