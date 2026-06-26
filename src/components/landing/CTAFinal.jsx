@@ -1,15 +1,15 @@
 export default function CTAFinal({ onEntrar }) {
   return (
     <section className="landing-final-cta" id="cta-final" aria-labelledby="cta-final-title">
-      <span className="landing-eyebrow">Próximo passo</span>
-      <h2 id="cta-final-title">Leve uma operação mais profissional para sua arena.</h2>
+      <span className="landing-eyebrow">Pr&oacute;ximo passo</span>
+      <h2 id="cta-final-title">Leve uma opera&ccedil;&atilde;o mais profissional para sua arena.</h2>
       <p>
-        Organize horários, clientes, pagamentos e atendimento em uma experiência
-        desenhada para gestão esportiva.
+        Organize hor&aacute;rios, clientes, pagamentos e atendimento em uma experi&ecirc;ncia
+        desenhada para gest&atilde;o esportiva.
       </p>
-      <div>
+      <div className="landing-final-actions">
         <a className="landing-primary-action" href="mailto:contato@arenabase.com.br">
-          Solicitar demonstração
+          Solicitar demonstra&ccedil;&atilde;o
         </a>
         <button className="landing-secondary-action" type="button" onClick={onEntrar}>
           Acessar minha conta
