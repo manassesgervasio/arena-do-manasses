@@ -4665,3 +4665,59 @@ code {
   letter-spacing: 0 !important;
   text-transform: none !important;
 }
+
+@media (min-width: 769px) {
+  .agenda-desktop .horario-card.is-expanded .horario-card-public-details {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 14px;
+    padding: 18px 0 4px;
+    border-top: 1px solid rgba(167, 139, 250, 0.16);
+    box-sizing: border-box;
+    justify-items: center;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .public-reserva-form {
+    width: min(100%, 680px);
+    max-width: 680px;
+    margin: 0 auto;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .public-reserva-form .horario-card-input,
+  .agenda-desktop .horario-card.is-expanded .public-reserva-form .whatsapp-reserva-button {
+    width: 100%;
+    max-width: 100%;
+    min-height: 48px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .public-reserva-form .horario-card-input {
+    padding: 12px 16px;
+    border-radius: 14px;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .public-reserva-form .whatsapp-reserva-button {
+    padding: 12px 18px;
+    border-radius: 14px;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .horario-card-time {
+    width: 100%;
+    margin-bottom: 0;
+    align-items: start;
+  }
+
+  .agenda-desktop .horario-card.is-expanded .horario-card-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .agenda-desktop .horario-card.is-expanded::before,
+  .agenda-desktop .horario-card.is-expanded .horario-card-time::after {
+    display: none;
+  }
+}
