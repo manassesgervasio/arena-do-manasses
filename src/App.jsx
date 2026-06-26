@@ -42,6 +42,7 @@ export default function App() {
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [perfilLogado, setPerfilLogado] = useState(null);
   const [pathname, setPathname] = useState(() => window.location.pathname);
+  const rotaLogin = normalizarPathname(pathname) === "/login";
   const slugPublico = obterSlugPublico(pathname);
   const temRotaPublicaSlug = Boolean(slugPublico);
   const contextoArenaLogada = useArenaAtual(sessaoAuth);
@@ -80,6 +81,12 @@ export default function App() {
     window.removeEventListener("popstate", atualizarPathname);
   };
 }, []);
+
+  useEffect(() => {
+  if (sessaoAuth && rotaLogin) {
+    irParaRaiz(setPathname, { replace: true });
+  }
+}, [sessaoAuth, rotaLogin]);
 
   useEffect(() => {
   if (temRotaPublicaSlug && contextoArena.arenaAtual?.nome) {
@@ -1300,7 +1307,7 @@ return "#14532d";
     : null;
 
   async function entrarComEmailSenha({ email, senha }) {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase(),
       password: senha,
     });
@@ -1309,6 +1316,11 @@ return "#14532d";
       console.error("Erro ao fazer login:", error);
       return "E-mail ou senha invalidos.";
     }
+
+    setSessaoAuth(data.session);
+    setPerfilLogado(obterPerfilDaSessao(data.session));
+    setMostrarLogin(false);
+    irParaRaiz(setPathname, { replace: true });
 
     return "";
   }
@@ -1330,7 +1342,7 @@ return "#14532d";
     );
   }
 
-  if (!sessaoAuth && mostrarLogin) {
+  if (!sessaoAuth && (mostrarLogin || rotaLogin)) {
     return (
       <Login
         onEntrar={entrarComEmailSenha}
@@ -1450,13 +1462,27 @@ function obterSlugPublico(pathname) {
   if (partes.length !== 1) return "";
 
   const [slug] = partes;
-  const rotasInternas = new Set(["agenda", "clientes", "financeiro", "mensalistas"]);
+  const rotasInternas = new Set([
+    "agenda",
+    "clientes",
+    "financeiro",
+    "login",
+    "mensalistas",
+  ]);
 
   return rotasInternas.has(slug) ? "" : slug;
 }
 
-function irParaRaiz(setPathname) {
-  window.history.pushState({}, "", "/");
+function normalizarPathname(pathname) {
+  const caminho = String(pathname || "/").trim() || "/";
+  return caminho.endsWith("/") && caminho.length > 1
+    ? caminho.slice(0, -1)
+    : caminho;
+}
+
+function irParaRaiz(setPathname, opcoes = {}) {
+  const metodoHistorico = opcoes.replace ? "replaceState" : "pushState";
+  window.history[metodoHistorico]({}, "", "/");
   setPathname("/");
 }
 
