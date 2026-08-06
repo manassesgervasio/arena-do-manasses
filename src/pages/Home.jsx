@@ -11,6 +11,7 @@ import PrimeirosPassos from "../components/PrimeirosPassos";
 import ResumoCards from "../components/ResumoCards";
 import UsuariosArena from "../components/UsuariosArena";
 import WeekControls from "../components/WeekControls";
+import ArenaCam from "./ArenaCam";
 import { navigationItems } from "../navigation";
 import {
   canAccessClientes,
@@ -67,8 +68,12 @@ export default function Home({
   setBuscaCliente,
   setFiltroCliente,
   setClienteSelecionado,
+  pathname = "/",
+  onNavigate,
 }) {
-  const [activeMobileTab, setActiveMobileTab] = useState("agenda");
+  const [activeMobileTab, setActiveMobileTab] = useState(() =>
+    obterTabPorPathname(pathname)
+  );
   const [mostrarFinanceiroProfissional, setMostrarFinanceiroProfissional] =
     useState(false);
   const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
@@ -143,6 +148,10 @@ export default function Home({
           onClick: onSair,
         },
   ].filter(Boolean);
+
+  useEffect(() => {
+    setActiveMobileTab(obterTabPorPathname(pathname));
+  }, [pathname]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 640px)");
@@ -351,6 +360,10 @@ export default function Home({
       return renderMensalistas();
     }
 
+    if (activeMobileTab === "arenacam") {
+      return <ArenaCam contextoArena={contextoArena} />;
+    }
+
     return (
       <>
         <PrimeirosPassos
@@ -403,6 +416,9 @@ export default function Home({
       return renderFinanceiroProfissional();
     }
     if (activeMobileTab === "mensalistas") return renderMensalistas();
+    if (activeMobileTab === "arenacam") {
+      return <ArenaCam contextoArena={contextoArena} />;
+    }
 
     return (
       <>
@@ -475,6 +491,8 @@ export default function Home({
           setMostrarUsuariosArena(false);
           setMostrarConfiguracoesArena(false);
           setActiveMobileTab(tab);
+          const item = navigationItems.find((navItem) => navItem.id === tab);
+          onNavigate?.(item?.path || "/agenda");
         }}
       />
 
@@ -501,4 +519,10 @@ function AccessDenied() {
       Você não tem permissão para acessar esta área.
     </section>
   );
+}
+
+function obterTabPorPathname(pathname) {
+  const item = navigationItems.find((navItem) => navItem.path === pathname);
+
+  return item?.id || "agenda";
 }

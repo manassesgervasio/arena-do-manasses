@@ -1463,6 +1463,8 @@ return "#14532d";
       setBuscaCliente={setBuscaCliente}
       setFiltroCliente={setFiltroCliente}
       setClienteSelecionado={setClienteSelecionado}
+      pathname={normalizarPathname(pathname)}
+      onNavigate={(path) => navegarPara(path, setPathname)}
     />
   );
 }
@@ -1481,8 +1483,10 @@ function obterSlugPublico(pathname) {
     "arenas",
     "clientes",
     "financeiro",
+    "financeiro-profissional",
     "login",
     "mensalistas",
+    "arenacam",
   ]);
 
   return rotasInternas.has(slug) ? "" : slug;
@@ -1504,6 +1508,15 @@ function irParaRaiz(setPathname, opcoes = {}) {
 function irParaBuscaArenas(setPathname) {
   window.history.pushState({}, "", "/arenas");
   setPathname("/arenas");
+}
+
+function navegarPara(path, setPathname) {
+  const destino = normalizarPathname(path || "/");
+
+  if (normalizarPathname(window.location.pathname) === destino) return;
+
+  window.history.pushState({}, "", destino);
+  setPathname(destino);
 }
 
 function PaginaPublicaCarregando() {

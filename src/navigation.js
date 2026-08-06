@@ -24,4 +24,9 @@ export const navigationItems = [
     label: "Mensalistas",
     path: "/mensalistas",
   },
+  {
+    id: "arenacam",
+    label: "ArenaCam",
+    path: "/arenacam",
+  },
 ];

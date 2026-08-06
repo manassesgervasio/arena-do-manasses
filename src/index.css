@@ -4666,6 +4666,327 @@ code {
   text-transform: none !important;
 }
 
+.arenacam-page {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  margin-top: 18px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.arenacam-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 16px 34px rgba(76, 29, 149, 0.08);
+}
+
+.arenacam-hero h1 {
+  margin: 4px 0 8px;
+  color: #111027;
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.arenacam-hero p {
+  max-width: 580px;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 21px;
+  font-weight: 750;
+}
+
+.arenacam-card-kicker {
+  color: #7c3aed;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.arenacam-arena-pill {
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.arenacam-arena-pill span {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 900;
+}
+
+.arenacam-arena-pill strong {
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 950;
+}
+
+.arenacam-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.arenacam-camera-card,
+.arenacam-recent-section {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 30px rgba(76, 29, 149, 0.07);
+}
+
+.arenacam-camera-header,
+.arenacam-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.arenacam-camera-header h2,
+.arenacam-section-header h2 {
+  margin: 2px 0 0;
+  color: #111827;
+  font-size: 22px;
+  line-height: 27px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.arenacam-status,
+.arenacam-lance-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.arenacam-status.is-online,
+.arenacam-lance-status {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.arenacam-status.is-offline {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.arenacam-preview {
+  aspect-ratio: 16 / 9;
+  min-height: 190px;
+  overflow: hidden;
+  border-radius: 14px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(135deg, #111827, #312e81 55%, #14532d);
+  background-size: 34px 34px, 34px 34px, 100% 100%;
+}
+
+.arenacam-preview-frame {
+  display: grid;
+  place-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+}
+
+.arenacam-preview-frame span {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.arenacam-preview-frame strong {
+  color: white;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 950;
+}
+
+.arenacam-save-button {
+  min-height: 54px;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  background: #22c55e;
+  color: #052e16;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 950;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.arenacam-save-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(22, 163, 74, 0.18);
+}
+
+.arenacam-save-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.arenacam-feedback {
+  min-height: 20px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 850;
+}
+
+.arenacam-feedback.is-success {
+  color: #15803d;
+}
+
+.arenacam-feedback.is-error {
+  color: #b91c1c;
+}
+
+.arenacam-feedback.is-processing {
+  color: #7c3aed;
+}
+
+.arenacam-empty {
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.arenacam-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.arenacam-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.arenacam-table th,
+.arenacam-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  color: #334155;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 800;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.arenacam-table th {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.arenacam-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.arenacam-table-actions button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #5b21b6;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.arenacam-table-actions button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+@media (max-width: 820px) {
+  .arenacam-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .arenacam-arena-pill {
+    min-width: 0;
+  }
+
+  .arenacam-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .arenacam-page {
+    margin-top: 12px;
+    gap: 14px;
+  }
+
+  .arenacam-hero,
+  .arenacam-camera-card,
+  .arenacam-recent-section {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .arenacam-hero h1 {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .arenacam-preview {
+    min-height: 168px;
+  }
+
+  .arenacam-camera-header h2,
+  .arenacam-section-header h2 {
+    font-size: 20px;
+    line-height: 25px;
+  }
+}
+
 @media (min-width: 769px) {
   .agenda-desktop .horario-card.is-expanded .horario-card-public-details {
     width: 100%;
