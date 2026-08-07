@@ -1,4 +1,10 @@
 export default function LancesRecentes({ lances = [] }) {
+  function abrirVideo(videoUrl) {
+    if (!videoUrl) return;
+
+    window.open(videoUrl, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <section className="arenacam-recent-section">
       <div className="arenacam-section-header">
@@ -22,32 +28,54 @@ export default function LancesRecentes({ lances = [] }) {
             </thead>
             <tbody>
               {lances.map((lance) => (
-                <tr key={lance.id}>
-                  <td>{formatarHorario(lance.created_at)}</td>
-                  <td>{lance.camera_nome || lance.camera_id}</td>
-                  <td>
-                    <span className="arenacam-lance-status">
-                      {formatarStatus(lance.status)}
-                    </span>
-                  </td>
-                  <td>{formatarDataHora(lance.expires_at)}</td>
-                  <td>
-                    <div className="arenacam-table-actions">
-                      <button type="button" disabled={!lance.video_url}>
-                        Assistir
-                      </button>
-                      <button type="button" disabled={!lance.video_url}>
-                        Baixar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                <LinhaLance
+                  key={lance.id}
+                  lance={lance}
+                  onAbrirVideo={abrirVideo}
+                />
               ))}
             </tbody>
           </table>
         </div>
       )}
     </section>
+  );
+}
+
+function LinhaLance({ lance, onAbrirVideo }) {
+  const temVideo = Boolean(lance.video_url);
+
+  return (
+    <tr>
+      <td>{formatarHorario(lance.created_at)}</td>
+      <td>{lance.camera_nome || lance.camera_id}</td>
+      <td>
+        <span className="arenacam-lance-status">
+          {formatarStatus(lance.status)}
+        </span>
+      </td>
+      <td>{formatarDataHora(lance.expires_at)}</td>
+      <td>
+        <div className="arenacam-table-actions">
+          <button
+            type="button"
+            onClick={() => onAbrirVideo(lance.video_url)}
+            disabled={!temVideo}
+            title={temVideo ? "Abrir vídeo" : "Vídeo indisponível"}
+          >
+            {temVideo ? "Assistir" : "Vídeo indisponível"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onAbrirVideo(lance.video_url)}
+            disabled={!temVideo}
+            title={temVideo ? "Baixar vídeo" : "Vídeo indisponível"}
+          >
+            Baixar
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }
 
