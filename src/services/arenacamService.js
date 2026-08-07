@@ -105,6 +105,72 @@ export async function listarReplaysPublicosDisponiveis(arenaSlug) {
   return (data || []).map(normalizarLanceDoBanco);
 }
 
+export async function excluirLance(lanceId, arenaId) {
+  if (!lanceId) {
+    throw new Error("Lance nao informado.");
+  }
+
+  if (!arenaId) {
+    throw new Error("Arena nao carregada.");
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Sessao autenticada nao encontrada.");
+  }
+
+  const apiUrl = obterArenaCamApiUrl();
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => {
+    controller.abort();
+  }, ARENACAM_REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/api/lances/${encodeURIComponent(lanceId)}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          arena_id: arenaId,
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    const payload = await lerRespostaJson(response);
+
+    if (!response.ok) {
+      throw new Error(
+        payload?.message ||
+          payload?.error ||
+          `Raspberry respondeu com HTTP ${response.status}.`
+      );
+    }
+
+    return payload || { id: lanceId };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("Tempo limite ao conectar com o Raspberry Pi.");
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error(
+        "Nao foi possivel conectar ao Raspberry Pi. Verifique rede, URL e CORS."
+      );
+    }
+
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 export async function gerarLance(cameraId, arenaId) {
   if (!cameraId) {
     throw new Error("Camera nao informada.");

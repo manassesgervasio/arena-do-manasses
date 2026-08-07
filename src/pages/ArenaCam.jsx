@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import CameraCard from "../components/arenacam/CameraCard";
 import LancesRecentes from "../components/arenacam/LancesRecentes";
 import {
+  excluirLance,
   filtrarLancesDisponiveis,
   gerarLance,
   listarLancesDisponiveis,
@@ -121,6 +122,24 @@ export default function ArenaCam({ contextoArena }) {
     }
   }
 
+  async function removerLance(lance) {
+    const confirmado = window.confirm(
+      "Deseja excluir este replay permanentemente?"
+    );
+
+    if (!confirmado) return;
+
+    try {
+      await excluirLance(lance.id, arenaId);
+      setLances((atuais) => atuais.filter((item) => item.id !== lance.id));
+      setErroLances("");
+    } catch (error) {
+      setErroLances(
+        error?.message || "Nao foi possivel excluir o replay agora."
+      );
+    }
+  }
+
   return (
     <main className="arenacam-page">
       <section className="arenacam-hero">
@@ -155,6 +174,7 @@ export default function ArenaCam({ contextoArena }) {
         lances={lancesDisponiveis}
         carregando={carregandoLances}
         erro={erroLances}
+        onExcluirLance={removerLance}
       />
     </main>
   );

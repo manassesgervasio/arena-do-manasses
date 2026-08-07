@@ -2,6 +2,7 @@ export default function LancesRecentes({
   lances = [],
   carregando = false,
   erro = "",
+  onExcluirLance,
 }) {
   function abrirVideo(videoUrl) {
     if (!videoUrl) return;
@@ -40,6 +41,7 @@ export default function LancesRecentes({
                   key={lance.id}
                   lance={lance}
                   onAbrirVideo={abrirVideo}
+                  onExcluirLance={onExcluirLance}
                 />
               ))}
             </tbody>
@@ -50,8 +52,9 @@ export default function LancesRecentes({
   );
 }
 
-function LinhaLance({ lance, onAbrirVideo }) {
+function LinhaLance({ lance, onAbrirVideo, onExcluirLance }) {
   const temVideo = Boolean(lance.video_url);
+  const podeExcluir = typeof onExcluirLance === "function";
 
   function baixarVideo() {
     if (!lance.video_url) return;
@@ -88,6 +91,11 @@ function LinhaLance({ lance, onAbrirVideo }) {
           >
             Baixar
           </button>
+          {podeExcluir && (
+            <button type="button" onClick={() => onExcluirLance(lance)}>
+              Excluir
+            </button>
+          )}
         </div>
       </td>
     </tr>
