@@ -6,7 +6,7 @@ export default function LancesRecentes({
   function abrirVideo(videoUrl) {
     if (!videoUrl) return;
 
-    window.open(videoUrl, "_blank", "noopener,noreferrer");
+    window.location.href = videoUrl;
   }
 
   return (
