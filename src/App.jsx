@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import BuscaArenasPublica from "./pages/BuscaArenasPublica";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
+import ReplaysPublicos from "./pages/ReplaysPublicos";
 import { supabase } from "./supabase";  
 import { formatarData, formatarDataBR, moeda } from "./utils";
 import { notificarGestorNovaReserva } from "./services/whatsappService";
@@ -45,6 +46,7 @@ export default function App() {
   const [pathname, setPathname] = useState(() => window.location.pathname);
   const rotaLogin = normalizarPathname(pathname) === "/login";
   const rotaBuscaArenas = normalizarPathname(pathname) === "/arenas";
+  const rotaReplaysPublicos = normalizarPathname(pathname) === "/replays";
   const slugPublico = obterSlugPublico(pathname);
   const temRotaPublicaSlug = Boolean(slugPublico);
   const contextoArenaLogada = useArenaAtual(sessaoAuth);
@@ -1360,6 +1362,10 @@ return "#14532d";
     return <BuscaArenasPublica onEntrar={() => setMostrarLogin(true)} />;
   }
 
+  if (rotaReplaysPublicos) {
+    return <ReplaysPublicos />;
+  }
+
   if (!sessaoAuth && !temRotaPublicaSlug) {
     return (
       <LandingPage
@@ -1487,6 +1493,7 @@ function obterSlugPublico(pathname) {
     "login",
     "mensalistas",
     "arenacam",
+    "replays",
   ]);
 
   return rotasInternas.has(slug) ? "" : slug;

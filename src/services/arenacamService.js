@@ -87,6 +87,24 @@ export async function listarLancesDisponiveis(arenaId) {
   return (data || []).map(normalizarLanceDoBanco);
 }
 
+export async function listarReplaysPublicosDisponiveis(arenaSlug) {
+  if (!arenaSlug) return [];
+
+  const { data, error } = await supabase.rpc("arenacam_replays_publicos", {
+    p_arena_slug: arenaSlug,
+  });
+
+  if (error) {
+    throw new Error(
+      `Nao foi possivel carregar os replays publicos: ${
+        error.message || "erro desconhecido"
+      }`
+    );
+  }
+
+  return (data || []).map(normalizarLanceDoBanco);
+}
+
 export async function gerarLance(cameraId, arenaId) {
   if (!cameraId) {
     throw new Error("Camera nao informada.");

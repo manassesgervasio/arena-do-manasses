@@ -4675,6 +4675,36 @@ code {
   box-sizing: border-box;
 }
 
+.arenacam-public-page {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  min-height: 100svh;
+  padding: 18px;
+  background: #f8fafc;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.arenacam-public-header {
+  display: grid;
+  gap: 4px;
+  padding: 22px;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 34px rgba(76, 29, 149, 0.08);
+}
+
+.arenacam-public-header h1 {
+  margin: 0;
+  color: #111027;
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
 .arenacam-hero {
   display: flex;
   align-items: flex-end;
