@@ -36,6 +36,9 @@ export default function Hero({ onEntrar, onBuscarArenas }) {
             <button className="landing-secondary-action" type="button" onClick={onBuscarArenas}>
               Ver agendas p&uacute;blicas
             </button>
+            <a className="landing-secondary-action" href="/replays">
+              Ver replays
+            </a>
           </div>
         </div>
 
