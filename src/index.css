@@ -4951,6 +4951,14 @@ code {
   cursor: not-allowed;
 }
 
+.arenacam-download-feedback {
+  margin-top: 8px;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 850;
+}
+
 @media (max-width: 820px) {
   .arenacam-hero {
     align-items: stretch;
