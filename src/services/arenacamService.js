@@ -1,3 +1,5 @@
+import { supabase } from "../supabase";
+
 const ARENACAM_REQUEST_TIMEOUT_MS = 10000;
 export const ARENACAM_RETENTION_HOURS = 72;
 export const ARENACAM_RETENTION_MS =
@@ -34,6 +36,55 @@ export async function limparLancesExpirados() {
     mensagem:
       "Limpeza real pendente: implementar exclusao no storage/API quando a integracao estiver ativa.",
   };
+}
+
+export async function salvarLance(lance) {
+  const lanceParaBanco = normalizarLanceParaBanco(lance);
+  const { data: userData } = await supabase.auth.getUser();
+  const createdBy = userData?.user?.id || null;
+
+  const { data, error } = await supabase
+    .from("arenacam_lances")
+    .insert({
+      ...lanceParaBanco,
+      created_by: createdBy,
+    })
+    .select(
+      "id,arena_id,camera_id,created_at,expires_at,status,video_url,created_by"
+    )
+    .single();
+
+  if (error) {
+    throw new Error(
+      `Replay gerado, mas nao foi possivel salvar no Supabase: ${
+        error.message || "erro desconhecido"
+      }`
+    );
+  }
+
+  return normalizarLanceDoBanco(data);
+}
+
+export async function listarLancesDisponiveis(arenaId) {
+  if (!arenaId) return [];
+
+  const agora = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("arenacam_lances")
+    .select("id,arena_id,camera_id,created_at,expires_at,status,video_url")
+    .eq("arena_id", arenaId)
+    .gt("expires_at", agora)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(
+      `Nao foi possivel carregar os lances do ArenaCam: ${
+        error.message || "erro desconhecido"
+      }`
+    );
+  }
+
+  return (data || []).map(normalizarLanceDoBanco);
 }
 
 export async function gerarLance(cameraId, arenaId) {
@@ -74,7 +125,9 @@ export async function gerarLance(cameraId, arenaId) {
       );
     }
 
-    return normalizarLanceResposta(payload, cameraId, arenaId);
+    const lance = normalizarLanceResposta(payload, cameraId, arenaId);
+
+    return salvarLance(lance);
   } catch (error) {
     if (error?.name === "AbortError") {
       throw new Error("Tempo limite ao conectar com o Raspberry Pi.");
@@ -137,6 +190,48 @@ function normalizarLanceResposta(payload, cameraId, arenaId) {
     created_at: createdAt,
     expires_at: expiresAt,
     status: lance.status || "concluido",
+    video_url: lance.video_url || "",
+  };
+}
+
+function normalizarLanceParaBanco(lance) {
+  if (!lance || typeof lance !== "object" || Array.isArray(lance)) {
+    throw new Error("Lance invalido para salvar no Supabase.");
+  }
+
+  const camposObrigatorios = [
+    "id",
+    "arena_id",
+    "camera_id",
+    "created_at",
+    "expires_at",
+    "status",
+  ];
+  const campoAusente = camposObrigatorios.find((campo) => !lance[campo]);
+
+  if (campoAusente) {
+    throw new Error(`Lance invalido: campo ${campoAusente} ausente.`);
+  }
+
+  return {
+    id: lance.id,
+    arena_id: lance.arena_id,
+    camera_id: lance.camera_id,
+    created_at: lance.created_at,
+    expires_at: lance.expires_at,
+    status: lance.status,
+    video_url: lance.video_url || "",
+  };
+}
+
+function normalizarLanceDoBanco(lance) {
+  return {
+    id: lance.id,
+    arena_id: lance.arena_id,
+    camera_id: lance.camera_id,
+    created_at: lance.created_at,
+    expires_at: lance.expires_at,
+    status: lance.status,
     video_url: lance.video_url || "",
   };
 }

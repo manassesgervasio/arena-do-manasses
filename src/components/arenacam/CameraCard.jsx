@@ -2,6 +2,7 @@ export default function CameraCard({
   camera,
   isProcessing = false,
   feedback,
+  liveUrl,
   onSalvarLance,
 }) {
   const statusClass = camera.status === "Online" ? "is-online" : "is-offline";
@@ -19,10 +20,20 @@ export default function CameraCard({
       </div>
 
       <div className="arenacam-preview" aria-label={`Preview ${camera.nome}`}>
-        <div className="arenacam-preview-frame">
-          <span>{camera.nome}</span>
-          <strong>Preview</strong>
-        </div>
+        {liveUrl ? (
+          <iframe
+            className="arenacam-live-frame"
+            src={liveUrl}
+            title={`Ao vivo - ${camera.nome}`}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <div className="arenacam-preview-frame">
+            <span>{camera.nome}</span>
+            <strong>Preview</strong>
+          </div>
+        )}
       </div>
 
       <button

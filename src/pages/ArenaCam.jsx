@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CameraCard from "../components/arenacam/CameraCard";
 import LancesRecentes from "../components/arenacam/LancesRecentes";
 import {
-  calcularExpiresAt,
   filtrarLancesDisponiveis,
   gerarLance,
+  listarLancesDisponiveis,
 } from "../services/arenacamService";
 
 const CAMERAS = [
@@ -12,11 +12,13 @@ const CAMERAS = [
     id: "camera-1",
     nome: "Câmera 1",
     status: "Online",
+    liveUrl: import.meta.env.VITE_ARENACAM_CAMERA1_LIVE_URL,
   },
   {
     id: "camera-2",
     nome: "Câmera 2",
     status: "Online",
+    liveUrl: import.meta.env.VITE_ARENACAM_CAMERA2_LIVE_URL,
   },
 ];
 
@@ -24,7 +26,9 @@ export default function ArenaCam({ contextoArena }) {
   const arenaId = contextoArena?.arenaAtual?.id || "";
   const [cameraProcessando, setCameraProcessando] = useState("");
   const [feedbackPorCamera, setFeedbackPorCamera] = useState({});
-  const [lances, setLances] = useState(() => criarLancesMock(arenaId));
+  const [lances, setLances] = useState([]);
+  const [carregandoLances, setCarregandoLances] = useState(false);
+  const [erroLances, setErroLances] = useState("");
   const lancesDisponiveis = useMemo(
     () => filtrarLancesDisponiveis(lances),
     [lances]
@@ -37,6 +41,44 @@ export default function ArenaCam({ contextoArena }) {
       }, {}),
     []
   );
+
+  useEffect(() => {
+    if (!arenaId) {
+      setLances([]);
+      setErroLances("");
+      return;
+    }
+
+    let ativo = true;
+
+    async function carregarLances() {
+      setCarregandoLances(true);
+      setErroLances("");
+
+      try {
+        const lancesCarregados = await listarLancesDisponiveis(arenaId);
+
+        if (!ativo) return;
+
+        setLances(lancesCarregados);
+      } catch (error) {
+        if (!ativo) return;
+
+        setLances([]);
+        setErroLances(
+          error?.message || "Nao foi possivel carregar os lances do ArenaCam."
+        );
+      } finally {
+        if (ativo) setCarregandoLances(false);
+      }
+    }
+
+    carregarLances();
+
+    return () => {
+      ativo = false;
+    };
+  }, [arenaId]);
 
   async function salvarLance(cameraId) {
     const camera = camerasPorId[cameraId];
@@ -103,53 +145,17 @@ export default function ArenaCam({ contextoArena }) {
             camera={camera}
             isProcessing={cameraProcessando === camera.id}
             feedback={feedbackPorCamera[camera.id]}
+            liveUrl={camera.liveUrl}
             onSalvarLance={salvarLance}
           />
         ))}
       </section>
 
-      <LancesRecentes lances={lancesDisponiveis} />
+      <LancesRecentes
+        lances={lancesDisponiveis}
+        carregando={carregandoLances}
+        erro={erroLances}
+      />
     </main>
   );
-}
-
-function criarLancesMock(arenaId) {
-  const agora = Date.now();
-
-  return [
-    criarLanceMock({
-      id: "mock-lance-1",
-      camera_id: "camera-1",
-      camera_nome: "Câmera 1",
-      arena_id: arenaId,
-      created_at: new Date(agora - 1000 * 60 * 8).toISOString(),
-      status: "concluido",
-      video_url: "/mock/arenacam/lance-1.mp4",
-    }),
-    criarLanceMock({
-      id: "mock-lance-2",
-      camera_id: "camera-2",
-      camera_nome: "Câmera 2",
-      arena_id: arenaId,
-      created_at: new Date(agora - 1000 * 60 * 19).toISOString(),
-      status: "concluido",
-      video_url: "/mock/arenacam/lance-2.mp4",
-    }),
-    criarLanceMock({
-      id: "mock-lance-expirado",
-      camera_id: "camera-1",
-      camera_nome: "Câmera 1",
-      arena_id: arenaId,
-      created_at: new Date(agora - 1000 * 60 * 60 * 80).toISOString(),
-      status: "expirado",
-      video_url: "/mock/arenacam/lance-expirado.mp4",
-    }),
-  ];
-}
-
-function criarLanceMock(lance) {
-  return {
-    ...lance,
-    expires_at: calcularExpiresAt(lance.created_at),
-  };
 }

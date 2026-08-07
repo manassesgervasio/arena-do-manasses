@@ -1,4 +1,8 @@
-export default function LancesRecentes({ lances = [] }) {
+export default function LancesRecentes({
+  lances = [],
+  carregando = false,
+  erro = "",
+}) {
   function abrirVideo(videoUrl) {
     if (!videoUrl) return;
 
@@ -12,8 +16,12 @@ export default function LancesRecentes({ lances = [] }) {
         <h2>Lances recentes</h2>
       </div>
 
-      {lances.length === 0 ? (
-        <div className="arenacam-empty">Nenhum lance salvo ainda.</div>
+      {erro ? (
+        <div className="arenacam-empty">{erro}</div>
+      ) : carregando ? (
+        <div className="arenacam-empty">Carregando lances...</div>
+      ) : lances.length === 0 ? (
+        <div className="arenacam-empty">Nenhum lance disponível ainda.</div>
       ) : (
         <div className="arenacam-table-wrap">
           <table className="arenacam-table">

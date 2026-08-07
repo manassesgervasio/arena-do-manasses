@@ -40,7 +40,7 @@ as $$
     select 1
     from public.usuarios_sistema us
     where us.id = public.arenabase_current_usuario_id()
-      and us.perfil = 'super_admin'
+      and us.tipo_usuario = 'super_admin'
       and coalesce(us.ativo, false) = true
   )
 $$;
@@ -165,7 +165,7 @@ set search_path = public
 as $$
   select
     r.arena_id,
-    r.data,
+    r.data::date,
     r.horario,
     true as ocupado,
     case
@@ -176,7 +176,7 @@ as $$
   join public.arenas a on a.id = r.arena_id
   where a.slug = p_arena_slug
     and coalesce(a.ativa, false) = true
-    and r.data between p_data_inicio and p_data_fim
+    and r.data::date between p_data_inicio and p_data_fim
     and (
       r.status in ('Pendente', 'Reservado', 'Pago')
       or r.tipo in ('Fixo', 'Mensalista')
