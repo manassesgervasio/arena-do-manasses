@@ -64,9 +64,19 @@ function LinhaLance({ lance, onAbrirVideo }) {
     setErroDownload("");
 
     try {
-      const response = await fetch(lance.video_url);
+      console.log("ArenaCam download URL:", lance.video_url);
+
+      const response = await fetch(lance.video_url, {
+        method: "GET",
+        mode: "cors",
+      });
 
       if (!response.ok) {
+        console.error(
+          "ArenaCam download HTTP:",
+          response.status,
+          response.statusText
+        );
         throw new Error(`HTTP ${response.status}`);
       }
 
@@ -86,6 +96,7 @@ function LinhaLance({ lance, onAbrirVideo }) {
         URL.revokeObjectURL(urlTemporaria);
       }, 1000);
     } catch (error) {
+      console.error("ArenaCam download error:", error);
       console.error("Erro ao baixar video do ArenaCam:", error);
       setErroDownload(
         "Nao foi possivel baixar o video. Tente assistir ou baixar novamente."
