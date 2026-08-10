@@ -5051,8 +5051,10 @@ code {
 }
 
 .arenacam-replay-preview {
+  position: relative;
   display: grid;
   place-items: center;
+  overflow: hidden;
   aspect-ratio: 16 / 8.4;
   width: 100%;
   border: 0;
@@ -5066,6 +5068,14 @@ code {
   line-height: 13px;
   font-weight: 950;
   cursor: pointer;
+}
+
+.arenacam-replay-thumbnail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .arenacam-replay-preview:disabled {
@@ -5085,6 +5095,8 @@ code {
   font-size: 13px;
   line-height: 1;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+  position: relative;
+  z-index: 1;
 }
 
 .arenacam-replay-content {
