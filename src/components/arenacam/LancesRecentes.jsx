@@ -100,7 +100,14 @@ function LanceCard({ lance, onAbrirVideo, onExcluirLance }) {
         disabled={!temVideo}
         title={temVideo ? "Abrir vídeo" : "Vídeo indisponível"}
       >
-        {temVideo && (
+        {lance.thumbnail_url ? (
+          <img
+            className="arenacam-replay-thumbnail"
+            src={lance.thumbnail_url}
+            alt=""
+            loading="lazy"
+          />
+        ) : temVideo ? (
           <video
             className="arenacam-replay-thumbnail"
             src={lance.video_url}
@@ -108,7 +115,7 @@ function LanceCard({ lance, onAbrirVideo, onExcluirLance }) {
             muted
             playsInline
           />
-        )}
+        ) : null}
         <span className="arenacam-replay-play" aria-hidden="true">
           ▶
         </span>

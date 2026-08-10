@@ -1,6 +1,10 @@
 import { supabase } from "../supabase";
 
 const ARENACAM_REQUEST_TIMEOUT_MS = 10000;
+const ARENACAM_LANCE_SELECT =
+  "id,arena_id,camera_id,created_at,expires_at,status,video_url,thumbnail_url";
+const ARENACAM_LANCE_SELECT_LEGADO =
+  "id,arena_id,camera_id,created_at,expires_at,status,video_url";
 export const ARENACAM_RETENTION_HOURS = 72;
 export const ARENACAM_RETENTION_MS =
   ARENACAM_RETENTION_HOURS * 60 * 60 * 1000;
@@ -43,16 +47,29 @@ export async function salvarLance(lance) {
   const { data: userData } = await supabase.auth.getUser();
   const createdBy = userData?.user?.id || null;
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("arenacam_lances")
     .insert({
       ...lanceParaBanco,
       created_by: createdBy,
     })
-    .select(
-      "id,arena_id,camera_id,created_at,expires_at,status,video_url,created_by"
-    )
+    .select(`${ARENACAM_LANCE_SELECT},created_by`)
     .single();
+
+  if (colunaThumbnailAusente(error)) {
+    const lanceLegado = removerThumbnailUrl(lanceParaBanco);
+    const resultadoLegado = await supabase
+      .from("arenacam_lances")
+      .insert({
+        ...lanceLegado,
+        created_by: createdBy,
+      })
+      .select(`${ARENACAM_LANCE_SELECT_LEGADO},created_by`)
+      .single();
+
+    data = resultadoLegado.data;
+    error = resultadoLegado.error;
+  }
 
   if (error) {
     throw new Error(
@@ -69,12 +86,24 @@ export async function listarLancesDisponiveis(arenaId) {
   if (!arenaId) return [];
 
   const agora = new Date().toISOString();
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("arenacam_lances")
-    .select("id,arena_id,camera_id,created_at,expires_at,status,video_url")
+    .select(ARENACAM_LANCE_SELECT)
     .eq("arena_id", arenaId)
     .gt("expires_at", agora)
     .order("created_at", { ascending: false });
+
+  if (colunaThumbnailAusente(error)) {
+    const resultadoLegado = await supabase
+      .from("arenacam_lances")
+      .select(ARENACAM_LANCE_SELECT_LEGADO)
+      .eq("arena_id", arenaId)
+      .gt("expires_at", agora)
+      .order("created_at", { ascending: false });
+
+    data = resultadoLegado.data;
+    error = resultadoLegado.error;
+  }
 
   if (error) {
     throw new Error(
@@ -156,12 +185,15 @@ export async function excluirLance(lanceId, arenaId) {
     return payload || { id: lanceId };
   } catch (error) {
     if (error?.name === "AbortError") {
-      throw new Error("Tempo limite ao conectar com o Raspberry Pi.");
+      throw new Error("Tempo limite ao conectar com o Raspberry Pi.", {
+        cause: error,
+      });
     }
 
     if (error instanceof TypeError) {
       throw new Error(
-        "Nao foi possivel conectar ao Raspberry Pi. Verifique rede, URL e CORS."
+        "Nao foi possivel conectar ao Raspberry Pi. Verifique rede, URL e CORS.",
+        { cause: error }
       );
     }
 
@@ -214,12 +246,15 @@ export async function gerarLance(cameraId, arenaId) {
     return salvarLance(lance);
   } catch (error) {
     if (error?.name === "AbortError") {
-      throw new Error("Tempo limite ao conectar com o Raspberry Pi.");
+      throw new Error("Tempo limite ao conectar com o Raspberry Pi.", {
+        cause: error,
+      });
     }
 
     if (error instanceof TypeError) {
       throw new Error(
-        "Nao foi possivel conectar ao Raspberry Pi. Verifique rede, URL e CORS."
+        "Nao foi possivel conectar ao Raspberry Pi. Verifique rede, URL e CORS.",
+        { cause: error }
       );
     }
 
@@ -275,6 +310,7 @@ function normalizarLanceResposta(payload, cameraId, arenaId) {
     expires_at: expiresAt,
     status: lance.status || "concluido",
     video_url: lance.video_url || "",
+    thumbnail_url: lance.thumbnail_url || "",
   };
 }
 
@@ -305,6 +341,7 @@ function normalizarLanceParaBanco(lance) {
     expires_at: lance.expires_at,
     status: lance.status,
     video_url: lance.video_url || "",
+    thumbnail_url: lance.thumbnail_url || "",
   };
 }
 
@@ -317,5 +354,21 @@ function normalizarLanceDoBanco(lance) {
     expires_at: lance.expires_at,
     status: lance.status,
     video_url: lance.video_url || "",
+    thumbnail_url: lance.thumbnail_url || "",
   };
+}
+
+function colunaThumbnailAusente(error) {
+  if (!error) return false;
+
+  const mensagem = `${error.message || ""} ${error.details || ""}`;
+
+  return mensagem.includes("thumbnail_url");
+}
+
+function removerThumbnailUrl(lance) {
+  const lanceLegado = { ...lance };
+  delete lanceLegado.thumbnail_url;
+
+  return lanceLegado;
 }
