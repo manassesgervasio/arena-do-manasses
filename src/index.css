@@ -4791,6 +4791,12 @@ code {
   gap: 12px;
 }
 
+.arenacam-section-header {
+  display: grid;
+  justify-content: start;
+  gap: 2px;
+}
+
 .arenacam-camera-header h2,
 .arenacam-section-header h2 {
   margin: 2px 0 0;
@@ -4925,6 +4931,232 @@ code {
   text-align: center;
 }
 
+.arenacam-calendar-gallery {
+  display: grid;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.arenacam-day-group {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.arenacam-day-group.is-today {
+  border-color: rgba(124, 58, 237, 0.24);
+  background:
+    linear-gradient(180deg, rgba(250, 245, 255, 0.94), rgba(248, 250, 252, 0.98));
+}
+
+.arenacam-day-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.arenacam-day-date {
+  display: grid;
+  place-items: center;
+  min-width: 78px;
+  min-height: 78px;
+  border-radius: 16px;
+  background: #111827;
+  color: white;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.arenacam-day-group.is-today .arenacam-day-date {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+}
+
+.arenacam-day-date strong {
+  font-size: 30px;
+  line-height: 34px;
+  font-weight: 950;
+}
+
+.arenacam-day-date span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.arenacam-day-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.arenacam-day-info h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 18px;
+  line-height: 23px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.arenacam-day-info p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 850;
+}
+
+.arenacam-day-info small {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 950;
+}
+
+.arenacam-day-empty {
+  display: grid;
+  place-items: center;
+  min-height: 112px;
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #64748b;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 900;
+}
+
+.arenacam-replay-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px;
+}
+
+.arenacam-replay-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 18px rgba(76, 29, 149, 0.07);
+}
+
+.arenacam-replay-preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 8.4;
+  width: 100%;
+  border: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(135deg, #111827, #312e81 55%, #14532d);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+  color: white;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.arenacam-replay-preview:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.arenacam-replay-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5b21b6;
+  font-size: 13px;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+}
+
+.arenacam-replay-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 8px 6px;
+}
+
+.arenacam-replay-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.arenacam-replay-main strong {
+  color: #111827;
+  font-size: 24px;
+  line-height: 26px;
+  font-weight: 950;
+}
+
+.arenacam-replay-main span {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 850;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arenacam-replay-card .arenacam-lance-status {
+  min-height: 20px;
+  padding: 2px 7px;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 900;
+}
+
+.arenacam-replay-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 0 8px 8px;
+}
+
+.arenacam-replay-actions button {
+  min-height: 28px;
+  padding: 5px 4px;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #5b21b6;
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.arenacam-replay-actions button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.arenacam-replay-actions .arenacam-replay-delete:not(:disabled) {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+  color: #64748b;
+}
+
 .arenacam-table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -5002,6 +5234,10 @@ code {
   .arenacam-grid {
     grid-template-columns: 1fr;
   }
+
+  .arenacam-replay-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -5030,6 +5266,40 @@ code {
   .arenacam-section-header h2 {
     font-size: 20px;
     line-height: 25px;
+  }
+
+  .arenacam-day-group {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .arenacam-day-header {
+    align-items: flex-start;
+  }
+
+  .arenacam-day-date {
+    min-width: 68px;
+    min-height: 68px;
+    border-radius: 14px;
+  }
+
+  .arenacam-day-date strong {
+    font-size: 26px;
+    line-height: 30px;
+  }
+
+  .arenacam-replay-grid {
+    grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+    gap: 9px;
+  }
+
+  .arenacam-replay-card {
+    border-radius: 12px;
+  }
+
+  .arenacam-replay-main strong {
+    font-size: 22px;
+    line-height: 24px;
   }
 }
 
