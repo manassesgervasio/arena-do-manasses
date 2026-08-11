@@ -3150,8 +3150,37 @@ textarea:disabled {
     box-shadow: 0 7px 16px rgba(76, 29, 149, 0.055) !important;
   }
 
-  .clientes-section .cliente-card-title {
+  .clientes-section .cliente-card-header {
     grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  .clientes-section .cliente-ranking-position {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    border: 1px solid rgba(124, 58, 237, 0.16) !important;
+    border-radius: 999px !important;
+    background: rgba(245, 243, 255, 0.9) !important;
+    color: var(--ds-primary-700) !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+  }
+
+  .clientes-section .cliente-ranking-medal {
+    border-color: transparent !important;
+    background: transparent !important;
+    font-size: 23px !important;
+  }
+
+  .clientes-section .cliente-card-title {
     margin: 0 !important;
     color: #111827 !important;
     font-size: 16px !important;
