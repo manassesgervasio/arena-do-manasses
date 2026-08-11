@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --ds-primary: #7c3aed;
   --ds-primary-700: #5b21b6;
   --ds-primary-900: #24106f;
@@ -1082,11 +1082,11 @@
   }
 
   .painel-saas-table td:nth-child(8)::before {
-    content: "Responsáveis";
+    content: "ResponsÃ¡veis";
   }
 
   .painel-saas-table td:nth-child(9)::before {
-    content: "Início";
+    content: "InÃ­cio";
   }
 
   .painel-saas-table td:nth-child(10)::before {
@@ -1094,7 +1094,7 @@
   }
 
   .painel-saas-table td:nth-child(11)::before {
-    content: "Ações";
+    content: "AÃ§Ãµes";
   }
 
   .painel-saas-table td strong {
@@ -1625,7 +1625,7 @@
   }
 
   .usuarios-arena-table td:nth-child(7)::before {
-    content: "Ações";
+    content: "AÃ§Ãµes";
   }
 
   .usuarios-arena-table td strong {
@@ -4295,4 +4295,120 @@ textarea:disabled {
   .app-header .app-account-button {
     display: none !important;
   }
+}
+
+/* Financeiro Profissional final overrides: legacy CSS above uses !important. */
+.home-page:has(section.financeiro-profissional) { background: #f8fafc !important; }
+section.financeiro-profissional {
+  width: min(100%, 1180px) !important; max-width: calc(100vw - 32px) !important;
+  margin: 22px auto 0 !important; padding: 0 0 calc(32px + env(safe-area-inset-bottom)) !important;
+  gap: 15px !important; overflow-x: clip !important; color: #0f172a !important; font-family: var(--ds-font) !important;
+}
+section.financeiro-profissional .financeiro-profissional-header { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 24px !important; }
+section.financeiro-profissional .financeiro-profissional-header h2 { color: #0f172a !important; font-size: clamp(29px, 2.5vw, 34px) !important; line-height: 1.08 !important; font-weight: 680 !important; }
+section.financeiro-profissional .financeiro-profissional-header p,
+section.financeiro-profissional .financeiro-profissional-form label,
+section.financeiro-profissional .financeiro-profissional-form label span,
+section.financeiro-profissional .financeiro-profissional-summary-card span:not(.financeiro-profissional-summary-icon),
+section.financeiro-profissional .financeiro-profissional-close-summary span,
+section.financeiro-profissional .financeiro-profissional-close-summary p { color: #64748b !important; font-weight: 500 !important; }
+section.financeiro-profissional .financeiro-profissional-filter {
+  position: relative !important; display: grid !important; grid-template-columns: 40px minmax(0, 1fr) !important;
+  align-items: center !important; width: min(100%, 260px) !important; min-width: 220px !important; max-width: 260px !important;
+  gap: 12px !important; padding: 10px 14px !important; border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  border-radius: 16px !important; background: #fff !important; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045) !important; cursor: pointer !important;
+}
+section.financeiro-profissional .financeiro-profissional-filter::after { content: none !important; }
+section.financeiro-profissional .financeiro-profissional-filter input[type="month"] {
+  position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important;
+  padding: 0 !important; border: 0 !important; background: transparent !important; color: transparent !important; box-shadow: none !important;
+  opacity: 0 !important; cursor: pointer !important;
+}
+section.financeiro-profissional .financeiro-profissional-filter-copy { display: grid !important; min-width: 0 !important; gap: 2px !important; }
+section.financeiro-profissional .financeiro-profissional-filter-copy > span { color: #64748b !important; font-size: 12px !important; line-height: 15px !important; font-weight: 500 !important; }
+section.financeiro-profissional .financeiro-profissional-filter-copy > strong { color: #0f172a !important; font-size: 15px !important; line-height: 20px !important; font-weight: 720 !important; text-transform: lowercase !important; }
+section.financeiro-profissional .financeiro-profissional-summary { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 12px !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card,
+section.financeiro-profissional .financeiro-profissional-card,
+section.financeiro-profissional .financeiro-profissional-balance {
+  border: 1px solid rgba(124, 58, 237, 0.14) !important; border-radius: 14px !important; background: #fff !important;
+  color: #0f172a !important; box-shadow: 0 8px 22px rgba(15, 23, 42, 0.035) !important;
+}
+section.financeiro-profissional .financeiro-profissional-summary-card {
+  display: grid !important; grid-template-columns: 38px minmax(0, 1fr) !important; grid-template-rows: auto auto !important;
+  min-height: 98px !important; padding: 14px !important; column-gap: 12px !important; row-gap: 3px !important;
+}
+section.financeiro-profissional .financeiro-profissional-summary-icon,
+section.financeiro-profissional .financeiro-profissional-filter-icon,
+section.financeiro-profissional .financeiro-profissional-balance-icon {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  width: 38px !important; height: 38px !important; border-radius: 12px !important; background: rgba(124, 58, 237, 0.08) !important; color: #7c3aed !important;
+}
+section.financeiro-profissional .financeiro-profissional-summary-icon { grid-row: 1 / span 2 !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card strong { color: #4c1d95 !important; font-size: clamp(19px, 1.8vw, 24px) !important; line-height: 1.08 !important; font-weight: 760 !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card.is-entradas .financeiro-profissional-summary-icon,
+section.financeiro-profissional .financeiro-profissional-balance-icon { background: rgba(22, 163, 74, 0.1) !important; color: #16a34a !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card.is-entradas strong,
+section.financeiro-profissional .financeiro-profissional-balance strong,
+section.financeiro-profissional .financeiro-profissional-close-summary strong,
+section.financeiro-profissional .financeiro-profissional-value-in { color: #047857 !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card.is-despesas .financeiro-profissional-summary-icon { background: rgba(220, 38, 38, 0.08) !important; color: #dc2626 !important; }
+section.financeiro-profissional .financeiro-profissional-summary-card.is-despesas strong,
+section.financeiro-profissional .financeiro-profissional-balance.is-negative strong,
+section.financeiro-profissional .financeiro-profissional-value-out { color: #b91c1c !important; }
+section.financeiro-profissional .financeiro-profissional-balance {
+  display: grid !important; grid-template-columns: 46px minmax(0, 1fr) !important; align-items: center !important; gap: 14px !important;
+  min-height: 112px !important; padding: 20px 22px !important; background: linear-gradient(90deg, rgba(22, 163, 74, 0.08), #fff 58%) !important;
+}
+section.financeiro-profissional .financeiro-profissional-balance-icon { width: 46px !important; height: 46px !important; border-radius: 14px !important; }
+section.financeiro-profissional .financeiro-profissional-balance > div { display: grid !important; gap: 6px !important; min-width: 0 !important; }
+section.financeiro-profissional .financeiro-profissional-balance span { color: #64748b !important; font-size: 13px !important; line-height: 17px !important; font-weight: 600 !important; }
+section.financeiro-profissional .financeiro-profissional-balance strong { font-size: clamp(30px, 3.4vw, 42px) !important; line-height: 1.03 !important; font-weight: 780 !important; }
+section.financeiro-profissional .financeiro-profissional-layout { grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.78fr) !important; gap: 16px !important; }
+section.financeiro-profissional .financeiro-profissional-card { gap: 15px !important; padding: 18px !important; }
+section.financeiro-profissional .financeiro-profissional-card h3,
+section.financeiro-profissional .financeiro-profissional-card-header h3 { color: #0f172a !important; font-size: 19px !important; line-height: 24px !important; font-weight: 680 !important; }
+section.financeiro-profissional .financeiro-profissional-form { grid-template-columns: minmax(0, 1.3fr) minmax(130px, 0.55fr) minmax(130px, 0.55fr) !important; gap: 12px !important; }
+section.financeiro-profissional .financeiro-profissional-form input,
+section.financeiro-profissional .financeiro-profissional-form select,
+section.financeiro-profissional .financeiro-profissional-form textarea {
+  min-height: 54px !important; padding: 12px 14px !important; border: 1px solid rgba(124, 58, 237, 0.16) !important;
+  border-radius: 12px !important; background: #fff !important; color: #0f172a !important; font-size: 15px !important; font-weight: 550 !important;
+}
+section.financeiro-profissional .financeiro-profissional-form input:focus,
+section.financeiro-profissional .financeiro-profissional-form select:focus,
+section.financeiro-profissional .financeiro-profissional-form textarea:focus,
+section.financeiro-profissional .financeiro-profissional-filter:focus-within { border-color: rgba(124, 58, 237, 0.44) !important; box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important; }
+section.financeiro-profissional .financeiro-profissional-primary,
+section.financeiro-profissional .financeiro-profissional-secondary { min-height: 54px !important; border-radius: 12px !important; font-size: 15px !important; font-weight: 750 !important; }
+section.financeiro-profissional .financeiro-profissional-primary { border: 1px solid #7c3aed !important; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%) !important; color: #fff !important; }
+section.financeiro-profissional .financeiro-profissional-secondary { border: 1px solid rgba(124, 58, 237, 0.18) !important; background: #fff !important; color: #4c1d95 !important; }
+section.financeiro-profissional .financeiro-profissional-close-summary { background: #f8fafc !important; }
+@media (max-width: 899px) {
+  section.financeiro-profissional { max-width: calc(100vw - 24px) !important; }
+  section.financeiro-profissional .financeiro-profissional-header,
+  section.financeiro-profissional .financeiro-profissional-layout { display: grid !important; grid-template-columns: 1fr !important; }
+  section.financeiro-profissional .financeiro-profissional-filter { width: 100% !important; min-width: 0 !important; max-width: none !important; }
+  section.financeiro-profissional .financeiro-profissional-summary { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  section.financeiro-profissional .financeiro-profissional-form { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 640px) {
+  section.financeiro-profissional { max-width: 100% !important; margin-top: 14px !important; padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; overflow-x: hidden !important; }
+  section.financeiro-profissional .financeiro-profissional-header h2 { font-size: 29px !important; line-height: 32px !important; font-weight: 680 !important; }
+  section.financeiro-profissional .financeiro-profissional-header p { font-size: 15px !important; line-height: 20px !important; font-weight: 400 !important; }
+  section.financeiro-profissional .financeiro-profissional-summary { gap: 8px !important; }
+  section.financeiro-profissional .financeiro-profissional-summary-card { grid-template-columns: 1fr !important; min-height: 96px !important; padding: 11px 12px !important; row-gap: 3px !important; }
+  section.financeiro-profissional .financeiro-profissional-summary-icon { grid-row: auto !important; }
+  section.financeiro-profissional .financeiro-profissional-summary-icon { width: 34px !important; height: 34px !important; border-radius: 11px !important; }
+  section.financeiro-profissional .financeiro-profissional-summary-card strong { font-size: clamp(18px, 5vw, 21px) !important; }
+  section.financeiro-profissional .financeiro-profissional-balance { grid-template-columns: 44px minmax(0, 1fr) !important; min-height: 108px !important; padding: 16px !important; }
+  section.financeiro-profissional .financeiro-profissional-form { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  section.financeiro-profissional .financeiro-profissional-form label:first-child,
+  section.financeiro-profissional .financeiro-profissional-form label:nth-child(4),
+  section.financeiro-profissional .financeiro-profissional-form label:nth-child(5),
+  section.financeiro-profissional .financeiro-profissional-form label:nth-child(6),
+  section.financeiro-profissional .financeiro-profissional-observacao { grid-column: 1 / -1 !important; }
+  section.financeiro-profissional .financeiro-profissional-table { min-width: 0 !important; }
+  section.financeiro-profissional .financeiro-profissional-table td:nth-child(2)::before { content: "Descrição" !important; }
+  section.financeiro-profissional .financeiro-profissional-table td:nth-child(7)::before { content: "Ações" !important; }
 }

@@ -32,6 +32,15 @@ function formatarDataHora(dataTexto) {
   }).format(new Date(dataTexto));
 }
 
+function formatarMesAnoLabel(mesAno) {
+  const { ano, mes } = separarMesAno(mesAno);
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(ano, mes - 1, 1));
+}
+
 function obterMesAtual() {
   const hoje = new Date();
   return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
@@ -714,38 +723,85 @@ export default function FinanceiroProfissional({
     setFechamentoSalvando(false);
   }
 
+  const cardsResumo = [
+    {
+      titulo: "Reservas pagas",
+      valor: moeda(reservasPagasPeriodo),
+      tipo: "reservas",
+      icone: "calendar",
+    },
+    {
+      titulo: "Mensalistas pagos",
+      valor: moeda(mensalistasPagosPeriodo),
+      tipo: "mensalistas",
+      icone: "users",
+    },
+    {
+      titulo: "Entradas manuais",
+      valor: moeda(totais.entradasManuais),
+      tipo: "entradas",
+      icone: "plus",
+    },
+    {
+      titulo: "Despesas",
+      valor: moeda(totais.despesas),
+      tipo: "despesas",
+      icone: "minus",
+    },
+  ];
+  const mesAnoLabel = formatarMesAnoLabel(mesAno);
+
   return (
     <section className="financeiro-profissional">
       <div className="financeiro-profissional-header">
-        <div>
+        <div className="financeiro-profissional-heading">
           <h2>Financeiro Profissional</h2>
           <p>Controle financeiro da arena</p>
         </div>
 
         <label className="financeiro-profissional-filter">
-          <span>Mês e ano</span>
-          <Input
-            type="month"
-            value={mesAno}
-            onChange={(event) => setMesAno(event.target.value)}
-          />
+          <span className="financeiro-profissional-filter-icon" aria-hidden="true">
+            <FinanceiroIcon name="calendar" />
+          </span>
+          <span className="financeiro-profissional-filter-copy">
+            <span>Mês e ano</span>
+            <strong>{mesAnoLabel}</strong>
+            <Input
+              type="month"
+              aria-label="Selecionar mês e ano"
+              value={mesAno}
+              onChange={(event) => setMesAno(event.target.value)}
+            />
+          </span>
         </label>
       </div>
 
       <div className="financeiro-profissional-summary">
-        <ResumoCard titulo="Reservas pagas" valor={moeda(reservasPagasPeriodo)} />
-        <ResumoCard titulo="Mensalistas pagos" valor={moeda(mensalistasPagosPeriodo)} />
-        <ResumoCard
-          titulo="Entradas manuais"
-          valor={moeda(totais.entradasManuais)}
-        />
-        <ResumoCard titulo="Despesas" valor={moeda(totais.despesas)} tipo="saida" />
-        <ResumoCard
-          titulo="Saldo liquido"
-          valor={moeda(totais.saldoLiquido)}
-          tipo={totais.saldoLiquido >= 0 ? "saldo" : "saida"}
-        />
+        {cardsResumo.map((card) => (
+          <ResumoCard
+            key={card.titulo}
+            titulo={card.titulo}
+            valor={card.valor}
+            tipo={card.tipo}
+            icone={card.icone}
+          />
+        ))}
       </div>
+
+      <Card
+        as="article"
+        className={`financeiro-profissional-balance ${
+          totais.saldoLiquido >= 0 ? "is-positive" : "is-negative"
+        }`}
+      >
+        <span className="financeiro-profissional-balance-icon" aria-hidden="true">
+          <FinanceiroIcon name="wallet" />
+        </span>
+        <div>
+          <span>Saldo líquido</span>
+          <strong>{moeda(totais.saldoLiquido)}</strong>
+        </div>
+      </Card>
 
       <div className="financeiro-profissional-layout">
         <Card
@@ -757,7 +813,7 @@ export default function FinanceiroProfissional({
             <h3>Lançamentos manuais</h3>
             {lancamentoEditandoId && (
               <Button type="button" onClick={limparFormulario}>
-                Cancelar edicao
+                Cancelar edição
               </Button>
             )}
           </div>
@@ -770,7 +826,7 @@ export default function FinanceiroProfissional({
 
           <div className="financeiro-profissional-form">
             <label>
-              <span>Descricao</span>
+              <span>Descrição</span>
               <Input
                 type="text"
                 value={formulario.descricao}
@@ -846,7 +902,7 @@ export default function FinanceiroProfissional({
             </label>
 
             <label className="financeiro-profissional-observacao">
-              <span>Observacao</span>
+              <span>Observação</span>
               <Textarea
                 value={formulario.observacao}
                 onChange={(event) => atualizarCampo("observacao", event.target.value)}
@@ -887,7 +943,7 @@ export default function FinanceiroProfissional({
             {salvandoLancamento
               ? "Salvando..."
               : lancamentoEditandoId
-                ? "Salvar alteracoes"
+                ? "Salvar alterações"
                 : "Adicionar lançamento"}
           </Button>
         </Card>
@@ -989,12 +1045,12 @@ export default function FinanceiroProfissional({
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Descricao</th>
+                <th>Descrição</th>
                 <th>Tipo</th>
                 <th>Categoria</th>
                 <th>Forma de pagamento</th>
                 <th>Valor</th>
-                <th>Acoes</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -1055,7 +1111,7 @@ export default function FinanceiroProfissional({
               {!lancamentosCarregando && totais.lancamentosDoMes.length === 0 && (
                 <tr>
                   <td colSpan="7" className="financeiro-profissional-empty">
-                    Nenhum lançamento manual para este mês.
+                    Nenhum lançamento manual neste mês.
                   </td>
                 </tr>
               )}
@@ -1067,14 +1123,66 @@ export default function FinanceiroProfissional({
   );
 }
 
-function ResumoCard({ titulo, valor, tipo = "entrada" }) {
+function ResumoCard({ titulo, valor, tipo = "reservas", icone = "calendar" }) {
   return (
     <Card
       as="article"
       className={`financeiro-profissional-summary-card is-${tipo}`}
     >
+      <span className="financeiro-profissional-summary-icon" aria-hidden="true">
+        <FinanceiroIcon name={icone} />
+      </span>
       <span>{titulo}</span>
       <strong>{valor}</strong>
     </Card>
+  );
+}
+
+function FinanceiroIcon({ name }) {
+  const paths = {
+    calendar: (
+      <>
+        <path d="M7 3v3" />
+        <path d="M17 3v3" />
+        <path d="M4 9h16" />
+        <path d="M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+      </>
+    ),
+    users: (
+      <>
+        <path d="M16 19c0-2-2-4-4-4s-4 2-4 4" />
+        <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+        <path d="M20 18c0-2-1-3-3-4" />
+        <path d="M17 5a3 3 0 0 1 0 6" />
+      </>
+    ),
+    plus: (
+      <>
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+      </>
+    ),
+    minus: <path d="M5 12h14" />,
+    wallet: (
+      <>
+        <path d="M19 7V6a2 2 0 0 0-2-2H6a3 3 0 0 0 0 6h13a1 1 0 0 1 1 1v6a2 2 0 0 1-2 2H6a3 3 0 0 1-3-3V7" />
+        <path d="M16 14h.01" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {paths[name] || paths.calendar}
+    </svg>
   );
 }
