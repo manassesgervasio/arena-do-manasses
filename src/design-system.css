@@ -3131,6 +3131,16 @@ textarea:disabled {
   .usuarios-arena-table-wrap {
     color: #111827 !important;
   }
+
+  .financeiro-profissional-close-summary span,
+  .financeiro-profissional-close-summary p,
+  .mensalista-history p {
+    color: #cbd5e1 !important;
+  }
+
+  .financeiro-profissional-close-summary strong {
+    color: #f8fafc !important;
+  }
 }
 
 @media (max-width: 767px) {

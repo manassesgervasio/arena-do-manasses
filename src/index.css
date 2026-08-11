@@ -1244,7 +1244,7 @@ code {
 
 .mensalista-history p {
   margin: 0;
-  color: #94a3b8;
+  color: #cbd5e1;
   font-size: 12px;
   line-height: 16px;
   font-weight: 800;
@@ -1777,7 +1777,7 @@ code {
 
 .painel-saas-header h2 {
   margin: 0;
-  color: white;
+  color: var(--ds-text);
   font-size: 26px;
   line-height: 32px;
   font-weight: 900;
@@ -1786,17 +1786,17 @@ code {
 
 .painel-saas-header p {
   margin-top: 4px;
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
   font-size: 14px;
 }
 
 .painel-saas-header button {
   min-height: 42px;
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid var(--ds-border);
   border-radius: 10px;
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  background: var(--ds-surface-solid);
+  color: var(--ds-primary-700);
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
@@ -1846,7 +1846,7 @@ code {
 
 .painel-saas-form-header h3 {
   margin: 0;
-  color: white;
+  color: var(--ds-text);
   font-size: 17px;
   line-height: 22px;
   font-weight: 900;
@@ -1856,10 +1856,10 @@ code {
 .painel-saas-form-header button {
   min-height: 34px;
   padding: 7px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid var(--ds-border);
   border-radius: 9px;
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  background: var(--ds-surface-solid);
+  color: var(--ds-primary-700);
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
@@ -1868,7 +1868,7 @@ code {
 .painel-saas-form label {
   display: grid;
   gap: 7px;
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
   font-size: 13px;
   font-weight: 900;
 }
@@ -1885,6 +1885,16 @@ code {
   color: #0f172a;
   font-size: 14px;
   box-sizing: border-box;
+}
+
+.painel-saas-form input::placeholder,
+.painel-saas-form textarea::placeholder,
+.painel-saas-filters input::placeholder,
+.financeiro-profissional-form input::placeholder,
+.financeiro-profissional-form textarea::placeholder,
+.mensalistas-form input::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
 
 .painel-saas-form textarea {
@@ -1987,7 +1997,7 @@ code {
 .painel-saas-empty {
   border: 1px solid rgba(148, 163, 184, 0.24);
   background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
 }
 
 .painel-saas-error {
@@ -2433,7 +2443,7 @@ code {
 
 .financeiro-profissional-header p {
   margin-top: 4px;
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
   font-size: 14px;
 }
 
@@ -2441,7 +2451,7 @@ code {
   display: grid;
   gap: 7px;
   min-width: 180px;
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
   font-size: 13px;
   font-weight: 900;
 }
@@ -2556,7 +2566,7 @@ code {
 .financeiro-profissional-form label {
   display: grid;
   gap: 7px;
-  color: #cbd5e1;
+  color: var(--ds-text-muted);
   font-size: 13px;
   font-weight: 900;
 }
@@ -2623,13 +2633,13 @@ code {
 }
 
 .financeiro-profissional-close-summary span {
-  color: #94a3b8;
+  color: #cbd5e1;
   font-size: 12px;
   font-weight: 900;
 }
 
 .financeiro-profissional-close-summary strong {
-  color: white;
+  color: #f8fafc;
   font-size: 26px;
   line-height: 30px;
   font-weight: 900;
@@ -2707,7 +2717,7 @@ code {
 .financeiro-profissional-table td small {
   display: block;
   margin-top: 4px;
-  color: #94a3b8;
+  color: var(--ds-text-muted);
   font-size: 12px;
   line-height: 16px;
 }
