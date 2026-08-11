@@ -3362,9 +3362,9 @@ textarea:disabled {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    min-height: 44px !important;
+    min-height: 40px !important;
     margin: 0 !important;
-    padding: 10px 44px 10px 12px !important;
+    padding: 8px 44px 8px 12px !important;
     border: 1px solid rgba(167, 139, 250, 0.22) !important;
     border-radius: 13px !important;
     background: #ffffff !important;
@@ -3455,13 +3455,13 @@ textarea:disabled {
 
   .financeiro-profissional .financeiro-profissional-filter {
     display: grid !important;
-    gap: 6px !important;
+    gap: 3px !important;
   }
 
   .financeiro-profissional .financeiro-profissional-filter span {
     color: #374151 !important;
-    font-size: 12px !important;
-    line-height: 15px !important;
+    font-size: 11px !important;
+    line-height: 13px !important;
     font-weight: 700 !important;
   }
 
@@ -3474,8 +3474,8 @@ textarea:disabled {
   .financeiro-profissional-summary-card {
     width: 100% !important;
     min-width: 0 !important;
-    min-height: 90px !important;
-    padding: 12px !important;
+    min-height: 84px !important;
+    padding: 10px !important;
     border: 1px solid rgba(167, 139, 250, 0.18) !important;
     border-radius: var(--ds-radius-md) !important;
     background: #ffffff !important;
@@ -3497,11 +3497,16 @@ textarea:disabled {
     overflow-wrap: anywhere;
   }
 
+  .financeiro-profissional-summary-card.is-saldo {
+    grid-column: 1 / -1 !important;
+    min-height: 86px !important;
+  }
+
   .financeiro-profissional-layout,
   .financeiro-profissional-form {
     display: grid !important;
     grid-template-columns: 1fr !important;
-    gap: 10px !important;
+    gap: 8px !important;
   }
 
   .financeiro-profissional-card {
