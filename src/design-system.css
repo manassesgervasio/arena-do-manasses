@@ -3069,6 +3069,135 @@ textarea:disabled {
     color: var(--ds-text-muted) !important;
   }
 
+  .clientes-section {
+    gap: 12px !important;
+    margin-top: 18px !important;
+  }
+
+  .clientes-section .clientes-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .clientes-section .clientes-stat-card {
+    min-height: 88px !important;
+    padding: 12px 10px !important;
+    border: 1px solid rgba(167, 139, 250, 0.22) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(76, 29, 149, 0.08) !important;
+  }
+
+  .clientes-section .clientes-stat-card p {
+    margin: 0 !important;
+    color: #374151 !important;
+    font-size: 12px !important;
+    line-height: 14px !important;
+    font-weight: 700 !important;
+  }
+
+  .clientes-section .clientes-stat-value {
+    margin: 6px 0 0 !important;
+    color: #1e123d !important;
+    font-size: clamp(21px, 6vw, 28px) !important;
+    line-height: 1.08 !important;
+    font-weight: 850 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .clientes-section .clientes-heading {
+    margin: 4px 0 0 !important;
+    color: #1e123d !important;
+    font-size: 20px !important;
+    line-height: 25px !important;
+    font-weight: 900 !important;
+  }
+
+  .clientes-section .clientes-search,
+  .clientes-section .clientes-filter-select {
+    min-height: 40px !important;
+    margin-bottom: 0 !important;
+    padding: 9px 12px !important;
+    border: 1px solid rgba(167, 139, 250, 0.24) !important;
+    border-radius: var(--ds-radius-sm) !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 14px !important;
+    font-weight: 750 !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset !important;
+  }
+
+  .clientes-section .clientes-list-grid {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  .clientes-section .cliente-card {
+    display: grid !important;
+    gap: 7px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(167, 139, 250, 0.2) !important;
+    border-radius: var(--ds-radius-md) !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(76, 29, 149, 0.07) !important;
+  }
+
+  .clientes-section .cliente-card-title {
+    margin: 0 !important;
+    color: #111827 !important;
+    font-size: 15px !important;
+    line-height: 19px !important;
+    font-weight: 900 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .clientes-section .cliente-card > p:not(.cliente-last-reserva) {
+    margin: 0 !important;
+    color: #4b5563 !important;
+    font-size: 13px !important;
+    line-height: 17px !important;
+    font-weight: 700 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .clientes-section .cliente-whatsapp-link {
+    width: fit-content !important;
+    min-height: 34px !important;
+    margin-top: 2px !important;
+    padding: 7px 12px !important;
+    border: 1px solid rgba(124, 58, 237, 0.18) !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: var(--ds-primary-700) !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 850 !important;
+    box-shadow: 0 6px 16px rgba(76, 29, 149, 0.07) !important;
+  }
+
+  .clientes-section .cliente-badge {
+    width: fit-content !important;
+    min-height: 22px !important;
+    margin-top: 0 !important;
+    padding: 3px 9px !important;
+    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+    background: var(--ds-warning-soft) !important;
+    color: #c2410c !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    font-weight: 850 !important;
+  }
+
+  .clientes-section .cliente-last-reserva {
+    margin-top: 2px !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 700 !important;
+    overflow-wrap: anywhere;
+  }
+
   .ds-empty,
   .ds-loading,
   .mensalistas-empty,
