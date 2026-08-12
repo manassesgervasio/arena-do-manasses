@@ -1,7 +1,7 @@
 import { supabase } from "../supabase";
 import { listarBrandingAtivoArena } from "./arenacamLogosService";
 
-const ARENACAM_REQUEST_TIMEOUT_MS = 10000;
+const ARENACAM_REQUEST_TIMEOUT_MS = 60000;
 const ARENACAM_LANCE_SELECT =
   "id,arena_id,camera_id,created_at,expires_at,status,video_url,thumbnail_url";
 const ARENACAM_LANCE_SELECT_LEGADO =
