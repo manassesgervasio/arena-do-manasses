@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
 import { canAccessConfiguracoesArena } from "../utils/permissoes";
+import ReplayBrandingSettings from "./arenacam/ReplayBrandingSettings";
 import { Button, Card, Input } from "./ui";
 
 const ARENABASE_PUBLIC_BASE_URL = "https://arenabase.com.br";
@@ -157,6 +158,7 @@ export default function ConfiguracoesArena({ contextoArena, onVoltar }) {
           <p>Carregando dados da arena...</p>
         </Card>
       ) : (
+        <>
         <div className="configuracoes-arena-layout">
           <Card className="configuracoes-arena-card">
             <form className="configuracoes-arena-form" onSubmit={salvarConfiguracoes}>
@@ -233,6 +235,8 @@ export default function ConfiguracoesArena({ contextoArena, onVoltar }) {
             </Button>
           </Card>
         </div>
+        <ReplayBrandingSettings contextoArena={contextoArena} />
+        </>
       )}
     </section>
   );
