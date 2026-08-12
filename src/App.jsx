@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { diasSemana, horarios, statusLista, tipoLista } from "./constants";
 import { useAgendaSemana } from "./hooks/useAgendaSemana";
 import { useArenaAtual } from "./hooks/useArenaAtual";
@@ -38,8 +38,13 @@ function obterPerfilDaSessao(session) {
   return perfilValido(perfil) ? perfil : PERFIL_PADRAO;
 }
 
+function obterUsuarioIdDaSessao(session) {
+  return session?.user?.id || "";
+}
+
 export default function App() {
   const [sessaoAuth, setSessaoAuth] = useState(null);
+  const sessaoAuthRef = useRef(null);
   const [authCarregando, setAuthCarregando] = useState(true);
   const [mostrarLogin, setMostrarLogin] = useState(false);
   const [perfilLogado, setPerfilLogado] = useState(null);
@@ -55,6 +60,7 @@ export default function App() {
     ? contextoArenaPublica
     : contextoArenaLogada;
   const sessaoOperacional = temRotaPublicaSlug ? null : sessaoAuth;
+  const usuarioOperacionalId = obterUsuarioIdDaSessao(sessaoOperacional);
   const arenaAtualId = contextoArena.arenaAtual?.id;
   const { dataBase, dias, mudarSemana, alterarData } = useAgendaSemana();
   const [mesFiltro, setMesFiltro] = useState(() => {
@@ -106,6 +112,7 @@ export default function App() {
 
     if (!ativo) return;
 
+    sessaoAuthRef.current = data.session;
     setSessaoAuth(data.session);
     setPerfilLogado(obterPerfilDaSessao(data.session));
     setMostrarLogin(false);
@@ -114,9 +121,22 @@ export default function App() {
 
   carregarSessao();
 
-  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
     if (!ativo) return;
 
+    const usuarioAtualId = obterUsuarioIdDaSessao(sessaoAuthRef.current);
+    const proximoUsuarioId = obterUsuarioIdDaSessao(session);
+    const mesmoUsuario = usuarioAtualId && usuarioAtualId === proximoUsuarioId;
+
+    if (
+      mesmoUsuario &&
+      (event === "TOKEN_REFRESHED" || event === "SIGNED_IN")
+    ) {
+      setAuthCarregando(false);
+      return;
+    }
+
+    sessaoAuthRef.current = session;
     setSessaoAuth(session);
     setPerfilLogado(obterPerfilDaSessao(session));
     if (session) setMostrarLogin(false);
@@ -136,7 +156,7 @@ export default function App() {
     setReservas({});
     setReservasArenaId(null);
 
-    const modoVisitante = !sessaoOperacional;
+    const modoVisitante = !usuarioOperacionalId;
     const primeiroDia = dias?.[0] ? formatarDataLocal(dias[0]) : "";
     const ultimoDia = dias?.length
       ? formatarDataLocal(dias[dias.length - 1])
@@ -217,7 +237,7 @@ export default function App() {
   return () => {
     ativo = false;
   };
-}, [sessaoOperacional, arenaAtualId, dias]);
+}, [usuarioOperacionalId, arenaAtualId, dias]);
 
   useEffect(() => {
   if (!sessaoOperacional || !arenaAtualId) {

@@ -4,6 +4,8 @@ import { supabase } from "../supabase";
 export const ARENA_SLUG_ATUAL = "arena-do-manasses";
 
 export function useArenaAtual(session) {
+  const usuarioAuthId = session?.user?.id || "";
+  const emailAuth = session?.user?.email?.toLowerCase() || "";
   const [arenaAtual, setArenaAtual] = useState(null);
   const [usuarioAtual, setUsuarioAtual] = useState(null);
   const [perfilAtual, setPerfilAtual] = useState(null);
@@ -14,7 +16,7 @@ export function useArenaAtual(session) {
     let montado = true;
 
     async function carregarContexto() {
-      if (!session?.user?.email) {
+      if (!usuarioAuthId || !emailAuth) {
         setCarregandoContexto(false);
         setErroContexto("");
         setArenaAtual(null);
@@ -28,8 +30,6 @@ export function useArenaAtual(session) {
       setArenaAtual(null);
       setUsuarioAtual(null);
       setPerfilAtual(null);
-
-      const emailAuth = session.user.email.toLowerCase();
 
       const { data: usuario, error: usuarioError } = await supabase
         .from("usuarios_sistema")
@@ -145,7 +145,7 @@ export function useArenaAtual(session) {
     return () => {
       montado = false;
     };
-  }, [session]);
+  }, [usuarioAuthId]);
 
   function atualizarArenaAtual(dadosArena) {
     setArenaAtual((arenaAnterior) => ({
