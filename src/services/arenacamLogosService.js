@@ -55,6 +55,50 @@ export async function listarLogosArena(arenaId) {
   return Promise.all((data || []).map(anexarUrlPreview));
 }
 
+export async function listarBrandingAtivoArena(arenaId) {
+  if (!arenaId) return [];
+
+  const { data, error } = await supabase
+    .from("arenacam_logos")
+    .select("id,arena_id,tipo,nome,storage_path,ativo,posicao,ordem,created_at")
+    .eq("arena_id", arenaId)
+    .eq("ativo", true)
+    .order("tipo", { ascending: true })
+    .order("ordem", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error(
+      `Não foi possível carregar o branding do ArenaCam. ${error.message || ""}`
+    );
+  }
+
+  const branding = await Promise.all(
+    (data || []).map(async (logo) => {
+      if (!logo.storage_path?.startsWith(`${arenaId}/`)) return null;
+
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from(ARENACAM_LOGOS_BUCKET)
+        .createSignedUrl(logo.storage_path, URL_ASSINADA_SEGUNDOS);
+
+      if (signedError || !signedData?.signedUrl) {
+        console.warn("ArenaCam branding: URL assinada indisponível.", signedError);
+        return null;
+      }
+
+      return {
+        id: logo.id,
+        tipo: logo.tipo,
+        nome: logo.nome,
+        posicao: logo.posicao,
+        image_url: signedData.signedUrl,
+      };
+    })
+  );
+
+  return branding.filter(Boolean);
+}
+
 export async function criarLogoArena({ arenaId, tipo, nome, posicao, arquivo, ordem = 0 }) {
   validarTipoLogo(tipo);
   validarPosicaoLogo(posicao);

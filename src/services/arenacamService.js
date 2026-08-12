@@ -1,4 +1,5 @@
 import { supabase } from "../supabase";
+import { listarBrandingAtivoArena } from "./arenacamLogosService";
 
 const ARENACAM_REQUEST_TIMEOUT_MS = 10000;
 const ARENACAM_LANCE_SELECT =
@@ -213,25 +214,34 @@ export async function gerarLance(cameraId, arenaId) {
   }
 
   const apiUrl = obterArenaCamApiUrl();
+  const branding = await obterBrandingSeguro(arenaId);
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => {
     controller.abort();
   }, ARENACAM_REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${apiUrl}/api/lances`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        camera_id: cameraId,
-        arena_id: arenaId,
-      }),
-      signal: controller.signal,
-    });
+    const payloadBase = {
+      camera_id: cameraId,
+      arena_id: arenaId,
+    };
+    const payloadLance = { ...payloadBase };
 
-    const payload = await lerRespostaJson(response);
+    if (branding.length) {
+      payloadLance.branding = branding;
+    }
+
+    let response = await enviarPedidoLance(apiUrl, payloadLance, controller.signal);
+    let payload = await lerRespostaJson(response);
+
+    if (!response.ok && branding.length) {
+      console.warn(
+        "ArenaCam branding recusado pela API; tentando gerar lance sem logos.",
+        payload
+      );
+      response = await enviarPedidoLance(apiUrl, payloadBase, controller.signal);
+      payload = await lerRespostaJson(response);
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -261,6 +271,26 @@ export async function gerarLance(cameraId, arenaId) {
     throw error;
   } finally {
     window.clearTimeout(timeoutId);
+  }
+}
+
+function enviarPedidoLance(apiUrl, payload, signal) {
+  return fetch(`${apiUrl}/api/lances`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    signal,
+  });
+}
+
+async function obterBrandingSeguro(arenaId) {
+  try {
+    return await listarBrandingAtivoArena(arenaId);
+  } catch (error) {
+    console.warn("ArenaCam branding indisponivel; gerando lance sem logos.", error);
+    return [];
   }
 }
 
