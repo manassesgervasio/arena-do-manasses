@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { carregarMarcaLancesConfig } from "../../services/sistemaConfigService";
+import ArenaCamBrandOverlay from "./ArenaCamBrandOverlay";
 
 const UM_DIA_MS = 24 * 60 * 60 * 1000;
 
@@ -8,12 +10,41 @@ export default function LancesRecentes({
   erro = "",
   onExcluirLance,
 }) {
+  const [videoAberto, setVideoAberto] = useState(null);
+  const [marcaLancesUrl, setMarcaLancesUrl] = useState("");
   const diasCalendario = useMemo(() => montarDiasCalendario(lances), [lances]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarMarcaGlobal() {
+      try {
+        const config = await carregarMarcaLancesConfig();
+
+        if (!ativo) return;
+
+        setMarcaLancesUrl(
+          config.logoLancesAtiva && config.logoLancesUrl
+            ? config.logoLancesUrl
+            : ""
+        );
+      } catch (error) {
+        console.warn("Marca global dos lances indisponivel.", error);
+        if (ativo) setMarcaLancesUrl("");
+      }
+    }
+
+    carregarMarcaGlobal();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   function abrirVideo(videoUrl) {
     if (!videoUrl) return;
 
-    window.location.href = videoUrl;
+    setVideoAberto(videoUrl);
   }
 
   return (
@@ -35,15 +66,40 @@ export default function LancesRecentes({
               dia={dia}
               onAbrirVideo={abrirVideo}
               onExcluirLance={onExcluirLance}
+              marcaLancesUrl={marcaLancesUrl}
             />
           ))}
+        </div>
+      )}
+
+      {videoAberto && (
+        <div className="arenacam-player-layer" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="arenacam-player-backdrop"
+            aria-label="Fechar replay"
+            onClick={() => setVideoAberto(null)}
+          />
+          <div className="arenacam-player-modal">
+            <button
+              type="button"
+              className="arenacam-player-close"
+              onClick={() => setVideoAberto(null)}
+            >
+              Fechar
+            </button>
+            <div className="arenacam-player-frame">
+              <video src={videoAberto} controls autoPlay playsInline />
+              <ArenaCamBrandOverlay logoUrl={marcaLancesUrl} />
+            </div>
+          </div>
         </div>
       )}
     </section>
   );
 }
 
-function DiaLances({ dia, onAbrirVideo, onExcluirLance }) {
+function DiaLances({ dia, onAbrirVideo, onExcluirLance, marcaLancesUrl }) {
   return (
     <article
       className={`arenacam-day-group ${
@@ -72,6 +128,7 @@ function DiaLances({ dia, onAbrirVideo, onExcluirLance }) {
               lance={lance}
               onAbrirVideo={onAbrirVideo}
               onExcluirLance={onExcluirLance}
+              marcaLancesUrl={marcaLancesUrl}
             />
           ))}
         </div>
@@ -80,7 +137,7 @@ function DiaLances({ dia, onAbrirVideo, onExcluirLance }) {
   );
 }
 
-function LanceCard({ lance, onAbrirVideo, onExcluirLance }) {
+function LanceCard({ lance, onAbrirVideo, onExcluirLance, marcaLancesUrl }) {
   const temVideo = Boolean(lance.video_url);
   const podeExcluir = typeof onExcluirLance === "function";
 
@@ -116,6 +173,7 @@ function LanceCard({ lance, onAbrirVideo, onExcluirLance }) {
             playsInline
           />
         ) : null}
+        <ArenaCamBrandOverlay logoUrl={marcaLancesUrl} />
         <span className="arenacam-replay-play" aria-hidden="true">
           ▶
         </span>

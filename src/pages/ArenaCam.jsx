@@ -7,6 +7,7 @@ import {
   gerarLance,
   listarLancesDisponiveis,
 } from "../services/arenacamService";
+import { carregarMarcaLancesConfig } from "../services/sistemaConfigService";
 
 const CAMERAS = [
   {
@@ -30,6 +31,7 @@ export default function ArenaCam({ contextoArena }) {
   const [lances, setLances] = useState([]);
   const [carregandoLances, setCarregandoLances] = useState(false);
   const [erroLances, setErroLances] = useState("");
+  const [marcaLancesUrl, setMarcaLancesUrl] = useState("");
   const lancesDisponiveis = useMemo(
     () => filtrarLancesDisponiveis(lances),
     [lances]
@@ -80,6 +82,33 @@ export default function ArenaCam({ contextoArena }) {
       ativo = false;
     };
   }, [arenaId]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarMarcaLances() {
+      try {
+        const config = await carregarMarcaLancesConfig();
+
+        if (!ativo) return;
+
+        setMarcaLancesUrl(
+          config.logoLancesAtiva && config.logoLancesUrl
+            ? config.logoLancesUrl
+            : ""
+        );
+      } catch (error) {
+        console.warn("Marca global dos lances indisponivel.", error);
+        if (ativo) setMarcaLancesUrl("");
+      }
+    }
+
+    carregarMarcaLances();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   async function salvarLance(cameraId) {
     const camera = camerasPorId[cameraId];
@@ -165,6 +194,7 @@ export default function ArenaCam({ contextoArena }) {
             isProcessing={cameraProcessando === camera.id}
             feedback={feedbackPorCamera[camera.id]}
             liveUrl={camera.liveUrl}
+            marcaLancesUrl={marcaLancesUrl}
             onSalvarLance={salvarLance}
           />
         ))}

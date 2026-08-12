@@ -1,8 +1,11 @@
+import ArenaCamBrandOverlay from "./ArenaCamBrandOverlay";
+
 export default function CameraCard({
   camera,
   isProcessing = false,
   feedback,
   liveUrl,
+  marcaLancesUrl = "",
   onSalvarLance,
 }) {
   const statusClass = camera.status === "Online" ? "is-online" : "is-offline";
@@ -34,6 +37,7 @@ export default function CameraCard({
             <strong>Preview</strong>
           </div>
         )}
+        <ArenaCamBrandOverlay logoUrl={marcaLancesUrl} />
       </div>
 
       <button

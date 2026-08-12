@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
+import {
+  carregarMarcaLancesConfig,
+  salvarMarcaLancesConfig,
+} from "../services/sistemaConfigService";
 import { criarUsuarioAuth } from "../utils/criarUsuarioAuth";
 import { Button, EmptyState, Input, LoadingState, Select, Textarea } from "./ui";
 
@@ -100,6 +104,11 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
   const [whatsappEdicao, setWhatsappEdicao] = useState("");
   const [salvandoWhatsapp, setSalvandoWhatsapp] = useState(false);
   const [erroWhatsapp, setErroWhatsapp] = useState("");
+  const [marcaLancesUrl, setMarcaLancesUrl] = useState("");
+  const [marcaLancesAtiva, setMarcaLancesAtiva] = useState(false);
+  const [carregandoMarcaLances, setCarregandoMarcaLances] = useState(false);
+  const [salvandoMarcaLances, setSalvandoMarcaLances] = useState(false);
+  const [erroMarcaLances, setErroMarcaLances] = useState("");
 
   async function carregarArenas() {
     setCarregando(true);
@@ -146,7 +155,67 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
 
   useEffect(() => {
     carregarArenas();
+    if (podeCadastrarArena) carregarMarcaLances();
   }, []);
+
+  async function carregarMarcaLances() {
+    setCarregandoMarcaLances(true);
+    setErroMarcaLances("");
+
+    try {
+      const config = await carregarMarcaLancesConfig();
+
+      setMarcaLancesUrl(config.logoLancesUrl);
+      setMarcaLancesAtiva(config.logoLancesAtiva);
+    } catch (error) {
+      setErroMarcaLances(
+        error?.message || "Nao foi possivel carregar a marca dos lances."
+      );
+    } finally {
+      setCarregandoMarcaLances(false);
+    }
+  }
+
+  async function salvarMarcaLances(event) {
+    event.preventDefault();
+
+    if (!podeCadastrarArena) {
+      setErroMarcaLances("Apenas super_admin pode alterar a marca dos lances.");
+      return;
+    }
+
+    const url = marcaLancesUrl.trim();
+
+    if (url) {
+      try {
+        new URL(url);
+      } catch {
+        setErroMarcaLances("Informe uma URL valida para a logo.");
+        return;
+      }
+    }
+
+    setSalvandoMarcaLances(true);
+    setErroMarcaLances("");
+    setMensagem("");
+
+    try {
+      const config = await salvarMarcaLancesConfig({
+        logoLancesUrl: url,
+        logoLancesAtiva: marcaLancesAtiva,
+      });
+
+      setMarcaLancesUrl(config.logoLancesUrl);
+      setMarcaLancesAtiva(config.logoLancesAtiva);
+      setMensagem("Marca dos lances ArenaCam atualizada com sucesso.");
+    } catch (error) {
+      setErroMarcaLances(
+        error?.message || "Nao foi possivel salvar a marca dos lances."
+      );
+    } finally {
+      setSalvandoMarcaLances(false);
+    }
+  }
 
   function atualizarFormulario(campo, valor) {
     setFormulario((anterior) => {
@@ -748,6 +817,59 @@ export default function PainelCentralSaaS({ contextoArena, onVoltar }) {
             Cadastrar nova arena
           </Button>
         </div>
+      )}
+
+      {podeCadastrarArena && (
+        <form className="painel-saas-brand-card" onSubmit={salvarMarcaLances}>
+          <div className="painel-saas-brand-copy">
+            <span>ArenaCam</span>
+            <h3>Marca dos lances ArenaCam</h3>
+            <p>
+              Logo global exibida sobre todos os lances, em todas as arenas e
+              replays publicos.
+            </p>
+          </div>
+
+          <div className="painel-saas-brand-preview">
+            {marcaLancesUrl ? (
+              <img src={marcaLancesUrl} alt="Marca dos lances ArenaCam" />
+            ) : (
+              <span>Sem logo configurada</span>
+            )}
+          </div>
+
+          <label>
+            <span>URL da logo</span>
+            <Input
+              type="url"
+              value={marcaLancesUrl}
+              onChange={(event) => setMarcaLancesUrl(event.target.value)}
+              placeholder="https://..."
+              disabled={carregandoMarcaLances || salvandoMarcaLances}
+            />
+          </label>
+
+          <label className="painel-saas-brand-toggle">
+            <input
+              type="checkbox"
+              checked={marcaLancesAtiva}
+              disabled={carregandoMarcaLances || salvandoMarcaLances}
+              onChange={(event) => setMarcaLancesAtiva(event.target.checked)}
+            />
+            <span>Exibir marca nos lances</span>
+          </label>
+
+          {erroMarcaLances && (
+            <div className="painel-saas-error">{erroMarcaLances}</div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={carregandoMarcaLances || salvandoMarcaLances}
+          >
+            {salvandoMarcaLances ? "Salvando..." : "Salvar marca"}
+          </Button>
+        </form>
       )}
 
       {mensagem && <div className="painel-saas-confirmation">{mensagem}</div>}

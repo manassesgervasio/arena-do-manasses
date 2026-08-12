@@ -1808,7 +1808,8 @@ code {
 }
 
 .painel-saas-toolbar button,
-.painel-saas-form > button {
+.painel-saas-form > button,
+.painel-saas-brand-card > button {
   min-height: 42px;
   padding: 10px 14px;
   border: none;
@@ -1823,6 +1824,105 @@ code {
 .painel-saas-form > button:disabled {
   cursor: wait;
   opacity: 0.72;
+}
+
+.painel-saas-brand-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(120px, 180px) minmax(220px, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: #111827;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.painel-saas-brand-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.painel-saas-brand-copy > span,
+.painel-saas-brand-card label > span {
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.painel-saas-brand-copy h3 {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+  line-height: 23px;
+  font-weight: 950;
+}
+
+.painel-saas-brand-copy p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 750;
+}
+
+.painel-saas-brand-preview {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px dashed rgba(196, 181, 253, 0.36);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.68);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.painel-saas-brand-preview img {
+  max-width: 100%;
+  max-height: 56px;
+  object-fit: contain;
+}
+
+.painel-saas-brand-card label {
+  display: grid;
+  gap: 7px;
+}
+
+.painel-saas-brand-card input[type="url"] {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: white;
+  color: #0f172a;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.painel-saas-brand-toggle {
+  display: inline-flex !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px !important;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.painel-saas-brand-toggle input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #22c55e;
+}
+
+.painel-saas-brand-card .painel-saas-error {
+  grid-column: 1 / -1;
 }
 
 .painel-saas-form {
@@ -3188,8 +3288,18 @@ code {
   }
 
   .painel-saas-toolbar button,
-  .painel-saas-form > button {
+  .painel-saas-form > button,
+  .painel-saas-brand-card > button {
     width: 100%;
+  }
+
+  .painel-saas-brand-card {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .painel-saas-brand-toggle {
+    white-space: normal;
   }
 
   .painel-saas-form {
@@ -4843,6 +4953,7 @@ code {
 }
 
 .arenacam-preview {
+  position: relative;
   aspect-ratio: 16 / 9;
   min-height: 190px;
   overflow: hidden;
@@ -5093,6 +5204,25 @@ code {
   opacity: 0.72;
 }
 
+.arenacam-brand-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  z-index: 2;
+  width: min(28%, 128px);
+  max-height: 18%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.arenacam-brand-overlay img {
+  display: block;
+  width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.34));
+}
+
 .arenacam-replay-play {
   display: inline-flex;
   align-items: center;
@@ -5106,7 +5236,7 @@ code {
   line-height: 1;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .arenacam-replay-content {
@@ -5177,6 +5307,59 @@ code {
   border-color: rgba(148, 163, 184, 0.2);
   background: #ffffff;
   color: #64748b;
+}
+
+.arenacam-player-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 21000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.arenacam-player-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.74);
+  cursor: pointer;
+}
+
+.arenacam-player-modal {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  width: min(960px, 100%);
+}
+
+.arenacam-player-close {
+  justify-self: end;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.arenacam-player-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #020617;
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.34);
+}
+
+.arenacam-player-frame video {
+  display: block;
+  width: 100%;
+  max-height: min(78vh, 720px);
+  background: #020617;
 }
 
 .arenacam-table-wrap {
@@ -5316,6 +5499,24 @@ code {
   }
 
   .arenacam-replay-card {
+    border-radius: 12px;
+  }
+
+  .arenacam-brand-overlay {
+    bottom: 7px;
+    width: min(34%, 92px);
+    max-height: 16%;
+  }
+
+  .arenacam-player-layer {
+    padding: 10px;
+  }
+
+  .arenacam-player-modal {
+    gap: 8px;
+  }
+
+  .arenacam-player-frame {
     border-radius: 12px;
   }
 
