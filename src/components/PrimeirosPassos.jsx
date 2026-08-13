@@ -155,7 +155,7 @@ export default function PrimeirosPassos({ contextoArena, refreshKey }) {
       {completo ? (
         <div className="primeiros-passos-success">
           <strong>{"\u{1F389} ArenaBase configurada com sucesso!"}</strong>
-          <p>Sua arena est\u00e1 pronta para receber reservas.</p>
+          <p>Sua arena está pronta para receber reservas.</p>
         </div>
       ) : (
         <div className="primeiros-passos-list">
