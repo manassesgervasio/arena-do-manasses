@@ -1,14 +1,11 @@
 ﻿import { useEffect, useState } from "react";
 import AgendaGrid from "../components/AgendaGrid";
 import AppHeader from "../components/AppHeader";
-import ClientesSection from "../components/ClientesSection";
 import ConfiguracoesArena from "../components/ConfiguracoesArena";
-import FinanceiroProfissional from "../components/FinanceiroProfissional";
-import MensalistasSection from "../components/MensalistasSection";
+import FinanceiroCentral from "../components/FinanceiroCentral";
 import MobileNavigation from "../components/MobileNavigation";
 import PainelCentralSaaS from "../components/PainelCentralSaaS";
 import PrimeirosPassos from "../components/PrimeirosPassos";
-import ResumoCards from "../components/ResumoCards";
 import UsuariosArena from "../components/UsuariosArena";
 import WeekControls from "../components/WeekControls";
 import ArenaCam from "./ArenaCam";
@@ -74,8 +71,6 @@ export default function Home({
   const [activeMobileTab, setActiveMobileTab] = useState(() =>
     obterTabPorPathname(pathname)
   );
-  const [mostrarFinanceiroProfissional, setMostrarFinanceiroProfissional] =
-    useState(false);
   const [mostrarPainelSaaS, setMostrarPainelSaaS] = useState(false);
   const [mostrarUsuariosArena, setMostrarUsuariosArena] = useState(false);
   const [mostrarConfiguracoesArena, setMostrarConfiguracoesArena] =
@@ -95,11 +90,13 @@ export default function Home({
     configuracoes: canAccessConfiguracoesArena(usuarioAtual, perfilAtual),
   };
   const mobileNavigationItems = navigationItems.filter((item) => {
-    if (item.id === "clientes") return permissoesArena.clientes;
-    if (item.id === "financeiro" || item.id === "financeiro-profissional") {
-      return permissoesArena.financeiro;
+    if (item.id === "financeiro") {
+      return (
+        permissoesArena.financeiro ||
+        permissoesArena.mensalistas ||
+        permissoesArena.clientes
+      );
     }
-    if (item.id === "mensalistas") return permissoesArena.mensalistas;
     return true;
   });
   const menuExtraItems = [
@@ -247,64 +244,32 @@ export default function Home({
     );
   }
 
-  function renderClientes() {
-    if (!permissoesArena.clientes) return <AccessDenied />;
+  function renderFinanceiro() {
+    if (
+      !permissoesArena.financeiro &&
+      !permissoesArena.mensalistas &&
+      !permissoesArena.clientes
+    ) {
+      return <AccessDenied />;
+    }
 
     return (
-      <ClientesSection
+      <FinanceiroCentral
+        contextoArena={contextoArena}
+        mesFiltro={mesFiltro}
+        abaInicial={obterAbaFinanceiroPorPathname(pathname)}
+        permissoesArena={permissoesArena}
+        moeda={moeda}
         clientes={clientes}
         clientesFiltrados={clientesFiltrados}
         buscaCliente={buscaCliente}
         filtroCliente={filtroCliente}
-        moeda={moeda}
-        formatarDataBR={formatarDataBR}
         clienteSelecionado={clienteSelecionado}
+        formatarDataBR={formatarDataBR}
         onBuscaClienteChange={(e) => setBuscaCliente(e.target.value)}
-        onFiltroClienteChange={(e) =>
-          setFiltroCliente(e.target.value)
-        }
-        onClienteSelect={(cliente) =>
-          setClienteSelecionado(cliente)
-        }
+        onFiltroClienteChange={(e) => setFiltroCliente(e.target.value)}
+        onClienteSelect={(cliente) => setClienteSelecionado(cliente)}
         onClienteModalClose={() => setClienteSelecionado(null)}
-      />
-    );
-  }
-
-  function renderFinanceiro() {
-    if (!permissoesArena.financeiro) return <AccessDenied />;
-
-    return (
-      <section className="financeiro-mobile-section">
-        <div className="financeiro-mobile-header">
-          <h2>Financeiro</h2>
-          <p>Resumo geral e mensal</p>
-        </div>
-
-        <ResumoCards resumo={resumo} moeda={moeda} />
-
-      </section>
-    );
-  }
-
-  function renderFinanceiroProfissional() {
-    if (!permissoesArena.financeiro) return <AccessDenied />;
-
-    return (
-      <FinanceiroProfissional
-        contextoArena={contextoArena}
-        mesInicial={mesFiltro}
-      />
-    );
-  }
-
-  function renderMensalistas() {
-    if (!permissoesArena.mensalistas) return <AccessDenied />;
-
-    return (
-      <MensalistasSection
-        moeda={moeda}
-        contextoArena={contextoArena}
         onMensalistasChange={onMensalistasChange}
       />
     );
@@ -344,20 +309,8 @@ export default function Home({
       );
     }
 
-    if (activeMobileTab === "clientes") {
-      return renderClientes();
-    }
-
     if (activeMobileTab === "financeiro") {
       return renderFinanceiro();
-    }
-
-    if (activeMobileTab === "financeiro-profissional") {
-      return renderFinanceiroProfissional();
-    }
-
-    if (activeMobileTab === "mensalistas") {
-      return renderMensalistas();
     }
 
     if (activeMobileTab === "arenacam") {
@@ -410,12 +363,7 @@ export default function Home({
       );
     }
 
-    if (activeMobileTab === "clientes") return renderClientes();
     if (activeMobileTab === "financeiro") return renderFinanceiro();
-    if (activeMobileTab === "financeiro-profissional") {
-      return renderFinanceiroProfissional();
-    }
-    if (activeMobileTab === "mensalistas") return renderMensalistas();
     if (activeMobileTab === "arenacam") {
       return <ArenaCam contextoArena={contextoArena} />;
     }
@@ -474,7 +422,6 @@ export default function Home({
           setMostrarPainelSaaS(false);
           setMostrarUsuariosArena(false);
           setMostrarConfiguracoesArena(false);
-          setMostrarFinanceiroProfissional(false);
           setActiveMobileTab("agenda");
           onIrParaReserva?.(reserva);
         }}
@@ -522,7 +469,27 @@ function AccessDenied() {
 }
 
 function obterTabPorPathname(pathname) {
+  const rotaFinanceiroAntiga = obterAbaFinanceiroPorPathname(pathname);
+
+  if (rotaFinanceiroAntiga) return "financeiro";
+
   const item = navigationItems.find((navItem) => navItem.path === pathname);
 
   return item?.id || "agenda";
+}
+
+function obterAbaFinanceiroPorPathname(pathname) {
+  const caminho = String(pathname || "");
+
+  if (caminho === "/clientes") return "clientes";
+  if (caminho === "/mensalistas") return "mensalistas";
+  if (caminho === "/financeiro-profissional") return "visao-geral";
+  if (caminho === "/financeiro") return "visao-geral";
+  if (caminho === "/financeiro/receitas") return "receitas";
+  if (caminho === "/financeiro/despesas") return "despesas";
+  if (caminho === "/financeiro/mensalistas") return "mensalistas";
+  if (caminho === "/financeiro/clientes") return "clientes";
+  if (caminho === "/financeiro/lancamentos") return "lancamentos";
+
+  return "";
 }

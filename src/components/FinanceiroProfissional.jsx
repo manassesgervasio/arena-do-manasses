@@ -65,6 +65,7 @@ function obterPeriodoMes(mesAno) {
 export default function FinanceiroProfissional({
   contextoArena,
   mesInicial = obterMesAtual(),
+  modo = "visao-geral",
 }) {
   const arenaAtualId = contextoArena?.arenaAtual?.id;
   const usuarioAtual = contextoArena?.usuarioAtual;
@@ -750,13 +751,31 @@ export default function FinanceiroProfissional({
     },
   ];
   const mesAnoLabel = formatarMesAnoLabel(mesAno);
+  const modoLancamentos = modo === "lancamentos";
+  const modoReceitas = modo === "receitas";
+  const modoDespesas = modo === "despesas";
+  const tituloFormulario = modoDespesas
+    ? "Nova despesa"
+    : modoReceitas
+      ? "Nova receita"
+      : "Novo lançamento";
+  const tituloTabela = modoDespesas
+    ? "Histórico de despesas"
+    : modoReceitas
+      ? "Histórico de receitas"
+      : "Histórico de lançamentos";
+  const lancamentosVisiveis = totais.lancamentosDoMes.filter((lancamento) => {
+    if (modoReceitas) return lancamento.tipo === "entrada";
+    if (modoDespesas) return lancamento.tipo === "despesa";
+    return true;
+  });
 
   return (
     <section className="financeiro-profissional">
       <div className="financeiro-profissional-header">
         <div className="financeiro-profissional-heading">
-          <h2>Financeiro Profissional</h2>
-          <p>Controle financeiro da arena</p>
+          <h2>Financeiro</h2>
+          <p>Controle financeiro completo da sua arena</p>
         </div>
 
         <label className="financeiro-profissional-filter">
@@ -803,6 +822,13 @@ export default function FinanceiroProfissional({
         </div>
       </Card>
 
+      {!modoLancamentos && !modoReceitas && !modoDespesas && (
+        <div className="financeiro-profissional-overview-note">
+          <strong>Resumo do mês</strong>
+          <span>Reservas pagas, entradas manuais, despesas e saldo do período.</span>
+        </div>
+      )}
+
       <div className="financeiro-profissional-layout">
         <Card
           as="form"
@@ -810,7 +836,7 @@ export default function FinanceiroProfissional({
           onSubmit={salvarLancamento}
         >
           <div className="financeiro-profissional-card-header">
-            <h3>Lançamentos manuais</h3>
+            <h3>{tituloFormulario}</h3>
             {lancamentoEditandoId && (
               <Button type="button" onClick={limparFormulario}>
                 Cancelar edição
@@ -1026,8 +1052,8 @@ export default function FinanceiroProfissional({
 
       <Card className="financeiro-profissional-card">
         <div className="financeiro-profissional-card-header">
-          <h3>Tabela de lançamentos</h3>
-          <span>{totais.lancamentosDoMes.length} no mês</span>
+          <h3>{tituloTabela}</h3>
+          <span>{lancamentosVisiveis.length} no mês</span>
         </div>
 
         {lancamentosCarregando && (
@@ -1055,7 +1081,7 @@ export default function FinanceiroProfissional({
             </thead>
             <tbody>
               {!lancamentosCarregando &&
-                totais.lancamentosDoMes.map((lancamento) => (
+                lancamentosVisiveis.map((lancamento) => (
                   <tr key={lancamento.id}>
                     <td>{formatarData(lancamento.data_lancamento)}</td>
                     <td>
@@ -1108,7 +1134,7 @@ export default function FinanceiroProfissional({
                   </tr>
                 ))}
 
-              {!lancamentosCarregando && totais.lancamentosDoMes.length === 0 && (
+              {!lancamentosCarregando && lancamentosVisiveis.length === 0 && (
                 <tr>
                   <td colSpan="7" className="financeiro-profissional-empty">
                     Nenhum lançamento manual neste mês.

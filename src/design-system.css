@@ -4734,6 +4734,108 @@ textarea:disabled {
   display: none;
 }
 
+.financeiro-central {
+  width: min(100%, 1180px);
+  max-width: calc(100vw - 32px);
+  margin: 22px auto 0;
+  display: grid;
+  gap: 16px;
+}
+
+.financeiro-central-tabs {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  overflow-x: auto;
+  padding: 6px;
+  border: 1px solid rgba(167, 139, 250, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 12px 32px rgba(36, 16, 111, 0.06);
+  scrollbar-width: none;
+}
+
+.financeiro-central-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.financeiro-central-tabs button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ds-text-muted);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.financeiro-central-tabs button.is-active {
+  background: var(--ds-primary-gradient);
+  color: #ffffff;
+  box-shadow: 0 12px 26px rgba(91, 33, 182, 0.16);
+}
+
+.financeiro-central-content > .financeiro-profissional,
+.financeiro-central-content > .mensalistas-section,
+.financeiro-central-content > .clientes-section {
+  margin-top: 0 !important;
+}
+
+.financeiro-profissional-overview-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(167, 139, 250, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 30px rgba(36, 16, 111, 0.06);
+}
+
+.financeiro-profissional-overview-note strong {
+  color: var(--ds-text);
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 950;
+}
+
+.financeiro-profissional-overview-note span {
+  color: var(--ds-text-muted);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 750;
+}
+
+@media (max-width: 767px) {
+  .financeiro-central {
+    max-width: calc(100vw - 20px);
+    margin-top: 14px;
+    gap: 12px;
+  }
+
+  .financeiro-central-tabs {
+    margin: 0;
+    padding: 5px;
+    border-radius: 18px;
+  }
+
+  .financeiro-central-tabs button {
+    min-height: 34px;
+    padding: 0 13px;
+    font-size: 12px;
+  }
+
+  .financeiro-profissional-overview-note {
+    display: grid;
+    padding: 12px;
+  }
+}
+
 @media (max-width: 767px) {
   .notifications-layer:has(.payments-panel) {
     background: transparent !important;

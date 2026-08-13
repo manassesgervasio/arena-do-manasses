@@ -99,6 +99,14 @@ export default function App() {
 }, [sessaoAuth, rotaLogin]);
 
   useEffect(() => {
+  const destinoCompatibilidade = obterRedirectRotaLegada(pathname);
+
+  if (destinoCompatibilidade) {
+    navegarPara(destinoCompatibilidade, setPathname, { replace: true });
+  }
+}, [pathname]);
+
+  useEffect(() => {
   if (temRotaPublicaSlug && contextoArena.arenaAtual?.nome) {
     document.title = `Horários disponíveis - ${contextoArena.arenaAtual.nome} | ArenaBase`;
   }
@@ -1537,13 +1545,24 @@ function irParaBuscaArenas(setPathname) {
   setPathname("/arenas");
 }
 
-function navegarPara(path, setPathname) {
+function navegarPara(path, setPathname, opcoes = {}) {
   const destino = normalizarPathname(path || "/");
 
   if (normalizarPathname(window.location.pathname) === destino) return;
 
-  window.history.pushState({}, "", destino);
+  const metodoHistorico = opcoes.replace ? "replaceState" : "pushState";
+  window.history[metodoHistorico]({}, "", destino);
   setPathname(destino);
+}
+
+function obterRedirectRotaLegada(pathname) {
+  const caminho = normalizarPathname(pathname);
+
+  if (caminho === "/clientes") return "/financeiro/clientes";
+  if (caminho === "/mensalistas") return "/financeiro/mensalistas";
+  if (caminho === "/financeiro-profissional") return "/financeiro";
+
+  return "";
 }
 
 function PaginaPublicaCarregando() {
