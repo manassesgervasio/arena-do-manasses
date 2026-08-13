@@ -4486,6 +4486,292 @@ textarea:disabled {
   }
 }
 
+/* Compact payment pendencies modal. Scoped to avoid changing the notification drawer. */
+.payments-panel {
+  box-sizing: border-box !important;
+  position: fixed !important;
+  top: 74px !important;
+  right: auto !important;
+  left: 50% !important;
+  width: min(430px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: min(560px, calc(100dvh - 96px)) !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  overflow-x: hidden !important;
+  transform: translateX(-50%) !important;
+  border: 1px solid rgba(167, 139, 250, 0.12) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%) !important;
+  box-shadow: 0 30px 90px rgba(36, 16, 111, 0.18) !important;
+}
+
+.payments-panel .payments-header {
+  min-width: 0;
+  gap: 12px !important;
+  padding-bottom: 2px;
+  border-bottom: 0;
+}
+
+.payments-panel .payments-header-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.payments-panel .payments-header-title > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.payments-panel .payments-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ds-secondary);
+  color: var(--ds-primary-700);
+  font-size: 13px;
+  font-weight: 950;
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.1);
+}
+
+.payments-panel .payments-header strong {
+  display: block;
+  min-width: 0;
+  color: var(--ds-text) !important;
+  font-size: 16px !important;
+  line-height: 19px !important;
+  font-weight: 950 !important;
+}
+
+.payments-panel .payments-header-count {
+  color: var(--ds-text-soft);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 800;
+}
+
+.payments-panel .payments-close-button {
+  flex: 0 0 auto;
+  min-height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  border-color: transparent !important;
+  background: rgba(237, 233, 254, 0.72) !important;
+  color: var(--ds-primary-700) !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+.payments-panel .payments-close-button:hover:not(:disabled) {
+  border-color: transparent !important;
+  background: rgba(221, 214, 254, 0.86) !important;
+  box-shadow: none !important;
+}
+
+.payments-panel .notifications-list {
+  gap: 10px !important;
+}
+
+.payments-panel .payments-item {
+  gap: 10px !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+  border-color: rgba(167, 139, 250, 0.08) !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 14px 34px rgba(36, 16, 111, 0.08) !important;
+}
+
+.payments-panel .payments-item-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.payments-panel .payments-item-identity {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.payments-panel .payments-item-identity strong {
+  overflow: hidden;
+  color: #1e123d !important;
+  font-size: 14.5px !important;
+  line-height: 18px !important;
+  font-weight: 950 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.payments-panel .payments-item-identity span {
+  overflow: hidden;
+  color: var(--ds-text-muted) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 750 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.payments-panel .payments-item-summary {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  min-width: 86px;
+}
+
+.payments-panel .payments-item-value {
+  color: var(--ds-primary-900) !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+}
+
+.payments-panel .payments-status-badge {
+  min-height: 22px !important;
+  padding: 3px 9px !important;
+  border: 0;
+  background: rgba(237, 233, 254, 0.82) !important;
+  color: var(--ds-primary-700) !important;
+  font-size: 10.5px !important;
+  line-height: 14px !important;
+  font-weight: 900 !important;
+  text-transform: none;
+}
+
+.payments-panel .notification-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 7px !important;
+  margin-top: 2px !important;
+}
+
+.payments-panel .notification-actions .ds-button,
+.payments-panel .notification-actions a,
+.payments-panel .notification-actions button {
+  min-width: 0 !important;
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border-color: transparent !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  line-height: 14px !important;
+  white-space: normal !important;
+  text-align: center !important;
+  box-shadow: 0 8px 20px rgba(36, 16, 111, 0.06) !important;
+}
+
+.payments-panel .payments-action-primary {
+  grid-column: 1 / -1;
+}
+
+.payments-panel .payments-action-primary.ds-button-primary {
+  min-height: 46px !important;
+  border-color: transparent !important;
+  background: var(--ds-primary-gradient) !important;
+  color: #ffffff !important;
+  font-weight: 850 !important;
+  box-shadow: 0 14px 30px rgba(91, 33, 182, 0.16) !important;
+}
+
+.payments-panel .payments-action-secondary {
+  background: rgba(237, 233, 254, 0.58) !important;
+  color: var(--ds-primary-900) !important;
+}
+
+.payments-panel .payments-action-secondary:hover:not(:disabled) {
+  background: rgba(221, 214, 254, 0.72) !important;
+  border-color: transparent !important;
+}
+
+@media (max-width: 767px) {
+  .payments-panel {
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 14px !important;
+    transform: none !important;
+    border-radius: 28px !important;
+  }
+
+  .payments-panel .payments-header {
+    margin: -2px 0 0 !important;
+    padding: 0 0 2px !important;
+  }
+
+  .payments-panel .payments-header-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .payments-panel .payments-header strong {
+    font-size: 15px !important;
+    line-height: 18px !important;
+  }
+
+  .payments-panel .payments-close-button {
+    min-width: 0 !important;
+    min-height: 30px !important;
+    padding: 0 10px !important;
+  }
+
+  .payments-panel .payments-item {
+    padding: 11px !important;
+    border-radius: 22px !important;
+  }
+
+  .payments-panel .payments-item-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .payments-panel .payments-item-summary {
+    min-width: 78px;
+  }
+
+  .payments-panel .notification-actions .ds-button,
+  .payments-panel .notification-actions a,
+  .payments-panel .notification-actions button {
+    min-height: 36px !important;
+    padding: 0 9px !important;
+  }
+
+  .payments-panel .payments-action-primary.ds-button-primary {
+    min-height: 46px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .payments-panel .payments-item-main {
+    grid-template-columns: 1fr;
+  }
+
+  .payments-panel .payments-item-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .payments-panel .payments-item-identity strong,
+  .payments-panel .payments-item-identity span {
+    white-space: normal;
+  }
+}
+
 /* Financeiro Profissional final overrides: legacy CSS above uses !important. */
 .home-page:has(section.financeiro-profissional) { background: #f8fafc !important; }
 section.financeiro-profissional {

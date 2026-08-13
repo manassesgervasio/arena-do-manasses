@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Drawer, EmptyState } from "./ui";
+import { Badge, Button, Drawer, EmptyState } from "./ui";
 
 export default function CentralPagamentos({
   pendencias = [],
@@ -18,7 +18,7 @@ export default function CentralPagamentos({
         className="notifications-button payments-button"
         onClick={() => setAberta((valor) => !valor)}
         aria-expanded={aberta}
-        aria-label="Abrir pendências de pagamento"
+        aria-label={`Abrir pend\u00eancias de pagamento`}
       >
         <span aria-hidden="true">$</span>
         {quantidade > 0 && (
@@ -34,37 +34,68 @@ export default function CentralPagamentos({
             type="button"
             className="notifications-backdrop"
             onClick={() => setAberta(false)}
-            aria-label="Fechar pendências de pagamento"
+            aria-label={`Fechar pend\u00eancias de pagamento`}
           />
 
           <Drawer className="notifications-panel payments-panel">
-            <div className="notifications-header">
-              <strong>Pendências de pagamento</strong>
-              <Button type="button" onClick={() => setAberta(false)}>
+            <div className="notifications-header payments-header">
+              <div className="payments-header-title">
+                <span className="payments-header-icon" aria-hidden="true">
+                  !
+                </span>
+                <div>
+                  <strong>Pend&ecirc;ncias de pagamento</strong>
+                  {quantidade > 0 && (
+                    <span className="payments-header-count">
+                      {quantidade} pend&ecirc;ncia{quantidade === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Button
+                type="button"
+                className="payments-close-button"
+                onClick={() => setAberta(false)}
+              >
                 Fechar
               </Button>
             </div>
 
             {quantidade === 0 ? (
               <EmptyState className="notifications-empty">
-                Nenhuma pendência de pagamento.
+                Nenhuma pend&ecirc;ncia de pagamento.
               </EmptyState>
             ) : (
               <div className="notifications-list">
                 {pendencias.map((reserva) => (
-                  <article className="notification-item" key={reserva.id}>
-                    <strong>{reserva.cliente || "Cliente sem nome"}</strong>
-                    <span>{formatarDataBR?.(reserva.data) || reserva.data}</span>
-                    <span>{reserva.horario}</span>
-                    <span>
-                      {moeda?.(Number(reserva.valor || 0)) ||
-                        `R$ ${reserva.valor || 0}`}
-                    </span>
-                    <small>Status atual: {reserva.status}</small>
+                  <article
+                    className="notification-item payments-item"
+                    key={reserva.id}
+                  >
+                    <div className="payments-item-main">
+                      <div className="payments-item-identity">
+                        <strong>{reserva.cliente || "Cliente sem nome"}</strong>
+                        <span>
+                          {formatarDataBR?.(reserva.data) || reserva.data}
+                          {" \u00b7 "}
+                          {reserva.horario}
+                        </span>
+                      </div>
+                      <div className="payments-item-summary">
+                        <span className="payments-item-value">
+                          {moeda?.(Number(reserva.valor || 0)) ||
+                            `R$ ${reserva.valor || 0}`}
+                        </span>
+                        <Badge className="payments-status-badge" tone="warning">
+                          {reserva.status}
+                        </Badge>
+                      </div>
+                    </div>
 
                     <div className="notification-actions">
                       <Button
                         type="button"
+                        className="payments-action-primary"
                         onClick={() => onMarcarPago?.(reserva)}
                         variant="primary"
                       >
@@ -73,6 +104,7 @@ export default function CentralPagamentos({
                       {reserva.telefone && (
                         <Button
                           as="a"
+                          className="payments-action-secondary"
                           href={criarLinkWhatsAppPagamento({
                             nome: reserva.cliente,
                             telefone: reserva.telefone,
@@ -90,12 +122,13 @@ export default function CentralPagamentos({
                       )}
                       <Button
                         type="button"
+                        className="payments-action-secondary"
                         onClick={() => {
                           onIrParaReserva?.(reserva);
                           setAberta(false);
                         }}
                       >
-                        Ir para horário
+                        Ir para hor&aacute;rio
                       </Button>
                     </div>
                   </article>
@@ -114,7 +147,7 @@ function criarLinkWhatsAppPagamento({ nome, telefone, data, horario, valor }) {
     `Ola, ${nome || "tudo bem"}. Identificamos que sua reserva ainda esta pendente de pagamento.`,
     "",
     `Data: ${data || ""}`,
-    `Horário: ${horario || ""}`,
+    `Hor\u00e1rio: ${horario || ""}`,
     `Valor: ${valor || "R$ 0"}`,
     "",
     "Pode nos enviar o comprovante por aqui?",
