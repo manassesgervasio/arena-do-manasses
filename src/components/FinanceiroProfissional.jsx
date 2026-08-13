@@ -62,6 +62,88 @@ function obterPeriodoMes(mesAno) {
   return { ano, mes, inicio, fim };
 }
 
+function adicionarMeses(mesAno, deslocamento) {
+  const { ano, mes } = separarMesAno(mesAno);
+  const data = new Date(ano, mes - 1 + deslocamento, 1);
+
+  return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function obterMesesEvolucao(mesAno, quantidade = 6) {
+  return Array.from({ length: quantidade }, (_, indice) =>
+    adicionarMeses(mesAno, indice - quantidade + 1)
+  );
+}
+
+function formatarMesCurto(mesAno) {
+  const { ano, mes } = separarMesAno(mesAno);
+  const mesLabel = new Intl.DateTimeFormat("pt-BR", {
+    month: "short",
+  })
+    .format(new Date(ano, mes - 1, 1))
+    .replace(".", "");
+
+  return `${mesLabel}/${String(ano).slice(-2)}`;
+}
+
+function obterChaveMes(dataTexto) {
+  return String(dataTexto || "").slice(0, 7);
+}
+
+function criarSerieEvolucaoZerada(meses) {
+  return meses.map((mesAno) => ({
+    mesAno,
+    label: formatarMesCurto(mesAno),
+    entradas: 0,
+    saidas: 0,
+    saldo: 0,
+  }));
+}
+
+function criarSerieEvolucao({ meses, reservas, mensalistas, lancamentos }) {
+  const porMes = criarSerieEvolucaoZerada(meses).reduce((mapa, item) => {
+    mapa[item.mesAno] = item;
+    return mapa;
+  }, {});
+
+  reservas.forEach((reserva) => {
+    const item = porMes[obterChaveMes(reserva.data)];
+    if (!item) return;
+
+    item.entradas += Number(reserva.valor || 0);
+  });
+
+  mensalistas.forEach((pagamento) => {
+    const item = porMes[obterChaveMes(pagamento.data_pagamento)];
+    if (!item) return;
+
+    item.entradas += Number(pagamento.valor || 0);
+  });
+
+  lancamentos.forEach((lancamento) => {
+    const item = porMes[obterChaveMes(lancamento.data_lancamento)];
+    if (!item) return;
+
+    if (lancamento.tipo === "despesa") {
+      item.saidas += Number(lancamento.valor || 0);
+      return;
+    }
+
+    if (lancamento.tipo === "entrada") {
+      item.entradas += Number(lancamento.valor || 0);
+    }
+  });
+
+  return meses.map((mesAno) => {
+    const item = porMes[mesAno];
+
+    return {
+      ...item,
+      saldo: item.entradas - item.saidas,
+    };
+  });
+}
+
 export default function FinanceiroProfissional({
   contextoArena,
   mesInicial = obterMesAtual(),
@@ -92,6 +174,9 @@ export default function FinanceiroProfissional({
     useState(0);
   const [resumoPeriodoCarregando, setResumoPeriodoCarregando] = useState(true);
   const [resumoPeriodoErro, setResumoPeriodoErro] = useState("");
+  const [evolucaoMensal, setEvolucaoMensal] = useState([]);
+  const [evolucaoCarregando, setEvolucaoCarregando] = useState(true);
+  const [evolucaoErro, setEvolucaoErro] = useState("");
   const [fechamentoMensal, setFechamentoMensal] = useState(null);
   const [fechamentoCarregando, setFechamentoCarregando] = useState(true);
   const [fechamentoSalvando, setFechamentoSalvando] = useState(false);
@@ -357,6 +442,86 @@ export default function FinanceiroProfissional({
     }
 
     carregarFechamentoMensal();
+
+    return () => {
+      ativo = false;
+    };
+  }, [arenaAtualId, carregandoContexto, erroContexto, mesAno]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarEvolucaoMensal() {
+      if (carregandoContexto) return;
+
+      const meses = obterMesesEvolucao(mesAno);
+
+      if (!arenaAtualId) {
+        setEvolucaoMensal(criarSerieEvolucaoZerada(meses));
+        setEvolucaoErro(erroContexto || "Não foi possível carregar o contexto da arena.");
+        setEvolucaoCarregando(false);
+        return;
+      }
+
+      const inicio = obterPeriodoMes(meses[0]).inicio;
+      const fim = obterPeriodoMes(adicionarMeses(mesAno, 1)).inicio;
+
+      setEvolucaoCarregando(true);
+      setEvolucaoErro("");
+
+      const [
+        { data: reservasData, error: reservasError },
+        { data: mensalistasData, error: mensalistasError },
+        { data: lancamentosData, error: lancamentosError },
+      ] = await Promise.all([
+        supabase
+          .from("reservas")
+          .select("id,data,valor,status")
+          .eq("status", "Pago")
+          .eq("arena_id", arenaAtualId)
+          .gte("data", inicio)
+          .lt("data", fim),
+        supabase
+          .from("mensalista_pagamentos")
+          .select("id,valor,situacao,data_pagamento")
+          .eq("situacao", "Pago")
+          .eq("arena_id", arenaAtualId)
+          .gte("data_pagamento", inicio)
+          .lt("data_pagamento", fim),
+        supabase
+          .from("financeiro_lancamentos")
+          .select("id,valor,tipo,data_lancamento,origem")
+          .eq("origem", "manual")
+          .eq("arena_id", arenaAtualId)
+          .gte("data_lancamento", inicio)
+          .lt("data_lancamento", fim),
+      ]);
+
+      if (!ativo) return;
+
+      if (reservasError || mensalistasError || lancamentosError) {
+        const erro = reservasError || mensalistasError || lancamentosError;
+
+        setEvolucaoMensal(criarSerieEvolucaoZerada(meses));
+        setEvolucaoErro(
+          `Não foi possível carregar a evolução financeira. ${erro.message}`
+        );
+        setEvolucaoCarregando(false);
+        return;
+      }
+
+      setEvolucaoMensal(
+        criarSerieEvolucao({
+          meses,
+          reservas: reservasData || [],
+          mensalistas: mensalistasData || [],
+          lancamentos: lancamentosData || [],
+        })
+      );
+      setEvolucaoCarregando(false);
+    }
+
+    carregarEvolucaoMensal();
 
     return () => {
       ativo = false;
@@ -802,6 +967,9 @@ export default function FinanceiroProfissional({
         totalPendencias={totalPendencias}
         quantidadePendencias={pendenciasPagamento.length}
         lancamentosRecentes={lancamentosRecentes}
+        evolucaoMensal={evolucaoMensal}
+        evolucaoCarregando={evolucaoCarregando}
+        evolucaoErro={evolucaoErro}
         onIrParaAba={onIrParaAba}
       />
     );
@@ -1213,6 +1381,9 @@ function FinanceiroOverview({
   totalPendencias,
   quantidadePendencias,
   lancamentosRecentes,
+  evolucaoMensal,
+  evolucaoCarregando,
+  evolucaoErro,
   onIrParaAba,
 }) {
   const saldoPositivo = totais.saldoLiquido >= 0;
@@ -1221,11 +1392,12 @@ function FinanceiroOverview({
   const faturamento = Number(resumo?.faturamento || 0);
   const receitaPartes = [
     { label: "Reservas", valor: Number(reservasPagasPeriodo || 0), cor: "#7c3aed" },
-    { label: "Mensalistas", valor: Number(mensalistasPagosPeriodo || 0), cor: "#a855f7" },
     { label: "Entradas manuais", valor: Number(totais.entradasManuais || 0), cor: "#22c55e" },
-  ].filter((item) => item.valor > 0);
+    { label: "Mensalistas", valor: Number(mensalistasPagosPeriodo || 0), cor: "#a855f7" },
+  ];
   const donut = criarDonut(receitaPartes, totalReceitas);
   const alturaMaxima = Math.max(totalReceitas, totais.despesas, Math.abs(totais.saldoLiquido), 1);
+  const evolucaoTotais = calcularTotaisEvolucao(evolucaoMensal);
   const saude = obterSaudeFinanceira({
     saldo: totais.saldoLiquido,
     receitas: totalReceitas,
@@ -1286,6 +1458,7 @@ function FinanceiroOverview({
 
       <div className="finance-overview-grid is-main">
         <FinancePanel
+          className="finance-panel-month"
           title="Resumo do mês"
           action="Ver detalhes do mês"
           onAction={() => onIrParaAba?.("lancamentos")}
@@ -1299,13 +1472,29 @@ function FinanceiroOverview({
           </div>
         </FinancePanel>
 
-        <FinancePanel title="Evolução financeira" meta="Mês selecionado">
-          <div className="finance-chart" aria-label="Evolução financeira do mês selecionado">
+        <FinancePanel className="finance-panel-evolution" title="Evolução financeira" meta="Últimos 6 meses">
+          <div className="finance-evolution-toolbar" aria-label="Período da evolução financeira">
+            <span>Últimos 6 meses</span>
+            <strong>Entradas</strong>
+            <strong>Saídas</strong>
+            <strong>Saldo</strong>
+          </div>
+          <FinanceLineChart
+            data={evolucaoMensal}
+            loading={evolucaoCarregando}
+            error={evolucaoErro}
+          />
+          <div className="finance-chart is-mobile-chart" aria-label="Resumo financeiro do mês selecionado">
             <ChartBar label="Entradas" value={totalReceitas} max={alturaMaxima} tone="purple" />
             <ChartBar label="Saídas" value={totais.despesas} max={alturaMaxima} tone="red" />
             <ChartBar label="Saldo" value={Math.abs(totais.saldoLiquido)} max={alturaMaxima} tone={saldoPositivo ? "green" : "red"} />
           </div>
           <div className="finance-chart-totals">
+            <FinanceMini label="Total entradas" value={moeda(evolucaoTotais.entradas)} />
+            <FinanceMini label="Total saídas" value={moeda(evolucaoTotais.saidas)} tone="negative" />
+            <FinanceMini label="Saldo" value={moeda(evolucaoTotais.saldo)} tone={evolucaoTotais.saldo >= 0 ? "positive" : "negative"} />
+          </div>
+          <div className="finance-chart-totals is-mobile-totals">
             <FinanceMini label="Total entradas" value={moeda(totalReceitas)} />
             <FinanceMini label="Total saídas" value={moeda(totais.despesas)} tone="negative" />
             <FinanceMini label="Saldo" value={moeda(totais.saldoLiquido)} tone={saldoPositivo ? "positive" : "negative"} />
@@ -1315,6 +1504,7 @@ function FinanceiroOverview({
 
       <div className="finance-overview-grid">
         <FinancePanel
+          className="finance-panel-revenue"
           title="Resumo de receitas"
           action="Ver todas as receitas"
           onAction={() => onIrParaAba?.("receitas")}
@@ -1324,29 +1514,35 @@ function FinanceiroOverview({
             <div className="finance-revenue-list">
               <strong>{moeda(totalReceitas)}</strong>
               <span>Total receitas</span>
-              {receitaPartes.length === 0 ? (
-                <p>Nenhuma receita registrada no mês.</p>
-              ) : (
-                receitaPartes.map((item) => (
-                  <div key={item.label}>
-                    <i style={{ background: item.cor }} />
-                    <span>{item.label}</span>
-                    <b>{moeda(item.valor)}</b>
-                  </div>
-                ))
+              {totalReceitas <= 0 && (
+                <p className="finance-revenue-empty">Nenhuma receita registrada no mês.</p>
               )}
+              {receitaPartes.map((item) => (
+                <div
+                  className={`finance-revenue-row${totalReceitas <= 0 ? " is-empty-total" : ""}`}
+                  key={item.label}
+                >
+                  <i style={{ background: item.cor }} />
+                  <span>{item.label}</span>
+                  <b>{moeda(item.valor)}</b>
+                </div>
+              ))}
             </div>
           </div>
         </FinancePanel>
 
         <FinancePanel
+          className="finance-panel-recent"
           title="Lançamentos recentes"
           action="Ver todos"
           onAction={() => onIrParaAba?.("lancamentos")}
         >
           <div className="finance-recent-list">
             {lancamentosRecentes.length === 0 ? (
-              <p>Nenhum lançamento manual recente.</p>
+              <div className="finance-recent-empty">
+                <span aria-hidden="true"><FinanceiroIcon name="plus" /></span>
+                <p>Nenhum lançamento manual recente.</p>
+              </div>
             ) : (
               lancamentosRecentes.map((lancamento) => (
                 <div className="finance-recent-item" key={lancamento.id}>
@@ -1371,7 +1567,7 @@ function FinanceiroOverview({
       </div>
 
       <div className="finance-overview-grid">
-        <FinancePanel title="Saúde financeira">
+        <FinancePanel className="finance-panel-health" title="Saúde financeira">
           <div className={`finance-health is-${saude.tone}`}>
             <strong>{saude.label}</strong>
             <span>{saude.description}</span>
@@ -1383,6 +1579,7 @@ function FinanceiroOverview({
         </FinancePanel>
 
         <FinancePanel
+          className="finance-panel-alerts"
           title="Alertas e pendências"
           action="Ver todas pendências"
           onAction={() => onIrParaAba?.("receitas")}
@@ -1412,9 +1609,9 @@ function FinanceiroOverview({
   );
 }
 
-function FinancePanel({ title, meta, action, onAction, children }) {
+function FinancePanel({ title, meta, action, onAction, className = "", children }) {
   return (
-    <article className="finance-panel">
+    <article className={`finance-panel ${className}`.trim()}>
       <header>
         <div>
           <h3>{title}</h3>
@@ -1435,9 +1632,11 @@ function FinanceKpi({ icon, label, value, meta, tone }) {
   return (
     <article className={`finance-kpi is-${tone}`}>
       <span className="finance-kpi-icon"><FinanceiroIcon name={icon} /></span>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{meta}</small>
+      <div className="finance-kpi-copy">
+        <span>{label}</span>
+        <strong>{value}</strong>
+        <small>{meta}</small>
+      </div>
     </article>
   );
 }
@@ -1461,6 +1660,106 @@ function ChartBar({ label, value, max, tone }) {
       <small>{label}</small>
     </div>
   );
+}
+
+function FinanceLineChart({ data = [], loading, error }) {
+  const serie = data.length ? data : criarSerieEvolucaoZerada(obterMesesEvolucao(obterMesAtual()));
+  const valores = serie.flatMap((item) => [item.entradas, item.saidas, item.saldo, 0]);
+  const maiorValor = Math.max(...valores);
+  const menorValor = Math.min(...valores);
+  const intervalo = maiorValor - menorValor || 1;
+  const width = 620;
+  const height = 188;
+  const padding = { top: 16, right: 18, bottom: 34, left: 58 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const linhasGuia = Array.from({ length: 4 }, (_, indice) =>
+    maiorValor - (intervalo / 3) * indice
+  );
+  const seriesConfig = [
+    { key: "entradas", label: "Entradas", color: "#7c3aed", strokeWidth: 3.4, markerRadius: 3.4 },
+    { key: "saidas", label: "Saídas", color: "#dc2626", strokeWidth: 2.8, markerRadius: 3.2 },
+    { key: "saldo", label: "Saldo", color: "#16a34a", strokeWidth: 2.6, markerRadius: 4.2, dash: "7 5" },
+  ];
+  const x = (indice) =>
+    padding.left + (serie.length <= 1 ? 0 : (plotWidth / (serie.length - 1)) * indice);
+  const y = (valor) =>
+    padding.top + ((maiorValor - valor) / intervalo) * plotHeight;
+  const path = (key) =>
+    serie
+      .map((item, indice) => `${indice === 0 ? "M" : "L"} ${x(indice)} ${y(item[key])}`)
+      .join(" ");
+
+  return (
+    <div className="finance-line-chart" aria-label="Evolução financeira dos últimos 6 meses">
+      {loading && <span className="finance-line-chart-status">Carregando evolução...</span>}
+      {error && !loading && <span className="finance-line-chart-status is-error">{error}</span>}
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-hidden={loading || Boolean(error)}>
+        {linhasGuia.map((valor, indice) => {
+          const posY = y(valor);
+
+          return (
+            <g key={indice}>
+              <line x1={padding.left} x2={width - padding.right} y1={posY} y2={posY} />
+              <text x={0} y={posY + 4}>{formatarValorCurto(valor)}</text>
+            </g>
+          );
+        })}
+
+        {serie.map((item, indice) => (
+          <text key={item.mesAno} className="finance-line-chart-month" x={x(indice)} y={height - 8}>
+            {item.label}
+          </text>
+        ))}
+
+        {seriesConfig.map((config) => (
+          <g className={`finance-line-series is-${config.key}`} key={config.key}>
+            <path
+              d={path(config.key)}
+              stroke={config.color}
+              strokeDasharray={config.dash}
+              strokeWidth={config.strokeWidth}
+            />
+            {serie.map((item, indice) => (
+              <circle
+                key={`${config.key}-${item.mesAno}`}
+                cx={x(indice)}
+                cy={y(item[config.key])}
+                r={config.markerRadius}
+                fill={config.key === "saldo" ? "#ffffff" : config.color}
+                stroke={config.color}
+                strokeWidth={config.key === "saldo" ? 2.4 : 0}
+              />
+            ))}
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function calcularTotaisEvolucao(data = []) {
+  return data.reduce(
+    (totais, item) => {
+      totais.entradas += Number(item.entradas || 0);
+      totais.saidas += Number(item.saidas || 0);
+      totais.saldo += Number(item.saldo || 0);
+      return totais;
+    },
+    { entradas: 0, saidas: 0, saldo: 0 }
+  );
+}
+
+function formatarValorCurto(valor) {
+  const numero = Number(valor || 0);
+  const absoluto = Math.abs(numero);
+  const sinal = numero < 0 ? "-" : "";
+
+  if (absoluto >= 1000) {
+    return `${sinal}R$ ${Math.round(absoluto / 1000)}k`;
+  }
+
+  return `${sinal}R$ ${Math.round(absoluto)}`;
 }
 
 function criarDonut(partes, total) {
