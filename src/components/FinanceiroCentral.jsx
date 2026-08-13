@@ -17,6 +17,8 @@ export default function FinanceiroCentral({
   mesFiltro,
   abaInicial = "visao-geral",
   permissoesArena,
+  resumo,
+  pendenciasPagamento = [],
   moeda,
   clientes,
   clientesFiltrados,
@@ -86,6 +88,9 @@ export default function FinanceiroCentral({
         contextoArena={contextoArena}
         mesInicial={mesFiltro}
         modo={abaAtiva}
+        resumo={resumo}
+        pendenciasPagamento={pendenciasPagamento}
+        onIrParaAba={setAbaAtiva}
       />
     );
   }

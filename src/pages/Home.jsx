@@ -259,6 +259,8 @@ export default function Home({
         mesFiltro={mesFiltro}
         abaInicial={obterAbaFinanceiroPorPathname(pathname)}
         permissoesArena={permissoesArena}
+        resumo={resumo}
+        pendenciasPagamento={pendenciasPagamento}
         moeda={moeda}
         clientes={clientes}
         clientesFiltrados={clientesFiltrados}

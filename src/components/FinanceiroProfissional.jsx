@@ -66,6 +66,9 @@ export default function FinanceiroProfissional({
   contextoArena,
   mesInicial = obterMesAtual(),
   modo = "visao-geral",
+  resumo,
+  pendenciasPagamento = [],
+  onIrParaAba,
 }) {
   const arenaAtualId = contextoArena?.arenaAtual?.id;
   const usuarioAtual = contextoArena?.usuarioAtual;
@@ -769,6 +772,40 @@ export default function FinanceiroProfissional({
     if (modoDespesas) return lancamento.tipo === "despesa";
     return true;
   });
+  const totalReceitas =
+    Number(reservasPagasPeriodo || 0) +
+    Number(mensalistasPagosPeriodo || 0) +
+    totais.entradasManuais;
+  const totalPendencias = pendenciasPagamento.reduce(
+    (total, pendencia) => total + Number(pendencia.valor || 0),
+    0
+  );
+  const lancamentosRecentes = [...totais.lancamentosDoMes]
+    .sort((a, b) => {
+      const dataA = `${a.data_lancamento || ""} ${a.created_at || ""}`;
+      const dataB = `${b.data_lancamento || ""} ${b.created_at || ""}`;
+      return dataB.localeCompare(dataA);
+    })
+    .slice(0, 5);
+
+  if (!modoLancamentos && !modoReceitas && !modoDespesas) {
+    return (
+      <FinanceiroOverview
+        mesAno={mesAno}
+        mesAnoLabel={mesAnoLabel}
+        onMesAnoChange={setMesAno}
+        resumo={resumo}
+        totais={totais}
+        reservasPagasPeriodo={reservasPagasPeriodo}
+        mensalistasPagosPeriodo={mensalistasPagosPeriodo}
+        totalReceitas={totalReceitas}
+        totalPendencias={totalPendencias}
+        quantidadePendencias={pendenciasPagamento.length}
+        lancamentosRecentes={lancamentosRecentes}
+        onIrParaAba={onIrParaAba}
+      />
+    );
+  }
 
   return (
     <section className="financeiro-profissional">
@@ -1164,6 +1201,316 @@ function ResumoCard({ titulo, valor, tipo = "reservas", icone = "calendar" }) {
   );
 }
 
+function FinanceiroOverview({
+  mesAno,
+  mesAnoLabel,
+  onMesAnoChange,
+  resumo,
+  totais,
+  reservasPagasPeriodo,
+  mensalistasPagosPeriodo,
+  totalReceitas,
+  totalPendencias,
+  quantidadePendencias,
+  lancamentosRecentes,
+  onIrParaAba,
+}) {
+  const saldoPositivo = totais.saldoLiquido >= 0;
+  const jogos = Number(resumo?.jogos || 0);
+  const jogosPagos = Number(resumo?.pagos || 0);
+  const faturamento = Number(resumo?.faturamento || 0);
+  const receitaPartes = [
+    { label: "Reservas", valor: Number(reservasPagasPeriodo || 0), cor: "#7c3aed" },
+    { label: "Mensalistas", valor: Number(mensalistasPagosPeriodo || 0), cor: "#a855f7" },
+    { label: "Entradas manuais", valor: Number(totais.entradasManuais || 0), cor: "#22c55e" },
+  ].filter((item) => item.valor > 0);
+  const donut = criarDonut(receitaPartes, totalReceitas);
+  const alturaMaxima = Math.max(totalReceitas, totais.despesas, Math.abs(totais.saldoLiquido), 1);
+  const saude = obterSaudeFinanceira({
+    saldo: totais.saldoLiquido,
+    receitas: totalReceitas,
+    despesas: totais.despesas,
+    pendencias: totalPendencias,
+  });
+
+  return (
+    <section className="finance-overview">
+      <header className="finance-overview-header">
+        <div>
+          <h2>Financeiro</h2>
+          <p>Controle financeiro completo da sua arena</p>
+        </div>
+
+        <label className="finance-overview-month">
+          <span aria-hidden="true"><FinanceiroIcon name="calendar" /></span>
+          <strong>{mesAnoLabel}</strong>
+          <Input
+            type="month"
+            aria-label="Selecionar mês e ano"
+            value={mesAno}
+            onChange={(event) => onMesAnoChange(event.target.value)}
+          />
+        </label>
+      </header>
+
+      <div className="finance-kpi-grid">
+        <FinanceKpi
+          icon="wallet"
+          label="Saldo líquido"
+          value={moeda(totais.saldoLiquido)}
+          tone={saldoPositivo ? "positive" : "negative"}
+          meta="Saldo do mês"
+        />
+        <FinanceKpi
+          icon="trend"
+          label="Faturamento"
+          value={moeda(faturamento)}
+          tone="purple"
+          meta="Total no ano"
+        />
+        <FinanceKpi
+          icon="clock"
+          label="Pendente"
+          value={moeda(totalPendencias || Number(resumo?.pendenteMes || 0))}
+          tone="warning"
+          meta={`${quantidadePendencias} cobrança${quantidadePendencias === 1 ? "" : "s"}`}
+        />
+        <FinanceKpi
+          icon="calendar"
+          label="Jogos"
+          value={jogos}
+          tone="neutral"
+          meta={`${jogosPagos} pagos`}
+        />
+      </div>
+
+      <div className="finance-overview-grid is-main">
+        <FinancePanel
+          title="Resumo do mês"
+          action="Ver detalhes do mês"
+          onAction={() => onIrParaAba?.("lancamentos")}
+          meta={mesAnoLabel}
+        >
+          <div className="finance-month-mini-grid">
+            <FinanceMini label="Reservas pagas" value={moeda(reservasPagasPeriodo)} />
+            <FinanceMini label="Entradas manuais" value={moeda(totais.entradasManuais)} />
+            <FinanceMini label="Despesas" value={moeda(totais.despesas)} tone="negative" />
+            <FinanceMini label="Saldo do mês" value={moeda(totais.saldoLiquido)} tone={saldoPositivo ? "positive" : "negative"} />
+          </div>
+        </FinancePanel>
+
+        <FinancePanel title="Evolução financeira" meta="Mês selecionado">
+          <div className="finance-chart" aria-label="Evolução financeira do mês selecionado">
+            <ChartBar label="Entradas" value={totalReceitas} max={alturaMaxima} tone="purple" />
+            <ChartBar label="Saídas" value={totais.despesas} max={alturaMaxima} tone="red" />
+            <ChartBar label="Saldo" value={Math.abs(totais.saldoLiquido)} max={alturaMaxima} tone={saldoPositivo ? "green" : "red"} />
+          </div>
+          <div className="finance-chart-totals">
+            <FinanceMini label="Total entradas" value={moeda(totalReceitas)} />
+            <FinanceMini label="Total saídas" value={moeda(totais.despesas)} tone="negative" />
+            <FinanceMini label="Saldo" value={moeda(totais.saldoLiquido)} tone={saldoPositivo ? "positive" : "negative"} />
+          </div>
+        </FinancePanel>
+      </div>
+
+      <div className="finance-overview-grid">
+        <FinancePanel
+          title="Resumo de receitas"
+          action="Ver todas as receitas"
+          onAction={() => onIrParaAba?.("receitas")}
+        >
+          <div className="finance-revenue">
+            <div className="finance-donut" style={{ "--finance-donut": donut }} />
+            <div className="finance-revenue-list">
+              <strong>{moeda(totalReceitas)}</strong>
+              <span>Total receitas</span>
+              {receitaPartes.length === 0 ? (
+                <p>Nenhuma receita registrada no mês.</p>
+              ) : (
+                receitaPartes.map((item) => (
+                  <div key={item.label}>
+                    <i style={{ background: item.cor }} />
+                    <span>{item.label}</span>
+                    <b>{moeda(item.valor)}</b>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </FinancePanel>
+
+        <FinancePanel
+          title="Lançamentos recentes"
+          action="Ver todos"
+          onAction={() => onIrParaAba?.("lancamentos")}
+        >
+          <div className="finance-recent-list">
+            {lancamentosRecentes.length === 0 ? (
+              <p>Nenhum lançamento manual recente.</p>
+            ) : (
+              lancamentosRecentes.map((lancamento) => (
+                <div className="finance-recent-item" key={lancamento.id}>
+                  <span className={`finance-recent-icon is-${lancamento.tipo}`}>
+                    <FinanceiroIcon name={lancamento.tipo === "despesa" ? "minus" : "plus"} />
+                  </span>
+                  <div>
+                    <strong>{lancamento.descricao}</strong>
+                    <small>{formatarData(lancamento.data_lancamento)}</small>
+                  </div>
+                  <b className={lancamento.tipo === "despesa" ? "is-negative" : "is-positive"}>
+                    {lancamento.tipo === "despesa" ? "-" : "+"}{moeda(lancamento.valor)}
+                  </b>
+                </div>
+              ))
+            )}
+          </div>
+          <Button className="finance-overview-primary" type="button" onClick={() => onIrParaAba?.("lancamentos")}>
+            + Novo lançamento
+          </Button>
+        </FinancePanel>
+      </div>
+
+      <div className="finance-overview-grid">
+        <FinancePanel title="Saúde financeira">
+          <div className={`finance-health is-${saude.tone}`}>
+            <strong>{saude.label}</strong>
+            <span>{saude.description}</span>
+          </div>
+          <div className="finance-health-metrics">
+            <FinanceMini label="Liquidez" value={moeda(totais.saldoLiquido)} tone={saldoPositivo ? "positive" : "negative"} />
+            <FinanceMini label="Rentabilidade" value={totalReceitas > 0 ? `${Math.round((totais.saldoLiquido / totalReceitas) * 100)}%` : "Sem receita"} />
+          </div>
+        </FinancePanel>
+
+        <FinancePanel
+          title="Alertas e pendências"
+          action="Ver todas pendências"
+          onAction={() => onIrParaAba?.("receitas")}
+        >
+          <div className="finance-alert-list">
+            {quantidadePendencias > 0 ? (
+              <div className="finance-alert-item">
+                <span><FinanceiroIcon name="clock" /></span>
+                <div>
+                  <strong>{quantidadePendencias} cobrança{quantidadePendencias === 1 ? "" : "s"} pendente{quantidadePendencias === 1 ? "" : "s"}</strong>
+                  <small>Valor total: {moeda(totalPendencias)}</small>
+                </div>
+              </div>
+            ) : (
+              <div className="finance-alert-item is-ok">
+                <span><FinanceiroIcon name="check" /></span>
+                <div>
+                  <strong>Tudo em dia!</strong>
+                  <small>Não há cobranças pendentes.</small>
+                </div>
+              </div>
+            )}
+          </div>
+        </FinancePanel>
+      </div>
+    </section>
+  );
+}
+
+function FinancePanel({ title, meta, action, onAction, children }) {
+  return (
+    <article className="finance-panel">
+      <header>
+        <div>
+          <h3>{title}</h3>
+          {meta && <span>{meta}</span>}
+        </div>
+        {action && onAction && (
+          <button type="button" onClick={onAction}>
+            {action}
+          </button>
+        )}
+      </header>
+      {children}
+    </article>
+  );
+}
+
+function FinanceKpi({ icon, label, value, meta, tone }) {
+  return (
+    <article className={`finance-kpi is-${tone}`}>
+      <span className="finance-kpi-icon"><FinanceiroIcon name={icon} /></span>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{meta}</small>
+    </article>
+  );
+}
+
+function FinanceMini({ label, value, tone = "neutral" }) {
+  return (
+    <div className={`finance-mini is-${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function ChartBar({ label, value, max, tone }) {
+  const height = Math.max(8, Math.round((Number(value || 0) / max) * 100));
+
+  return (
+    <div className={`finance-chart-bar is-${tone}`}>
+      <div><span style={{ height: `${height}%` }} /></div>
+      <strong>{moeda(value)}</strong>
+      <small>{label}</small>
+    </div>
+  );
+}
+
+function criarDonut(partes, total) {
+  if (!partes.length || !total) return "rgba(237, 233, 254, 0.9) 0 100%";
+
+  let inicio = 0;
+  return partes
+    .map((parte) => {
+      const fim = inicio + (parte.valor / total) * 100;
+      const segmento = `${parte.cor} ${inicio}% ${fim}%`;
+      inicio = fim;
+      return segmento;
+    })
+    .join(", ");
+}
+
+function obterSaudeFinanceira({ saldo, receitas, despesas, pendencias }) {
+  if (receitas <= 0) {
+    return {
+      label: "Sem receita",
+      tone: "neutral",
+      description: "Ainda não há receita suficiente para avaliar o mês.",
+    };
+  }
+
+  if (saldo >= 0 && pendencias === 0) {
+    return {
+      label: "Ótima",
+      tone: "positive",
+      description: "Receitas cobrem as despesas e não há cobranças pendentes.",
+    };
+  }
+
+  if (saldo >= 0) {
+    return {
+      label: "Boa",
+      tone: "positive",
+      description: "Saldo positivo, com pendências a acompanhar.",
+    };
+  }
+
+  return {
+    label: "Atenção",
+    tone: "warning",
+    description: despesas > receitas
+      ? "As despesas superam as receitas do mês."
+      : "Há sinais financeiros que merecem acompanhamento.",
+  };
+}
+
 function FinanceiroIcon({ name }) {
   const paths = {
     calendar: (
@@ -1193,6 +1540,23 @@ function FinanceiroIcon({ name }) {
       <>
         <path d="M19 7V6a2 2 0 0 0-2-2H6a3 3 0 0 0 0 6h13a1 1 0 0 1 1 1v6a2 2 0 0 1-2 2H6a3 3 0 0 1-3-3V7" />
         <path d="M16 14h.01" />
+      </>
+    ),
+    trend: (
+      <>
+        <path d="m3 17 6-6 4 4 7-7" />
+        <path d="M14 8h6v6" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 8v5l3 2" />
+      </>
+    ),
+    check: (
+      <>
+        <path d="M20 6 9 17l-5-5" />
       </>
     ),
   };
