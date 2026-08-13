@@ -4727,25 +4727,81 @@ textarea:disabled {
   border-color: transparent !important;
 }
 
+.payments-title-mobile,
+.payments-count-mobile,
+.payments-close-mobile,
+.payments-date-mobile {
+  display: none;
+}
+
 @media (max-width: 767px) {
+  .notifications-layer:has(.payments-panel) {
+    background: transparent !important;
+  }
+
+  .notifications-layer:has(.payments-panel) > .notifications-backdrop.ds-button {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
   .payments-panel {
+    top: max(72px, calc(env(safe-area-inset-top) + 64px)) !important;
     right: 10px !important;
-    left: 10px !important;
-    width: auto !important;
-    max-width: none !important;
-    padding: 14px !important;
+    bottom: auto !important;
+    left: auto !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    align-content: stretch !important;
+    width: min(320px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    max-height: min(70vh, 600px, calc(100dvh - 88px - env(safe-area-inset-bottom))) !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    overflow: hidden !important;
     transform: none !important;
-    border-radius: 28px !important;
+    border-radius: 22px !important;
+  }
+
+  .payments-panel::before {
+    content: "" !important;
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    display: block !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: 1px solid rgba(167, 139, 250, 0.12);
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: 4px 0 0 0;
+    background: #ffffff;
+    pointer-events: none;
+    transform: rotate(45deg);
+    box-shadow: none;
   }
 
   .payments-panel .payments-header {
     margin: -2px 0 0 !important;
-    padding: 0 0 2px !important;
+    padding: 0 !important;
+    gap: 8px !important;
   }
 
   .payments-panel .payments-header-icon {
     width: 24px;
     height: 24px;
+    font-size: 12px;
+  }
+
+  .payments-panel .payments-header-title {
+    gap: 8px;
+  }
+
+  .payments-panel .payments-header-title > div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
   }
 
   .payments-panel .payments-header strong {
@@ -4753,53 +4809,156 @@ textarea:disabled {
     line-height: 18px !important;
   }
 
+  .payments-panel .payments-header-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: rgba(237, 233, 254, 0.86);
+    color: var(--ds-primary-700);
+    font-size: 11px !important;
+    line-height: 14px !important;
+    font-weight: 950;
+  }
+
   .payments-panel .payments-close-button {
-    min-width: 0 !important;
-    min-height: 30px !important;
-    padding: 0 10px !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+  }
+
+  .payments-title-desktop,
+  .payments-count-desktop,
+  .payments-close-desktop,
+  .payments-date-desktop {
+    display: none !important;
+  }
+
+  .payments-title-mobile,
+  .payments-count-mobile,
+  .payments-close-mobile,
+  .payments-date-mobile {
+    display: inline !important;
+  }
+
+  .payments-panel .notifications-list {
+    min-height: 0;
+    gap: 8px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    padding-right: 2px;
   }
 
   .payments-panel .payments-item {
-    padding: 11px !important;
-    border-radius: 22px !important;
+    gap: 10px !important;
+    min-height: 104px;
+    padding: 12px !important;
+    border-radius: 19px !important;
   }
 
   .payments-panel .payments-item-main {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
+    gap: 6px 10px;
+  }
+
+  .payments-panel .payments-item-identity {
+    gap: 2px;
+  }
+
+  .payments-panel .payments-item-identity strong {
+    font-size: 15px !important;
+    line-height: 18px !important;
+  }
+
+  .payments-panel .payments-item-identity span {
+    font-size: 12px !important;
+    line-height: 15px !important;
   }
 
   .payments-panel .payments-item-summary {
+    gap: 4px;
     min-width: 78px;
+  }
+
+  .payments-panel .payments-item-value {
+    font-size: 15px !important;
+    line-height: 18px !important;
+  }
+
+  .payments-panel .payments-status-badge {
+    min-height: 19px !important;
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+    line-height: 13px !important;
+  }
+
+  .payments-panel .notification-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    margin-top: 0 !important;
   }
 
   .payments-panel .notification-actions .ds-button,
   .payments-panel .notification-actions a,
   .payments-panel .notification-actions button {
-    min-height: 36px !important;
-    padding: 0 9px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    line-height: 14px !important;
+  }
+
+  .payments-panel .payments-action-whatsapp {
+    order: 1;
+  }
+
+  .payments-panel .payments-action-whatsapp::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #22c55e;
+  }
+
+  .payments-panel .payments-action-primary {
+    grid-column: auto;
+    order: 2;
   }
 
   .payments-panel .payments-action-primary.ds-button-primary {
-    min-height: 46px !important;
+    min-height: 34px !important;
+  }
+
+  .payments-panel .payments-action-primary.ds-button-primary::before {
+    content: "\2713";
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .payments-panel .payments-action-go {
+    display: none !important;
   }
 }
 
 @media (max-width: 390px) {
   .payments-panel .payments-item-main {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .payments-panel .payments-item-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 0;
+    display: grid;
+    justify-items: end;
+    min-width: 72px;
   }
 
   .payments-panel .payments-item-identity strong,
   .payments-panel .payments-item-identity span {
-    white-space: normal;
+    white-space: nowrap;
   }
 }
 

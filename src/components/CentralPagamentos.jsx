@@ -44,10 +44,21 @@ export default function CentralPagamentos({
                   !
                 </span>
                 <div>
-                  <strong>Pend&ecirc;ncias de pagamento</strong>
+                  <strong>
+                    <span className="payments-title-desktop">
+                      Pend&ecirc;ncias de pagamento
+                    </span>
+                    <span className="payments-title-mobile">
+                      Pend&ecirc;ncias
+                    </span>
+                  </strong>
                   {quantidade > 0 && (
                     <span className="payments-header-count">
-                      {quantidade} pend&ecirc;ncia{quantidade === 1 ? "" : "s"}
+                      <span className="payments-count-desktop">
+                        {quantidade} pend&ecirc;ncia
+                        {quantidade === 1 ? "" : "s"}
+                      </span>
+                      <span className="payments-count-mobile">{quantidade}</span>
                     </span>
                   )}
                 </div>
@@ -57,7 +68,10 @@ export default function CentralPagamentos({
                 className="payments-close-button"
                 onClick={() => setAberta(false)}
               >
-                Fechar
+                <span className="payments-close-desktop">Fechar</span>
+                <span className="payments-close-mobile" aria-hidden="true">
+                  X
+                </span>
               </Button>
             </div>
 
@@ -75,8 +89,15 @@ export default function CentralPagamentos({
                     <div className="payments-item-main">
                       <div className="payments-item-identity">
                         <strong>{reserva.cliente || "Cliente sem nome"}</strong>
-                        <span>
+                        <span className="payments-date-desktop">
                           {formatarDataBR?.(reserva.data) || reserva.data}
+                          {" \u00b7 "}
+                          {reserva.horario}
+                        </span>
+                        <span className="payments-date-mobile">
+                          {formatarDataMobile(
+                            formatarDataBR?.(reserva.data) || reserva.data
+                          )}
                           {" \u00b7 "}
                           {reserva.horario}
                         </span>
@@ -104,7 +125,7 @@ export default function CentralPagamentos({
                       {reserva.telefone && (
                         <Button
                           as="a"
-                          className="payments-action-secondary"
+                          className="payments-action-secondary payments-action-whatsapp"
                           href={criarLinkWhatsAppPagamento({
                             nome: reserva.cliente,
                             telefone: reserva.telefone,
@@ -122,7 +143,7 @@ export default function CentralPagamentos({
                       )}
                       <Button
                         type="button"
-                        className="payments-action-secondary"
+                        className="payments-action-secondary payments-action-go"
                         onClick={() => {
                           onIrParaReserva?.(reserva);
                           setAberta(false);
@@ -140,6 +161,17 @@ export default function CentralPagamentos({
       )}
     </div>
   );
+}
+
+function formatarDataMobile(data) {
+  const texto = String(data || "");
+  const dataBR = texto.match(/^(\d{2})\/(\d{2})(?:\/\d{4})?$/);
+  if (dataBR) return `${dataBR[1]}/${dataBR[2]}`;
+
+  const dataISO = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (dataISO) return `${dataISO[3]}/${dataISO[2]}`;
+
+  return texto;
 }
 
 function criarLinkWhatsAppPagamento({ nome, telefone, data, horario, valor }) {
