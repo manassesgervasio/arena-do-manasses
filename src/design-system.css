@@ -4487,6 +4487,25 @@ textarea:disabled {
 }
 
 /* Compact payment pendencies modal. Scoped to avoid changing the notification drawer. */
+@media (min-width: 768px) {
+  .notifications-layer:has(.payments-panel) > .notifications-backdrop.ds-button {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
 .payments-panel {
   box-sizing: border-box !important;
   position: fixed !important;
@@ -4504,6 +4523,18 @@ textarea:disabled {
   border-radius: 28px !important;
   background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%) !important;
   box-shadow: 0 30px 90px rgba(36, 16, 111, 0.18) !important;
+}
+
+@media (min-width: 768px) {
+  .payments-panel {
+    top: 76px !important;
+    right: 28px !important;
+    left: auto !important;
+    width: min(420px, calc(100vw - 56px)) !important;
+    max-width: calc(100vw - 56px) !important;
+    max-height: min(560px, calc(100dvh - 100px)) !important;
+    transform: none !important;
+  }
 }
 
 .payments-panel .payments-header {
