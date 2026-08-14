@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabase";
-import { canAccessConfiguracoesArena } from "../utils/permissoes";
+import {
+  canAccessConfiguracoesArena,
+  canAccessUsuariosArena,
+} from "../utils/permissoes";
 import ReplayBrandingSettings from "./arenacam/ReplayBrandingSettings";
 import { Button, Card, Input } from "./ui";
 
@@ -20,7 +23,11 @@ function normalizarWhatsapp(valor) {
   return String(valor || "").replace(/[^\d+]/g, "");
 }
 
-export default function ConfiguracoesArena({ contextoArena, onVoltar }) {
+export default function ConfiguracoesArena({
+  contextoArena,
+  onVoltar,
+  onGerenciarUsuarios,
+}) {
   const {
     arenaAtual,
     usuarioAtual,
@@ -31,6 +38,7 @@ export default function ConfiguracoesArena({ contextoArena, onVoltar }) {
   } = contextoArena || {};
   const arenaAtualId = arenaAtual?.id;
   const podeAcessar = canAccessConfiguracoesArena(usuarioAtual, perfilAtual);
+  const podeGerenciarUsuarios = canAccessUsuariosArena(usuarioAtual, perfilAtual);
   const [formulario, setFormulario] = useState(() => criarFormulario(arenaAtual));
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState("");
@@ -234,6 +242,18 @@ export default function ConfiguracoesArena({ contextoArena, onVoltar }) {
               Copiar link público
             </Button>
           </Card>
+
+          {podeGerenciarUsuarios && onGerenciarUsuarios && (
+            <Card className="configuracoes-arena-admin-card">
+              <div>
+                <span>Usuários da Arena</span>
+                <p>Gerencie usuários, acessos e permissões desta arena.</p>
+              </div>
+              <Button type="button" variant="primary" onClick={onGerenciarUsuarios}>
+                Gerenciar usuários
+              </Button>
+            </Card>
+          )}
         </div>
         <ReplayBrandingSettings contextoArena={contextoArena} />
         </>

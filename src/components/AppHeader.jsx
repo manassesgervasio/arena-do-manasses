@@ -4,7 +4,6 @@ import CentralPagamentos from "./CentralPagamentos";
 import {
   canAccessConfiguracoesArena,
   canAccessPainelSaaS,
-  canAccessUsuariosArena,
 } from "../utils/permissoes";
 
 export default function AppHeader({
@@ -12,7 +11,6 @@ export default function AppHeader({
   permissoesLogado,
   contextoArena,
   onAbrirPainelSaaS,
-  onAbrirUsuariosArena,
   onAbrirConfiguracoesArena,
   onSair,
   onEntrar,
@@ -35,10 +33,6 @@ export default function AppHeader({
     erroContexto,
   } = contextoArena || {};
   const podeAcessarPainelSaaS = canAccessPainelSaaS(usuarioAtual);
-  const podeAcessarUsuariosArena = canAccessUsuariosArena(
-    usuarioAtual,
-    perfilAtual
-  );
   const podeAcessarConfiguracoesArena = canAccessConfiguracoesArena(
     usuarioAtual,
     perfilAtual
@@ -123,11 +117,6 @@ export default function AppHeader({
               {podeAcessarPainelSaaS && (
                 <button type="button" onClick={onAbrirPainelSaaS}>
                   Painel SaaS
-                </button>
-              )}
-              {podeAcessarUsuariosArena && (
-                <button type="button" onClick={onAbrirUsuariosArena}>
-                  Usuários
                 </button>
               )}
               {podeAcessarConfiguracoesArena && (

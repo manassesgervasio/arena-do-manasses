@@ -111,17 +111,6 @@ export default function Home({
           },
         }
       : null,
-    !modoPublico && permissoesArena.usuarios
-      ? {
-          id: "usuarios",
-          label: "Usuários",
-          onClick: () => {
-            setMostrarPainelSaaS(false);
-            setMostrarConfiguracoesArena(false);
-            setMostrarUsuariosArena(true);
-          },
-        }
-      : null,
     !modoPublico && permissoesArena.configuracoes
       ? {
           id: "configuracoes-arena",
@@ -307,6 +296,11 @@ export default function Home({
         <ConfiguracoesArena
           contextoArena={contextoArena}
           onVoltar={() => setMostrarConfiguracoesArena(false)}
+          onGerenciarUsuarios={() => {
+            setMostrarPainelSaaS(false);
+            setMostrarConfiguracoesArena(false);
+            setMostrarUsuariosArena(true);
+          }}
         />
       );
     }
@@ -359,6 +353,11 @@ export default function Home({
         <ConfiguracoesArena
           contextoArena={contextoArena}
           onVoltar={() => setMostrarConfiguracoesArena(false)}
+          onGerenciarUsuarios={() => {
+            setMostrarPainelSaaS(false);
+            setMostrarConfiguracoesArena(false);
+            setMostrarUsuariosArena(true);
+          }}
         />
       ) : (
         <AccessDenied />
@@ -397,13 +396,6 @@ export default function Home({
           setMostrarUsuariosArena(false);
           setMostrarConfiguracoesArena(false);
           setMostrarPainelSaaS(true);
-        }}
-        onAbrirUsuariosArena={() => {
-          if (!permissoesArena.usuarios) return;
-
-          setMostrarPainelSaaS(false);
-          setMostrarConfiguracoesArena(false);
-          setMostrarUsuariosArena(true);
         }}
         onAbrirConfiguracoesArena={() => {
           if (!permissoesArena.configuracoes) return;
