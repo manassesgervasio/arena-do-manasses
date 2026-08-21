@@ -590,7 +590,6 @@ export default function MensalistasSection({
     <section className="mensalistas-section">
       <div className="mensalistas-header">
         <div>
-          <h2>Mensalistas</h2>
           <p>Mensalidades de {competenciaAtual}, sem agenda e sem resumo financeiro</p>
         </div>
 

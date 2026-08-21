@@ -5,11 +5,9 @@ import MensalistasSection from "./MensalistasSection";
 
 const abasBase = [
   { id: "visao-geral", label: "Visão geral", requires: "financeiro" },
-  { id: "receitas", label: "Receitas", requires: "financeiro" },
-  { id: "despesas", label: "Despesas", requires: "financeiro" },
+  { id: "lancamentos", label: "Lançamentos", requires: "financeiro" },
   { id: "mensalistas", label: "Mensalistas", requires: "mensalistas" },
   { id: "clientes", label: "Clientes", requires: "clientes" },
-  { id: "lancamentos", label: "Lançamentos", requires: "financeiro" },
 ];
 
 export default function FinanceiroCentral({

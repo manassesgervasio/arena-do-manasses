@@ -6276,6 +6276,200 @@ section.financeiro-profissional .financeiro-profissional-close-summary { backgro
   section.financeiro-profissional .financeiro-profissional-table td:nth-child(7)::before { content: "Ações" !important; }
 }
 
+/* Financeiro overview typography aligned with the Receitas tab. */
+section.finance-overview {
+  font-family: var(--ds-font) !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-overview-header h2 {
+  font-family: var(--ds-font) !important;
+  font-size: clamp(29px, 2.5vw, 34px) !important;
+  line-height: 1.08 !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-overview-header p {
+  font-family: var(--ds-font) !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-overview-month strong {
+  font-family: var(--ds-font) !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-overview-month input {
+  font-family: var(--ds-font) !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 550 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-kpi-copy > span,
+section.finance-overview .finance-mini span,
+section.finance-overview .finance-panel header span,
+section.finance-overview .finance-chart-bar small,
+section.finance-overview .finance-revenue-list > span,
+section.finance-overview .finance-revenue-list p,
+section.finance-overview .finance-revenue-list div,
+section.finance-overview .finance-recent-item small,
+section.finance-overview .finance-alert-item small,
+section.finance-overview .finance-health span,
+section.finance-overview .finance-recent-empty {
+  font-family: var(--ds-font) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-kpi-copy > span {
+  font-size: 13px !important;
+  line-height: 17px !important;
+}
+
+section.finance-overview .finance-kpi small {
+  font-family: var(--ds-font) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-kpi strong {
+  font-family: var(--ds-font) !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-panel h3 {
+  font-family: var(--ds-font) !important;
+  font-size: 19px !important;
+  line-height: 24px !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-panel header button,
+section.finance-overview .finance-overview-primary {
+  font-family: var(--ds-font) !important;
+  font-weight: 750 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-panel header button {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+
+section.finance-overview .finance-mini span {
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+section.finance-overview .finance-mini strong,
+section.finance-overview .finance-chart-bar strong,
+section.finance-overview .finance-revenue-list > strong,
+section.finance-overview .finance-revenue-list b,
+section.finance-overview .finance-recent-item strong,
+section.finance-overview .finance-alert-item strong,
+section.finance-overview .finance-recent-item b,
+section.finance-overview .finance-health strong {
+  font-family: var(--ds-font) !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-revenue-list > span,
+section.finance-overview .finance-revenue-list p {
+  font-size: 13px !important;
+  line-height: 17px !important;
+}
+
+section.finance-overview .finance-revenue-list div {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+
+section.finance-overview .finance-recent-item strong,
+section.finance-overview .finance-alert-item strong {
+  font-size: 13px !important;
+  line-height: 17px !important;
+}
+
+section.finance-overview .finance-recent-item small,
+section.finance-overview .finance-alert-item small,
+section.finance-overview .finance-chart-bar small {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+
+section.finance-overview .finance-health span,
+section.finance-overview .finance-recent-empty {
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+section.finance-overview .finance-evolution-toolbar {
+  font-family: var(--ds-font) !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-evolution-toolbar strong {
+  font-family: var(--ds-font) !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-line-chart text {
+  font-family: var(--ds-font) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.finance-overview .finance-line-chart-status {
+  font-family: var(--ds-font) !important;
+  font-size: 13px !important;
+  line-height: 18px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+@media (max-width: 640px) {
+  section.finance-overview .finance-overview-header h2 {
+    font-size: 29px !important;
+    line-height: 32px !important;
+    font-weight: 680 !important;
+  }
+
+  section.finance-overview .finance-overview-header p {
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 400 !important;
+  }
+
+  section.finance-overview .finance-panel h3 {
+    font-size: 19px !important;
+    line-height: 24px !important;
+    font-weight: 680 !important;
+  }
+
+  section.finance-overview .finance-kpi strong {
+    font-size: clamp(18px, 5vw, 21px) !important;
+  }
+}
+
 /* Mensalistas desktop: mobile-approved visual language adapted to wide screens. */
 @media (min-width: 900px) {
   .financeiro-central-content > .mensalistas-section,
@@ -6655,5 +6849,482 @@ section.financeiro-profissional .financeiro-profissional-close-summary { backgro
     background: rgba(248, 250, 252, 0.92) !important;
     color: #64748b !important;
     opacity: 1 !important;
+  }
+}
+
+/* Mensalistas typography aligned with the approved Financeiro tabs. */
+.financeiro-central-content > section.mensalistas-section,
+section.mensalistas-section {
+  font-family: var(--ds-font) !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-header h2 {
+  font-family: var(--ds-font) !important;
+  font-size: clamp(29px, 2.5vw, 34px) !important;
+  line-height: 1.08 !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-header p {
+  font-family: var(--ds-font) !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-summary-card span,
+section.mensalistas-section .mensalistas-filters label,
+section.mensalistas-section .mensalistas-filters label span,
+section.mensalistas-section .mensalista-card-header p,
+section.mensalistas-section .mensalista-info span,
+section.mensalistas-section .mensalista-history p,
+section.mensalistas-section .mensalista-history-item,
+section.mensalistas-section .mensalista-history-item span,
+section.mensalistas-section .mensalistas-empty,
+section.mensalistas-section .mensalistas-error {
+  font-family: var(--ds-font) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-summary-card span,
+section.mensalistas-section .mensalistas-filters label,
+section.mensalistas-section .mensalistas-filters label span,
+section.mensalistas-section .mensalista-info span {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+
+section.mensalistas-section .mensalista-card-header p {
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+section.mensalistas-section .mensalistas-primary-button,
+section.mensalistas-section .mensalistas-form button,
+section.mensalistas-section .mensalista-payment-button,
+section.mensalistas-section .mensalista-edit-button,
+section.mensalistas-section .mensalista-delete-button,
+section.mensalistas-section .mensalista-delete-payment-button {
+  font-family: var(--ds-font) !important;
+  font-weight: 750 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-form input,
+section.mensalistas-section .mensalistas-form select,
+section.mensalistas-section .mensalistas-filters select {
+  font-family: var(--ds-font) !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 550 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalistas-summary-card strong,
+section.mensalistas-section .mensalista-info strong,
+section.mensalistas-section .mensalista-history-item strong {
+  font-family: var(--ds-font) !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalista-card-header h3,
+section.mensalistas-section .mensalista-history h4 {
+  font-family: var(--ds-font) !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalista-card-header h3 {
+  font-size: 19px !important;
+  line-height: 24px !important;
+}
+
+section.mensalistas-section .mensalista-history h4 {
+  font-size: 13px !important;
+  line-height: 17px !important;
+}
+
+section.mensalistas-section .mensalista-badge,
+section.mensalistas-section .mensalista-situacao {
+  font-family: var(--ds-font) !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
+section.mensalistas-section .mensalista-history p,
+section.mensalistas-section .mensalista-history-item,
+section.mensalistas-section .mensalista-history-item span {
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+section.mensalistas-section .mensalistas-empty,
+section.mensalistas-section .mensalistas-error {
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+@media (max-width: 640px) {
+  section.mensalistas-section .mensalistas-header h2 {
+    font-size: 29px !important;
+    line-height: 32px !important;
+    font-weight: 680 !important;
+  }
+
+  section.mensalistas-section .mensalistas-header p {
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 400 !important;
+  }
+
+  section.mensalistas-section .mensalista-card-header h3 {
+    font-size: 19px !important;
+    line-height: 24px !important;
+    font-weight: 680 !important;
+  }
+
+  section.mensalistas-section .mensalistas-summary-card strong {
+    font-size: clamp(18px, 5vw, 21px) !important;
+  }
+}
+
+/* Clientes typography aligned with the approved Financeiro tabs. */
+.financeiro-central-content > .clientes-section,
+.clientes-section {
+  font-family: var(--ds-font) !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .clientes-stat-card p,
+.clientes-section .cliente-card > p,
+.clientes-section .cliente-last-reserva,
+.clientes-section .clientes-list-grid > div:only-child {
+  font-family: var(--ds-font) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .clientes-stat-card p {
+  font-size: 12px !important;
+  line-height: 15px !important;
+}
+
+.clientes-section .clientes-stat-value {
+  font-family: var(--ds-font) !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .clientes-heading {
+  font-family: var(--ds-font) !important;
+  font-size: 19px !important;
+  line-height: 24px !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .clientes-search,
+.clientes-section .clientes-filter-select {
+  font-family: var(--ds-font) !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 550 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .clientes-search::placeholder {
+  font-family: var(--ds-font) !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .cliente-ranking-position {
+  font-family: var(--ds-font) !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .cliente-ranking-medal {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .cliente-card-title {
+  font-family: var(--ds-font) !important;
+  font-size: 19px !important;
+  line-height: 24px !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .cliente-card > p:not(.cliente-last-reserva) {
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+.clientes-section .cliente-last-reserva,
+.clientes-section .clientes-list-grid > div:only-child {
+  font-size: 12px !important;
+  line-height: 17px !important;
+}
+
+.clientes-section .cliente-whatsapp-link,
+.clientes-section .cliente-badge {
+  font-family: var(--ds-font) !important;
+  letter-spacing: 0 !important;
+}
+
+.clientes-section .cliente-whatsapp-link {
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 750 !important;
+}
+
+.clientes-section .cliente-badge {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  font-weight: 720 !important;
+}
+
+@media (max-width: 640px) {
+  .clientes-section .clientes-stat-value {
+    font-size: clamp(18px, 5vw, 21px) !important;
+  }
+
+  .clientes-section .clientes-heading,
+  .clientes-section .cliente-card-title {
+    font-size: 19px !important;
+    line-height: 24px !important;
+    font-weight: 680 !important;
+  }
+}
+
+/* Financeiro tab shell alignment: title position and Lancamentos background. */
+.home-page:has(.financeiro-central) {
+  background: #f8fafc !important;
+}
+
+.financeiro-central-content > .finance-overview,
+.financeiro-central-content > section.financeiro-profissional,
+.financeiro-central-content > section.mensalistas-section,
+.financeiro-central-content > .clientes-section {
+  margin-top: 0 !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-header,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-header,
+.financeiro-central-content > section.mensalistas-section .mensalistas-header,
+.financeiro-central-content > .clientes-section .clientes-header {
+  box-sizing: border-box !important;
+  width: min(100%, 1180px) !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+.financeiro-central-content > .clientes-section .clientes-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+}
+
+.financeiro-central-content > .clientes-section .clientes-header h2 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-family: var(--ds-font) !important;
+  font-size: clamp(29px, 2.5vw, 34px) !important;
+  line-height: 1.08 !important;
+  font-weight: 680 !important;
+  letter-spacing: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .financeiro-central-content > .clientes-section .clientes-header h2 {
+    font-size: 29px !important;
+    line-height: 32px !important;
+    font-weight: 680 !important;
+  }
+}
+
+/* Financeiro tabs without internal main titles. */
+.financeiro-central-content > .finance-overview .finance-overview-header p,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-header p,
+.financeiro-central-content > section.mensalistas-section .mensalistas-header p {
+  margin: 0 !important;
+}
+
+/* Financeiro first-row cards and date controls. */
+.financeiro-central-content > .finance-overview .finance-kpi-grid,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary,
+.financeiro-central-content > section.mensalistas-section .mensalistas-summary-grid,
+.financeiro-central-content > .clientes-section .clientes-stats-grid {
+  gap: 12px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card,
+.financeiro-central-content > section.mensalistas-section .mensalistas-summary-card,
+.financeiro-central-content > .clientes-section .clientes-stat-card {
+  min-height: 110px !important;
+  height: 110px !important;
+  padding: 14px !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.035) !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi {
+  gap: 0 !important;
+  align-content: stretch !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi-icon,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi-icon {
+  top: 14px !important;
+  left: 14px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi-icon svg,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card {
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  column-gap: 12px !important;
+  row-gap: 3px !important;
+}
+
+.financeiro-central-content > section.mensalistas-section .mensalistas-summary-card,
+.financeiro-central-content > .clientes-section .clientes-stat-card {
+  display: grid !important;
+  align-content: center !important;
+  gap: 6px !important;
+}
+
+.financeiro-central-content > .clientes-section .clientes-stat-card {
+  text-align: center !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-kpi-copy {
+  align-self: end !important;
+  gap: 2px !important;
+  min-height: 65px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-month,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter {
+  min-height: 58px !important;
+  padding: 10px 14px !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.045) !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-month {
+  grid-template-columns: 40px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  width: min(100%, 260px) !important;
+  min-width: 220px !important;
+  max-width: 260px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-month > span,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-month svg,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.financeiro-central-content > .finance-overview .finance-overview-month:focus-within,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter:focus-within,
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-form input[type="date"]:focus {
+  border-color: rgba(124, 58, 237, 0.44) !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
+}
+
+.financeiro-central-content > section.financeiro-profissional .financeiro-profissional-form input[type="date"] {
+  min-height: 54px !important;
+  padding: 12px 14px !important;
+  border: 1px solid rgba(124, 58, 237, 0.16) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  font-family: var(--ds-font) !important;
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 550 !important;
+}
+
+@media (max-width: 899px) {
+  .financeiro-central-content > .finance-overview .finance-overview-month,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-kpi-grid,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary,
+  .financeiro-central-content > section.mensalistas-section .mensalistas-summary-grid,
+  .financeiro-central-content > .clientes-section .clientes-stats-grid {
+    gap: 8px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card,
+  .financeiro-central-content > section.mensalistas-section .mensalistas-summary-card,
+  .financeiro-central-content > .clientes-section .clientes-stat-card {
+    min-height: 96px !important;
+    height: 96px !important;
+    padding: 11px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-icon,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-icon {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 11px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-icon {
+    top: 11px !important;
+    left: 12px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy {
+    min-height: 58px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter {
+    min-height: 56px !important;
+    padding: 9px 12px !important;
+    border-radius: 15px !important;
   }
 }

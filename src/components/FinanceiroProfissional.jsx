@@ -979,7 +979,6 @@ export default function FinanceiroProfissional({
     <section className="financeiro-profissional">
       <div className="financeiro-profissional-header">
         <div className="financeiro-profissional-heading">
-          <h2>Financeiro</h2>
           <p>Controle financeiro completo da sua arena</p>
         </div>
 
@@ -1409,7 +1408,6 @@ function FinanceiroOverview({
     <section className="finance-overview">
       <header className="finance-overview-header">
         <div>
-          <h2>Financeiro</h2>
           <p>Controle financeiro completo da sua arena</p>
         </div>
 
