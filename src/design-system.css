@@ -7328,3 +7328,278 @@ section.mensalistas-section .mensalistas-error {
     border-radius: 15px !important;
   }
 }
+
+/* Mobile-only internal layout fixes for Visao geral and Lancamentos cards. */
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-kpi {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    grid-template-rows: minmax(15px, auto) minmax(20px, auto) minmax(15px, auto) !important;
+    align-content: center !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    row-gap: 1px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-icon {
+    position: static !important;
+    grid-row: 1 / span 3 !important;
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy {
+    display: grid !important;
+    grid-template-rows: minmax(15px, auto) minmax(20px, auto) minmax(15px, auto) !important;
+    align-content: center !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > span,
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > strong,
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > small {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > span {
+    align-self: end !important;
+    font-size: 11.5px !important;
+    line-height: 14px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > strong {
+    align-self: center !important;
+    font-size: clamp(15px, 4vw, 18px) !important;
+    line-height: 20px !important;
+    white-space: nowrap !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > small {
+    align-self: start !important;
+    font-size: 11px !important;
+    line-height: 14px !important;
+    white-space: nowrap !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card {
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    grid-template-rows: minmax(16px, auto) minmax(22px, auto) !important;
+    align-content: center !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    row-gap: 2px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-icon {
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card span:not(.financeiro-profissional-summary-icon),
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card strong {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card span:not(.financeiro-profissional-summary-icon) {
+    align-self: end !important;
+    font-size: 11.5px !important;
+    line-height: 14px !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-summary-card strong {
+    align-self: start !important;
+    font-size: clamp(14px, 3.9vw, 17px) !important;
+    line-height: 20px !important;
+    white-space: nowrap !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-balance {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-balance > div {
+    min-width: 0 !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-balance strong {
+    font-size: clamp(24px, 7vw, 31px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/* Mobile-only vertical centering for Visao geral KPI cards. */
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-kpi {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-icon {
+    position: static !important;
+    flex: 0 0 34px !important;
+    align-self: center !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-self: center !important;
+    gap: 1px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > span,
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > strong,
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > small {
+    align-self: stretch !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > span {
+    font-size: 11.5px !important;
+    line-height: 14px !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > strong {
+    font-size: clamp(14px, 3.85vw, 17px) !important;
+    line-height: 19px !important;
+    white-space: nowrap !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-kpi-copy > small {
+    font-size: 11px !important;
+    line-height: 14px !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Mobile-only: remove duplicated totals inside Evolucao financeira. */
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-panel-evolution > .finance-chart-totals.is-mobile-totals {
+    display: none !important;
+  }
+}
+
+/* Mobile-only calendar presentation for Visao geral and Lancamentos. */
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-overview-header > div,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-heading {
+    display: none !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-header,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-header {
+    display: block !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 24px !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month > span,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-icon {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #6d28d9 !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month svg,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-copy {
+    display: block !important;
+    min-width: 0 !important;
+  }
+
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-copy > span {
+    display: none !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month strong,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-copy > strong {
+    display: inline-block !important;
+    color: #0f172a !important;
+    font-family: var(--ds-font) !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-weight: 720 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month strong::first-letter,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter-copy > strong::first-letter {
+    text-transform: uppercase !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month:focus-within,
+  .financeiro-central-content > section.financeiro-profissional .financeiro-profissional-filter:focus-within {
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Mobile-only left alignment for Visao geral calendar. */
+@media (max-width: 640px) {
+  .financeiro-central-content > .finance-overview .finance-overview-header {
+    text-align: left !important;
+  }
+
+  .financeiro-central-content > .finance-overview .finance-overview-month {
+    justify-content: flex-start !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+    text-align: left !important;
+  }
+}
+
+/* Mobile-only: hide Mensalistas helper text. */
+@media (max-width: 640px) {
+  .financeiro-central-content > section.mensalistas-section .mensalistas-header p {
+    display: none !important;
+  }
+}
