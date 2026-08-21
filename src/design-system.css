@@ -7603,3 +7603,117 @@ section.mensalistas-section .mensalistas-error {
     display: none !important;
   }
 }
+
+/* Desktop-only premium drawer menu. Mobile menu remains unchanged. */
+@media (min-width: 641px) {
+  .main-menu-layer .mobile-navigation {
+    inset: 24px auto auto 24px !important;
+    align-content: start !important;
+    width: min(292px, calc(100vw - 48px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 48px) !important;
+    padding: 18px !important;
+    overflow-y: auto !important;
+    border: 1px solid rgba(167, 139, 250, 0.18) !important;
+    border-radius: 22px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%) !important;
+    box-shadow: 0 24px 70px rgba(36, 16, 111, 0.18) !important;
+  }
+
+  .main-menu-layer .main-menu-backdrop {
+    background: rgba(15, 23, 42, 0.34) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+
+  .main-menu-layer .main-menu-header {
+    margin-bottom: 12px !important;
+  }
+
+  .main-menu-layer .main-menu-arena {
+    margin-bottom: 14px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid rgba(167, 139, 250, 0.14) !important;
+  }
+
+  .main-menu-layer .main-menu-section-label {
+    margin: 2px 0 8px !important;
+  }
+
+  .main-menu-layer .mobile-navigation-item {
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+    transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .main-menu-layer .mobile-navigation-item:hover:not(:disabled) {
+    background: rgba(237, 233, 254, 0.74) !important;
+    color: #4c1d95 !important;
+  }
+
+  .main-menu-layer .mobile-navigation-item.is-active,
+  .main-menu-layer .mobile-navigation-item.is-active:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.22) !important;
+  }
+}
+
+/* Mobile drawer menu now matches the approved desktop drawer visual. */
+@media (max-width: 640px) {
+  .main-menu-layer .mobile-navigation {
+    inset: 12px auto auto 12px !important;
+    align-content: start !important;
+    width: min(400px, calc(100vw - 24px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 24px) !important;
+    padding: 18px !important;
+    overflow-y: auto !important;
+    border: 1px solid rgba(167, 139, 250, 0.18) !important;
+    border-radius: 22px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf8ff 100%) !important;
+    box-shadow: 0 24px 70px rgba(36, 16, 111, 0.18) !important;
+  }
+
+  .main-menu-layer .main-menu-backdrop {
+    background: rgba(15, 23, 42, 0.34) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+
+  .main-menu-layer .main-menu-header {
+    margin-bottom: 12px !important;
+  }
+
+  .main-menu-layer .main-menu-arena {
+    margin-bottom: 14px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid rgba(167, 139, 250, 0.14) !important;
+  }
+
+  .main-menu-layer .main-menu-section-label {
+    margin: 2px 0 8px !important;
+  }
+
+  .main-menu-layer .mobile-navigation-item {
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+    transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .main-menu-layer .mobile-navigation-item.is-active {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.22) !important;
+  }
+}
