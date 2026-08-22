@@ -62,6 +62,16 @@ function obterPeriodoMes(mesAno) {
   return { ano, mes, inicio, fim };
 }
 
+function obterPeriodoAno(mesAno) {
+  const { ano } = separarMesAno(mesAno);
+
+  return {
+    ano,
+    inicio: `${ano}-01-01`,
+    fim: `${ano + 1}-01-01`,
+  };
+}
+
 function adicionarMeses(mesAno, deslocamento) {
   const { ano, mes } = separarMesAno(mesAno);
   const data = new Date(ano, mes - 1 + deslocamento, 1);
@@ -172,6 +182,7 @@ export default function FinanceiroProfissional({
   const [reservasPagasPeriodo, setReservasPagasPeriodo] = useState(0);
   const [mensalistasPagosPeriodo, setMensalistasPagosPeriodo] =
     useState(0);
+  const [faturamentoAno, setFaturamentoAno] = useState(0);
   const [resumoPeriodoCarregando, setResumoPeriodoCarregando] = useState(true);
   const [resumoPeriodoErro, setResumoPeriodoErro] = useState("");
   const [evolucaoMensal, setEvolucaoMensal] = useState([]);
@@ -395,6 +406,81 @@ export default function FinanceiroProfissional({
       ativo = false;
     };
   }, [arenaAtualId, carregandoContexto, erroContexto, mesAno]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarFaturamentoAno() {
+      if (carregandoContexto) return;
+
+      if (!arenaAtualId) {
+        setFaturamentoAno(0);
+        return;
+      }
+
+      const { inicio, fim } = obterPeriodoAno(mesAno);
+
+      const [
+        { data: reservasData, error: reservasError },
+        { data: mensalistasData, error: mensalistasError },
+        { data: lancamentosData, error: lancamentosError },
+      ] = await Promise.all([
+        supabase
+          .from("reservas")
+          .select("id,valor,status,data")
+          .eq("status", "Pago")
+          .eq("arena_id", arenaAtualId)
+          .gte("data", inicio)
+          .lt("data", fim),
+        supabase
+          .from("mensalista_pagamentos")
+          .select("id,valor,situacao,data_pagamento")
+          .eq("situacao", "Pago")
+          .eq("arena_id", arenaAtualId)
+          .gte("data_pagamento", inicio)
+          .lt("data_pagamento", fim),
+        supabase
+          .from("financeiro_lancamentos")
+          .select("id,valor,tipo,data_lancamento,origem")
+          .eq("tipo", "entrada")
+          .eq("origem", "manual")
+          .eq("arena_id", arenaAtualId)
+          .gte("data_lancamento", inicio)
+          .lt("data_lancamento", fim),
+      ]);
+
+      if (!ativo) return;
+
+      if (reservasError || mensalistasError || lancamentosError) {
+        const erro = reservasError || mensalistasError || lancamentosError;
+
+        console.error("Erro ao carregar faturamento anual:", erro);
+        setFaturamentoAno(0);
+        return;
+      }
+
+      const totalReservas = (reservasData || []).reduce(
+        (total, reserva) => total + Number(reserva.valor || 0),
+        0
+      );
+      const totalMensalistas = (mensalistasData || []).reduce(
+        (total, pagamento) => total + Number(pagamento.valor || 0),
+        0
+      );
+      const totalEntradasManuais = (lancamentosData || []).reduce(
+        (total, lancamento) => total + Number(lancamento.valor || 0),
+        0
+      );
+
+      setFaturamentoAno(totalReservas + totalMensalistas + totalEntradasManuais);
+    }
+
+    carregarFaturamentoAno();
+
+    return () => {
+      ativo = false;
+    };
+  }, [arenaAtualId, carregandoContexto, mesAno]);
 
   useEffect(() => {
     let ativo = true;
@@ -781,6 +867,7 @@ export default function FinanceiroProfissional({
     }
 
     const agora = new Date().toISOString();
+    const observacaoAtual = fechamentoExistente?.observacao?.trim();
     const observacaoRefechamento = `Mês fechado novamente em ${formatarDataHora(agora)}`;
     const payload = {
       ano,
@@ -960,6 +1047,7 @@ export default function FinanceiroProfissional({
         mesAnoLabel={mesAnoLabel}
         onMesAnoChange={setMesAno}
         resumo={resumo}
+        faturamentoAno={faturamentoAno}
         totais={totais}
         reservasPagasPeriodo={reservasPagasPeriodo}
         mensalistasPagosPeriodo={mensalistasPagosPeriodo}
@@ -1373,6 +1461,7 @@ function FinanceiroOverview({
   mesAnoLabel,
   onMesAnoChange,
   resumo,
+  faturamentoAno,
   totais,
   reservasPagasPeriodo,
   mensalistasPagosPeriodo,
@@ -1388,7 +1477,7 @@ function FinanceiroOverview({
   const saldoPositivo = totais.saldoLiquido >= 0;
   const jogos = Number(resumo?.jogos || 0);
   const jogosPagos = Number(resumo?.pagos || 0);
-  const faturamento = Number(resumo?.faturamento || 0);
+  const faturamento = Number(faturamentoAno || 0);
   const receitaPartes = [
     { label: "Reservas", valor: Number(reservasPagasPeriodo || 0), cor: "#7c3aed" },
     { label: "Entradas manuais", valor: Number(totais.entradasManuais || 0), cor: "#22c55e" },
